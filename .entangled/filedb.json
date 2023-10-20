@@ -1,0 +1,157 @@
+{
+  "version": "2.0.0b6",
+  "files": [
+    {
+      "path": "loom/lazy.py",
+      "deps": [
+        "docs/lazy.md"
+      ],
+      "modified": "2023-10-20T21:21:50.403637",
+      "hexdigest": "18dac522bc0e06d25481a4abd56944c102ed1b0b178f761dcbeb95250e4c60b6",
+      "size": 3441
+    },
+    {
+      "path": "docs/index.md",
+      "deps": null,
+      "modified": "2023-10-20T21:24:58.691130",
+      "hexdigest": "97358b28ef4ea0dca57c553cca9b29cea1ed28e947a07b96de800536c2fee0a8",
+      "size": 917
+    },
+    {
+      "path": "docs/lazy.md",
+      "deps": null,
+      "modified": "2023-10-20T21:34:29.928713",
+      "hexdigest": "8421ec4e0e020174f984ce131c811f4f24cfe8b872737f29759daec98e0193b7",
+      "size": 5222
+    },
+    {
+      "path": "loom/task.py",
+      "deps": [
+        "docs/tasks.md"
+      ],
+      "modified": "2023-10-20T21:38:03.001413",
+      "hexdigest": "d00239ada2f8c6372867ce53469543ab147865d68874a8eb0b9e11843c077724",
+      "size": 6753
+    },
+    {
+      "path": "docs/tasks.md",
+      "deps": null,
+      "modified": "2023-10-20T21:38:03.061414",
+      "hexdigest": "cdde451c8806cc7ba67b3ad21932ddd2f3397a3fd066f129764e6453684f319e",
+      "size": 6739
+    },
+    {
+      "path": "loom/program.py",
+      "deps": [
+        "docs/program.md"
+      ],
+      "modified": "2023-10-20T21:37:15.652258",
+      "hexdigest": "cc036ceead4d44649297918f55a9fd07105d4b132df933cd491f518b7bcc32a1",
+      "size": 3139
+    },
+    {
+      "path": "docs/program.md",
+      "deps": null,
+      "modified": "2023-10-20T21:37:15.715258",
+      "hexdigest": "d9e6c9f087a4c10fb00b59da62423584bb8ab36eb63ca3772fbf691311110efa",
+      "size": 3126
+    },
+    {
+      "path": "loom/target.py",
+      "deps": [
+        "docs/target.md"
+      ],
+      "modified": "2023-10-20T22:01:13.450790",
+      "hexdigest": "29c5261b8fcf538e29bde2fc05e03a16d711c8a6513fc7ed13d2bb33391c0a3b",
+      "size": 1457
+    },
+    {
+      "path": "docs/target.md",
+      "deps": null,
+      "modified": "2023-10-20T22:01:13.500790",
+      "hexdigest": "0ba4933e59b00f7e559fe4cdc36d44a008b4513a8255c92ecdf43a6c82811f8e",
+      "size": 1444
+    },
+    {
+      "path": "loom/__init__.py",
+      "deps": [
+        "docs/index.md"
+      ],
+      "modified": "2023-10-20T17:30:58.147021",
+      "hexdigest": "42ecd07f900398f97fc55a0560f29c54fcd60cc0f96fcac534590a627e11a0fe",
+      "size": 213
+    },
+    {
+      "path": "loom/result.py",
+      "deps": [
+        "docs/lazy.md"
+      ],
+      "modified": "2023-10-20T20:51:08.317714",
+      "hexdigest": "09853186d979ca088a01f655ae6da7aac7dfa5df5b55059682a7bec36b58e459",
+      "size": 675
+    },
+    {
+      "path": "loom/utility.py",
+      "deps": [
+        "docs/utility.md"
+      ],
+      "modified": "2023-10-20T22:01:54.999934",
+      "hexdigest": "60c8fa5a8c5483fd71ed2ff2700856f82b1dc965bccbe6b4e2109b2be7f48d0d",
+      "size": 3840
+    },
+    {
+      "path": "test/test_result.py",
+      "deps": [
+        "docs/lazy.md"
+      ],
+      "modified": "2023-10-20T21:34:29.867712",
+      "hexdigest": "1c76b0da0bf45be910ef361f861b2d12114dd39238556901fd0d31514aa39a5a",
+      "size": 430
+    },
+    {
+      "path": "docs/utility.md",
+      "deps": null,
+      "modified": "2023-10-20T22:01:55.049934",
+      "hexdigest": "804b7b7ccb8c5d8c05b6f9850a56c208fcecf83a08b953ae842df69028462f17",
+      "size": 3824
+    },
+    {
+      "path": "loom/errors.py",
+      "deps": [
+        "docs/errors.md"
+      ],
+      "modified": "2023-10-20T20:50:25.249597",
+      "hexdigest": "161251c82bc64df157f31f372ee5339e6229635b140a8db7860dbae4d0190909",
+      "size": 366
+    },
+    {
+      "path": "docs/errors.md",
+      "deps": null,
+      "modified": "2023-10-20T20:50:25.208597",
+      "hexdigest": "5bcd81ba5117ed80701d65f5204420472b5f9b2bac03011615489c01872a6b38",
+      "size": 343
+    },
+    {
+      "path": "loom/logging.py",
+      "deps": [
+        "docs/index.md"
+      ],
+      "modified": "2023-10-20T21:24:58.744130",
+      "hexdigest": "00a1e489bcef06a53a0618d956deb2d9991ec3e57db68d83976437e106b5c358",
+      "size": 128
+    }
+  ],
+  "source": [],
+  "target": [
+    "loom/errors.py",
+    "loom/utility.py",
+    "loom/logging.py",
+    "loom/target.py",
+    "test/test_result.py",
+    "loom/__init__.py",
+    "loom/task.py",
+    "loom/program.py",
+    "loom/lazy.py",
+    "loom/result.py"
+  ]
+}

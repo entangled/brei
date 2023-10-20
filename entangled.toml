@@ -1,0 +1,4 @@
+version="2.0"
+watch_list=["docs/**/*.md"]
+ignore_list=["**/README.md"]
+
