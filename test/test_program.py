@@ -1,15 +1,16 @@
 from contextlib import chdir
 from pathlib import Path
 import sys
+import time
 
 import pytest
-from loom.task import Phony, Target
+from loom.lazy import Phony
 from loom.program import Program, resolve_tasks
 
 
 hello_world_loom = """
 [[task]]
-targets = ["phony(all)"]
+name = "all"
 dependencies = ["hello.txt"]
 
 [[task]]
@@ -28,8 +29,8 @@ async def test_loom(tmp_path):
         src.write_text(hello_world_loom)
         prg = Program.read(src)
         db = await resolve_tasks(prg)
-        assert db.index[Target(tgt)].stdout == tgt
-        await db.run(Target(Phony("all")))
+        assert db.index[tgt].stdout == tgt
+        await db.run(Phony("all"))
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World\n"
 
@@ -54,7 +55,7 @@ script = "echo 'Hello, World'"
 '''
 
 [[task]]
-targets = ["phony(all)"]
+name = "all"
 dependencies = ["hello.txt"]
 """
 
@@ -67,8 +68,8 @@ async def test_include(tmp_path):
         src.write_text(include_loom)
         prg = Program.read(src)
         db = await resolve_tasks(prg)
-        assert db.index[Target(tgt)].stdout == tgt
-        await db.run(Target(Phony("all")))
+        assert db.index[tgt].stdout == tgt
+        await db.run(Phony("all"))
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World\n"
 
@@ -83,7 +84,7 @@ print("{text}")
 '''
 
 [[task]]
-targets = ["phony(all)"]
+name = "all"
 dependencies = ["hello.txt"]
 
 [[call]]
@@ -100,8 +101,8 @@ async def test_pattern(tmp_path):
         src.write_text(pattern_loom)
         prg = Program.read(src)
         db = await resolve_tasks(prg)
-        assert db.index[Target(tgt)].stdout == tgt
-        await db.run(Target(Phony("all")))
+        assert db.index[tgt].stdout == tgt
+        await db.run(Phony("all"))
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World\n"
 
@@ -129,7 +130,7 @@ pattern = "rot13"
   stdout = "hello.txt"
 
 [[task]]
-targets = ["phony(all)"]
+name = "all"
 dependencies = ["hello.txt"]
 """
 
@@ -143,7 +144,7 @@ async def test_rot13(tmp_path):
         src.write_text(rot_13_loom)
         prg = Program.read(src)
         db = await resolve_tasks(prg)
-        assert db.index[Target(tgt)].stdout == tgt
-        await db.run(Target(Phony("all")))
+        assert db.index[tgt].stdout == tgt
+        await db.run(Phony("all"))
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World!\n"

@@ -10,11 +10,12 @@ from pathlib import Path
 
 import tomllib
 
+from loom.lazy import Phony
+
 from .errors import UserError
 
 from .utility import construct
-from .task import DEFAULT_RUNNERS, Task, TaskDB, Pattern, Runner
-from .target import Target
+from .task import Task, TaskDB, Pattern, Runner
 
 
 @dataclass
@@ -41,8 +42,9 @@ class PatternCall:
 
 @dataclass
 class TaskProxy:
-    targets: list[Target] = field(default_factory=list)
-    dependencies: list[Target] = field(default_factory=list)
+    targets: list[Path] = field(default_factory=list)
+    dependencies: list[Phony | Path] = field(default_factory=list)
+    name: Optional[str] = None
     language: Optional[str] = None
     path: Optional[Path] = None
     script: Optional[str] = None
@@ -96,8 +98,8 @@ async def resolve_tasks(program: Program) -> TaskDB:
             db.add(task)
 
         for inc in program.include:
-            if Target(inc) in db.index:
-                await db.run(Target(inc))
+            if inc in db.index:
+                await db.run(inc)
             if not inc.exists():
                 raise MissingInclude(inc)
 
@@ -116,5 +118,4 @@ async def resolve_tasks(program: Program) -> TaskDB:
         return db
 
     return await go(program)
-
 ```

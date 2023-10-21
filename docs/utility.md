@@ -52,7 +52,7 @@ def stat(path: Path, deps: Optional[list[Path]] = None) -> FileStat:
 
 
 def isgeneric(annot):
-    return hasattr(annot, "__origin__") and hasattr(annot, "__args__")
+    return typing.get_origin(annot) and hasattr(annot, "__args__")
 
 
 class FromStr:
@@ -64,9 +64,9 @@ class FromStr:
 def construct(annot: Any, json: Any) -> Any:
     try:
         return _construct(annot, json)
-    except (AssertionError, ValueError):
+    except (AssertionError, ValueError) as e:
         traceback.print_exc()
-        raise InputError(annot, json)
+        raise InputError(annot, json) from e
 
 
 def is_object_type(dtype: Type[Any]) -> TypeGuard[Type[dict[str, Any]]]:
@@ -118,7 +118,14 @@ def _construct(annot: Type[T], json: Any) -> T:
             return cast(T, None)
         else:
             return cast(T, construct(typing.get_args(annot)[0], json))
-    if issubclass(annot, FromStr) and isinstance(json, str):
+    if isgeneric(annot) and typing.get_origin(annot) is types.UnionType:
+        for dtype in typing.get_args(annot):
+            try:
+                return cast(T, _construct(dtype, json))
+            except ValueError:
+                continue
+        raise ValueError("None of the choices in type union match data.")
+    if type(annot) is type and issubclass(annot, FromStr) and isinstance(json, str):
         return cast(T, annot.from_str(json))
     if is_dataclass(annot):
         assert isinstance(json, dict)
@@ -165,5 +172,4 @@ def read_from_file(data_type: Type[T], path: Path, section: Optional[str] = None
         ) from e
 
     return construct(data_type, data)
-
 ```

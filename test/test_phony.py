@@ -4,6 +4,6 @@ from loom.task import Phony
 
 
 def test_phony_parsing():
-    x = Phony.from_str("phony(all)")
+    x = Phony.from_str("#all")
     assert x == Phony("all")
-    assert str(x) == "phony(all)"
+    assert str(x) == "#all"

@@ -23,5 +23,4 @@ class InputError(UserError):
 
     def __str__(self):
         return f"Expected {self.expected}, got: {self.got}"
-
 ```

@@ -10,7 +10,6 @@ from loom.utility import read_from_file
 from rich_argparse import RichHelpFormatter
 
 from .program import Program, resolve_tasks
-from .target import Target
 from .logging import logger
 
 log = logger()
@@ -25,24 +24,20 @@ async def main(
     if throttle:
         db.throttle = asyncio.Semaphore(throttle)
     db.force_run = force_run
-    jobs = [db.run(Target.from_str(t)) for t in target_strs]
-    await asyncio.gather(*jobs)
+    await asyncio.gather(*(db.run_name(t) for t in target_strs))
 
 
 @argh.arg(
     "path",
     help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
 )
-@argh.arg("targets", nargs="*", help="name of targets to run", default="phony(all)")
+@argh.arg("targets", nargs="+", help="name of targets to run")
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
 def loom(
     path: str, targets: list[str], force_run: bool = False, jobs: Optional[int] = None
 ):
     """Build one of the configured targets."""
-    if not targets:
-        targets = ["phony(all)"]
-
     if m := re.match(path, r"([^\[\]]+)\[([^\[\]\s]+)\]"):
         input_path = Path(m.group(1))
         section = m.group(2)

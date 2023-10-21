@@ -2,14 +2,15 @@ from __future__ import annotations
 import pytest
 from dataclasses import dataclass
 from typing import Any
-from loom.lazy import Lazy, LazyDB
+from loom.lazy import Lazy, LazyDB, Phony
 import uuid
 
 
-@dataclass
 class PyFunc(Lazy[str, Any]):
-    foo: Any
-    db: LazyDB
+    def __init__(self, db: LazyDB, foo: Any, tgt: str, deps: list[Phony | str]):
+        super().__init__([tgt], deps)
+        self.db = db
+        self.foo = foo
 
     async def run(self):
         args = [self.db.index[t].result for t in self.dependencies]
@@ -21,7 +22,9 @@ class PyFunc(Lazy[str, Any]):
 
 @dataclass
 class PyLiteral(Lazy[str, Any]):
-    value: Any
+    def __init__(self, tgt: str, value: Any):
+        super().__init__([tgt], [])
+        self.value = value
 
     async def run(self):
         return self.value
@@ -37,10 +40,10 @@ class PyTaskDB(LazyDB[str, Any]):
                     deps.append(arg.targets[0])
                 else:
                     dep = uuid.uuid4().hex
-                    self.add(PyLiteral([dep], [], arg))
+                    self.add(PyLiteral(dep, arg))
                     deps.append(dep)
 
-            task = PyFunc([target], deps, f, self)
+            task = PyFunc(self, f, target, deps)
             self.add(task)
             return task
 

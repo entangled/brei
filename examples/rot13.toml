@@ -1,0 +1,29 @@
+# ~/~ begin <<docs/index.md#examples/rot13.toml>>[init]
+[[task]]
+name = "all"
+dependencies = ["msg.txt"]
+
+# ~/~ begin <<docs/index.md#rot13-secret>>[init]
+[[task]]
+stdout = "secret.txt"
+language = "Python"
+script = """
+print("Uryyb, Jbeyq!")
+"""
+# ~/~ end
+# ~/~ begin <<docs/index.md#rot13-pattern>>[init]
+[pattern.rot13]
+stdout = "{stdout}"
+stdin = "{stdin}"
+language = "Bash"
+script = """
+tr a-zA-Z n-za-mN-ZA-M
+"""
+
+[[call]]
+pattern = "rot13"
+  [call.args]
+  stdin = "secret.txt"
+  stdout = "msg.txt"
+# ~/~ end
+# ~/~ end

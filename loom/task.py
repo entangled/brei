@@ -10,8 +10,7 @@ from typing import Any, Optional, Union
 from asyncio import create_subprocess_exec
 from textwrap import indent
 
-from .lazy import MissingDependency, Lazy, LazyDB
-from .target import Phony, Target
+from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
 from .logging import logger
 from .errors import UserError
@@ -44,8 +43,15 @@ DEFAULT_RUNNERS: dict[str, Runner] = {
 }
 
 
+def str_to_target(s: str) -> Path | Phony:
+    if s[0] == '#':
+        return Phony(s[1:])
+    else:
+        return Path(s)
+
+
 @dataclass
-class Task(Lazy[Target, None]):
+class Task(Lazy[Path, None]):
     language: Optional[str] = None
     path: Optional[Path] = None
     script: Optional[str] = None
@@ -61,42 +67,38 @@ class Task(Lazy[Target, None]):
             src = str(self.path)
         else:
             src = " - "
-        return f"[{tgts}] <- [{deps}]\n" + src
+        name = f"{self.name}: " if self.name else ""
+        return name + f"[{tgts}] <- [{deps}]\n" + src
 
     def __post_init__(self):
-        if self.stdin and Target(self.stdin) not in self.dependencies:
-            self.dependencies.append(Target(self.stdin))
-        if self.path and Target(self.path) not in self.dependencies:
-            self.dependencies.append(Target(self.path))
-        if self.stdout and Target(self.stdout) not in self.targets:
-            self.targets.append(Target(self.stdout))
+        if self.stdin and Path(self.stdin) not in self.dependencies:
+            self.dependencies.append(Path(self.stdin))
+        if self.path and Path(self.path) not in self.dependencies:
+            self.dependencies.append(Path(self.path))
+        if self.stdout and Path(self.stdout) not in self.targets:
+            self.targets.append(Path(self.stdout))
 
     def validate(self):
         assert (self.path is None) or (self.script is None)
         if self.stdin is not None:
-            assert Target(self.stdin) in self.dependencies
+            assert Path(self.stdin) in self.dependencies
         if self.stdout is not None:
-            assert Target(self.stdout) in self.targets
+            assert Path(self.stdout) in self.targets
 
     def always_run(self) -> bool:
-        dep_paths = [p.path for p in self.dependencies if p.is_path()]
-        if not dep_paths:
-            return True
-        return False
+        return len(self.real_dependencies) == 0
 
     def needs_run(self) -> bool:
-        target_paths = [t.path for t in self.targets if t.is_path()]
-        dep_paths = [p.path for p in self.dependencies if p.is_path()]
-        if any(not path.exists() for path in target_paths):
+        if any(not path.exists() for path in self.targets):
             return True
-        target_stats = [stat(p) for p in target_paths]
-        dep_stats = [stat(p) for p in dep_paths]
+        target_stats = [stat(p) for p in self.targets]
+        dep_stats = [stat(p) for p in self.real_dependencies]
         if any(t < d for t in target_stats for d in dep_stats):
             return True
         return False
 
     async def run(self, cfg):
-        log.debug(f"targets: {self.targets}")
+        log.debug(f"{self}")
         if not self.always_run() and not self.needs_run() and not cfg.force_run:
             return
 
@@ -141,27 +143,26 @@ class Task(Lazy[Target, None]):
 
 
 @dataclass
-class TaskDB(LazyDB[Target, Task]):
+class TaskDB(LazyDB[Path, Task]):
     runners: dict[str, Runner] = field(default_factory=lambda: copy(DEFAULT_RUNNERS))
     throttle: Optional[asyncio.Semaphore] = None
     force_run: bool = False
 
-    async def run(self, t: Target, *args):
+    async def run(self, t: Phony | Path, *args):
         log.debug(str(t))
         return await super().run(t, self, *args)
 
-    def on_missing(self, t: Target):
-        if not t.is_path() or not t.path.exists():
+    def on_missing(self, t: Path):
+        if not t.exists():
             raise MissingDependency()
         return Task([t], [])
 
-    def target(self, target_path: Union[str, Path], deps: list[Target], **kwargs):
-        target_path = Path(target_path)
-        task = Task([Target(target_path)], deps, **kwargs)
+    def target(self, target_path: Union[str, Path], deps: list[Path | Phony], **kwargs):
+        task = Task([Path(target_path)], deps, **kwargs)
         self.add(task)
 
-    def phony(self, target_name: str, deps: list[Target], **kwargs):
-        task = Task([Target(Phony(target_name))], deps, **kwargs)
+    def phony(self, name: str, deps: list[Path | Phony], **kwargs):
+        task = Task([], deps, name=name, **kwargs)
         self.add(task)
 
 
@@ -172,6 +173,7 @@ class Pattern:
 
     targets: list[str] = field(default_factory=list)
     dependencies: list[str] = field(default_factory=list)
+    name: Optional[str] = None
     language: Optional[str] = None
     path: Optional[Path] = None
     script: Optional[str] = None
@@ -182,12 +184,13 @@ class Pattern:
         assert (self.path is None) ^ (self.script is None)
 
     def call(self, args: dict[str, Any]) -> Task:
-        targets: list[Target] = [
-            Target.from_str(t.format(**args)) for t in self.targets
+        targets: list[Path] = [
+            Path(t.format(**args)) for t in self.targets
         ]
-        deps: list[Target] = [
-            Target.from_str(d.format(**args)) for d in self.dependencies
+        deps: list[Path | Phony] = [
+            str_to_target(d.format(**args)) for d in self.dependencies
         ]
+        name = self.name.format(**args) if self.name else None
         lang = self.language
         if self.path is not None:
             script = self.path.read_text().format(**args)
@@ -200,6 +203,5 @@ class Pattern:
 
         stdout = Path(self.stdout.format(**args)) if self.stdout is not None else None
         stdin = Path(self.stdin.format(**args)) if self.stdin is not None else None
-        return Task(targets, deps, lang, script=script, stdout=stdout, stdin=stdin)
-
+        return Task(targets, deps, name, lang, script=script, stdout=stdout, stdin=stdin)
 # ~/~ end
