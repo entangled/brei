@@ -7,6 +7,9 @@ license = "Apache 2"
 readme = "README.md"
 packages = []
 
+[tool.poetry.scripts]
+loom = "loom.cli:cli"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 
@@ -24,3 +27,6 @@ pytest-asyncio = "^0.21.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+packages = ["loom"]

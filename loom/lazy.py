@@ -29,7 +29,7 @@ class Lazy(Generic[T, R]):
     targets: list[T]
     dependencies: list[T]
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
-    _result: Optional[Result[T, R]] = field(default=None, init=False)
+    _result: Optional[Result[R]] = field(default=None, init=False)
 
     def __bool__(self):
         return self._result is not None and bool(self._result)
@@ -46,17 +46,17 @@ class Lazy(Generic[T, R]):
     async def run(self) -> R:
         raise NotImplementedError()
 
-    async def run_after_deps(self, recurse, *args) -> Result[T, R]:
+    async def run_after_deps(self, recurse, *args) -> Result[R]:
         dep_res = await asyncio.gather(*(recurse(dep) for dep in self.dependencies))
         if not all(dep_res):
-            return DependencyFailure(self, [f for f in dep_res if not f])
+            return DependencyFailure({
+                k: v  for (k, v) in zip(self.dependencies, dep_res) if not v})
         try:
-            result = await self.run(*args)
-            return Ok(result)
+            return Ok(await self.run(*args))
         except TaskFailure as f:
             return f
 
-    async def run_cached(self, recurse, *args) -> Result[T, R]:
+    async def run_cached(self, recurse, *args) -> Result[R]:
         async with self._lock:
             if self._result is not None:
                 return self._result
@@ -81,7 +81,7 @@ class LazyDB(Generic[T, TaskT]):
     tasks: list[TaskT] = field(default_factory=list)
     index: dict[T, TaskT] = field(default_factory=dict)
 
-    async def run(self, t: T, *args) -> Result[T, R]:
+    async def run(self, t: T, *args) -> Result[R]:
         if t not in self.index:
             try:
                 task = self.on_missing(t)

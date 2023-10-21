@@ -6,23 +6,23 @@
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-20T21:21:50.403637",
-      "hexdigest": "18dac522bc0e06d25481a4abd56944c102ed1b0b178f761dcbeb95250e4c60b6",
-      "size": 3441
+      "modified": "2023-10-21T15:06:11.265162",
+      "hexdigest": "4c3e064e08400d6264b33ee89b688872b72031a832b9c0c2f8a14b496de1c421",
+      "size": 3445
     },
     {
       "path": "docs/index.md",
       "deps": null,
-      "modified": "2023-10-20T21:24:58.691130",
-      "hexdigest": "97358b28ef4ea0dca57c553cca9b29cea1ed28e947a07b96de800536c2fee0a8",
-      "size": 917
+      "modified": "2023-10-21T15:15:36.208073",
+      "hexdigest": "f3e76621be418e4da220fc4cb4dcbc56d1b9a9e357783ec2b510637c8ca193ef",
+      "size": 2496
     },
     {
       "path": "docs/lazy.md",
       "deps": null,
-      "modified": "2023-10-20T21:34:29.928713",
-      "hexdigest": "8421ec4e0e020174f984ce131c811f4f24cfe8b872737f29759daec98e0193b7",
-      "size": 5222
+      "modified": "2023-10-21T15:08:27.486243",
+      "hexdigest": "626e42dcc1f3c811ddbcaeb99830a45ab5539ba72cc641ca5a8f6393676f57a6",
+      "size": 5230
     },
     {
       "path": "loom/task.py",
@@ -86,50 +86,50 @@
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-20T20:51:08.317714",
-      "hexdigest": "09853186d979ca088a01f655ae6da7aac7dfa5df5b55059682a7bec36b58e459",
-      "size": 675
+      "modified": "2023-10-21T15:00:08.707382",
+      "hexdigest": "bbd9ae85096e5fedb2dcd9a686cccd199efcf331a7dcbeaa5d12f5dac3a21fa5",
+      "size": 658
     },
     {
       "path": "loom/utility.py",
       "deps": [
         "docs/utility.md"
       ],
-      "modified": "2023-10-20T22:01:54.999934",
-      "hexdigest": "60c8fa5a8c5483fd71ed2ff2700856f82b1dc965bccbe6b4e2109b2be7f48d0d",
-      "size": 3840
+      "modified": "2023-10-21T14:33:50.426616",
+      "hexdigest": "70c1437f457920c12c59996b167fc383ca92199623c62be2392f83e302c9d644",
+      "size": 5167
     },
     {
       "path": "test/test_result.py",
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-20T21:34:29.867712",
-      "hexdigest": "1c76b0da0bf45be910ef361f861b2d12114dd39238556901fd0d31514aa39a5a",
-      "size": 430
+      "modified": "2023-10-21T15:08:27.414243",
+      "hexdigest": "a0954c5bf9a0a5da166d7e870aeb7a161127107e0c8c216b3760d0d065502095",
+      "size": 451
     },
     {
       "path": "docs/utility.md",
       "deps": null,
-      "modified": "2023-10-20T22:01:55.049934",
-      "hexdigest": "804b7b7ccb8c5d8c05b6f9850a56c208fcecf83a08b953ae842df69028462f17",
-      "size": 3824
+      "modified": "2023-10-21T14:33:50.508616",
+      "hexdigest": "1e33461180ecb49330defa68e20d5363edea567af70b9fcdc158fafb2ec53c2a",
+      "size": 5151
     },
     {
       "path": "loom/errors.py",
       "deps": [
         "docs/errors.md"
       ],
-      "modified": "2023-10-20T20:50:25.249597",
-      "hexdigest": "161251c82bc64df157f31f372ee5339e6229635b140a8db7860dbae4d0190909",
-      "size": 366
+      "modified": "2023-10-21T12:05:19.863343",
+      "hexdigest": "2772373182d58dbc0546553a2a6ee46627e14ba9aa9b76937d0c92f35f97db5a",
+      "size": 475
     },
     {
       "path": "docs/errors.md",
       "deps": null,
-      "modified": "2023-10-20T20:50:25.208597",
-      "hexdigest": "5bcd81ba5117ed80701d65f5204420472b5f9b2bac03011615489c01872a6b38",
-      "size": 343
+      "modified": "2023-10-21T12:05:19.925343",
+      "hexdigest": "2c4897783dbb11f9b36d744c31f89924683e723b191cb3872b776405e48702ae",
+      "size": 451
     },
     {
       "path": "loom/logging.py",
@@ -139,11 +139,21 @@
       "modified": "2023-10-20T21:24:58.744130",
       "hexdigest": "00a1e489bcef06a53a0618d956deb2d9991ec3e57db68d83976437e106b5c358",
       "size": 128
+    },
+    {
+      "path": "loom/cli.py",
+      "deps": [
+        "docs/index.md"
+      ],
+      "modified": "2023-10-21T15:15:36.138072",
+      "hexdigest": "f8e79e8df9b81d0bff3a090b5f06d75ae9f580984f164c82fe8992837a247798",
+      "size": 1599
     }
   ],
   "source": [],
   "target": [
     "loom/errors.py",
+    "loom/cli.py",
     "loom/utility.py",
     "loom/logging.py",
     "loom/target.py",

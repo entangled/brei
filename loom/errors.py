@@ -9,7 +9,15 @@ class UserError(Exception):
 
 
 @dataclass
-class ConfigError(UserError):
+class HelpfulUserError(UserError):
+    msg: str
+
+    def __str__(self):
+        return self.msg
+
+
+@dataclass
+class InputError(UserError):
     expected: str
     got: Any
 

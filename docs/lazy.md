@@ -7,18 +7,18 @@ This is achieved by memoizing results and keeping locks on the `Lazy` task when 
 One common problem when using workflow systems in Python, is that errors are not tracable to their source. It is quite common to get a stack-trace that leads to the internals of the workflow system, but not to the cause of the error. The way around this, is not to use Python's exception system (at least not in the outer layer), but rather signify errors by returning `Failure` objects.
 
 ``` {.python file=test/test_result.py}
-from loom.result import Failure, Ok
+from loom.result import Failure, TaskFailure, Ok
 from hypothesis import given
 from hypothesis.strategies import builds, booleans, text, integers
 
 
-results = builds(lambda b, t, i: Ok(i) if b else Failure(t),
+results = builds(lambda b, t, i: Ok(i) if b else TaskFailure(t),
                  booleans(), text(min_size=1), integers())
 
 
 @given(results)
 def test_result(r):
-    assert (r and hasattr(r, "value")) or (not r and hasattr(r, "task"))
+    assert (r and hasattr(r, "value")) or (not r and isinstance(r, Failure))
 ```
 
 ``` {.python file=loom/result.py}
@@ -30,20 +30,18 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 
-@dataclass
-class Failure(Generic[T]):
-    task: T
-
+class Failure:
     def __bool__(self):
         return False
 
 
-class MissingFailure(Failure[T]):
-    pass
+@dataclass
+class MissingFailure(Failure, Generic[T]):
+    target: T
 
 
 @dataclass
-class TaskFailure(Failure[T], Exception):
+class TaskFailure(Failure, Exception):
     message: str
 
     def __post_init__(self):
@@ -51,8 +49,8 @@ class TaskFailure(Failure[T], Exception):
 
 
 @dataclass
-class DependencyFailure(Failure[T], Generic[T]):
-    dependent: list[Failure[T]]
+class DependencyFailure(Failure, Generic[T]):
+    dependencies: dict[T, Failure]
 
 
 @dataclass
@@ -63,7 +61,7 @@ class Ok(Generic[R]):
         return True
 
 
-Result = Failure[T] | Ok[R]
+Result = Failure | Ok[R]
 ```
 
 ``` {.python file=loom/lazy.py}
@@ -97,7 +95,7 @@ class Lazy(Generic[T, R]):
     targets: list[T]
     dependencies: list[T]
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
-    _result: Optional[Result[T, R]] = field(default=None, init=False)
+    _result: Optional[Result[R]] = field(default=None, init=False)
 
     def __bool__(self):
         return self._result is not None and bool(self._result)
@@ -114,17 +112,17 @@ class Lazy(Generic[T, R]):
     async def run(self) -> R:
         raise NotImplementedError()
 
-    async def run_after_deps(self, recurse, *args) -> Result[T, R]:
+    async def run_after_deps(self, recurse, *args) -> Result[R]:
         dep_res = await asyncio.gather(*(recurse(dep) for dep in self.dependencies))
         if not all(dep_res):
-            return DependencyFailure(self, [f for f in dep_res if not f])
+            return DependencyFailure({
+                k: v  for (k, v) in zip(self.dependencies, dep_res) if not v})
         try:
-            result = await self.run(*args)
-            return Ok(result)
+            return Ok(await self.run(*args))
         except TaskFailure as f:
             return f
 
-    async def run_cached(self, recurse, *args) -> Result[T, R]:
+    async def run_cached(self, recurse, *args) -> Result[R]:
         async with self._lock:
             if self._result is not None:
                 return self._result
@@ -149,7 +147,7 @@ class LazyDB(Generic[T, TaskT]):
     tasks: list[TaskT] = field(default_factory=list)
     index: dict[T, TaskT] = field(default_factory=dict)
 
-    async def run(self, t: T, *args) -> Result[T, R]:
+    async def run(self, t: T, *args) -> Result[R]:
         if t not in self.index:
             try:
                 task = self.on_missing(t)

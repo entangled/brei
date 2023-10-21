@@ -7,20 +7,18 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 
-@dataclass
-class Failure(Generic[T]):
-    task: T
-
+class Failure:
     def __bool__(self):
         return False
 
 
-class MissingFailure(Failure[T]):
-    pass
+@dataclass
+class MissingFailure(Failure, Generic[T]):
+    target: T
 
 
 @dataclass
-class TaskFailure(Failure[T], Exception):
+class TaskFailure(Failure, Exception):
     message: str
 
     def __post_init__(self):
@@ -28,8 +26,8 @@ class TaskFailure(Failure[T], Exception):
 
 
 @dataclass
-class DependencyFailure(Failure[T], Generic[T]):
-    dependent: list[Failure[T]]
+class DependencyFailure(Failure, Generic[T]):
+    dependencies: dict[T, Failure]
 
 
 @dataclass
@@ -40,5 +38,5 @@ class Ok(Generic[R]):
         return True
 
 
-Result = Failure[T] | Ok[R]
+Result = Failure | Ok[R]
 # ~/~ end
