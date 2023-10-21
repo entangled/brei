@@ -23,11 +23,14 @@ class FailedTaskError(UserError):
     stderr: str
 
     def __str__(self):
-        return f"process returned code {self.error_code}\n" \
-               f"standard error output: {self.stderr}"
+        return (
+            f"process returned code {self.error_code}\n"
+            f"standard error output: {self.stderr}"
+        )
 
 
 log = logger()
+
 
 @dataclass
 class Runner:
@@ -53,7 +56,7 @@ class Task(Lazy[Target, None]):
         tgts = ", ".join(str(t) for t in self.targets)
         deps = ", ".join(str(t) for t in self.dependencies)
         if self.script is not None:
-            src = indent(self.script, prefix = " ▎ ", predicate = lambda _: True)
+            src = indent(self.script, prefix=" ▎ ", predicate=lambda _: True)
         elif self.path is not None:
             src = str(self.path)
         else:
@@ -120,7 +123,11 @@ class Task(Lazy[Target, None]):
         log.info(f"{tgt_str} -> {runner.command} " + " ".join(args))
         async with cfg.throttle or nullcontext():
             proc = await create_subprocess_exec(
-                runner.command, *args, stdin=stdin, stdout=stdout, stderr=asyncio.subprocess.PIPE
+                runner.command,
+                *args,
+                stdin=stdin,
+                stdout=stdout,
+                stderr=asyncio.subprocess.PIPE,
             )
         stderr = await proc.stderr.read() if proc.stderr else b""
         await proc.wait()
@@ -194,4 +201,5 @@ class Pattern:
         stdout = Path(self.stdout.format(**args)) if self.stdout is not None else None
         stdin = Path(self.stdin.format(**args)) if self.stdin is not None else None
         return Task(targets, deps, lang, script=script, stdout=stdout, stdin=stdin)
+
 # ~/~ end

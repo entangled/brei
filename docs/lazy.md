@@ -75,6 +75,7 @@ from .result import Result, Ok, DependencyFailure, TaskFailure, MissingFailure
 T = TypeVar("T")
 R = TypeVar("R")
 
+
 @dataclass
 class Lazy(Generic[T, R]):
     """Base class for tasks that are tagged with type `T` (usually `str` or
@@ -115,8 +116,9 @@ class Lazy(Generic[T, R]):
     async def run_after_deps(self, recurse, *args) -> Result[R]:
         dep_res = await asyncio.gather(*(recurse(dep) for dep in self.dependencies))
         if not all(dep_res):
-            return DependencyFailure({
-                k: v  for (k, v) in zip(self.dependencies, dep_res) if not v})
+            return DependencyFailure(
+                {k: v for (k, v) in zip(self.dependencies, dep_res) if not v}
+            )
         try:
             return Ok(await self.run(*args))
         except TaskFailure as f:
@@ -173,4 +175,5 @@ class LazyDB(Generic[T, TaskT]):
     def reset(self):
         for t in self.tasks:
             t.reset()
+
 ```

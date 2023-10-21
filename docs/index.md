@@ -28,11 +28,14 @@ __all__ = ["Program", "resolve_tasks", "Task", "TaskDB", "Target"]
 ``` {.python file=loom/logging.py}
 import logging
 
+
 def logger():
     return logging.getLogger("loom")
+
 ```
 
 ``` {.python file=loom/cli.py}
+from argparse import ArgumentParser
 from pathlib import Path
 import re
 from typing import Optional
@@ -40,6 +43,7 @@ import argh  # type: ignore
 import asyncio
 
 from loom.utility import read_from_file
+from rich_argparse import RichHelpFormatter
 
 from .program import Program, resolve_tasks
 from .target import Target
@@ -48,7 +52,9 @@ from .logging import logger
 log = logger()
 
 
-async def main(program: Program, target_strs: list[str], force_run: bool, throttle: Optional[int]):
+async def main(
+    program: Program, target_strs: list[str], force_run: bool, throttle: Optional[int]
+):
     db = await resolve_tasks(program)
     for t in db.tasks:
         log.debug(str(t))
@@ -59,11 +65,16 @@ async def main(program: Program, target_strs: list[str], force_run: bool, thrott
     await asyncio.gather(*jobs)
 
 
-@argh.arg("path", help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.")
+@argh.arg(
+    "path",
+    help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
+)
 @argh.arg("targets", nargs="*", help="name of targets to run", default="phony(all)")
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
-def loom(path: str, targets: list[str], force_run: bool = False, jobs: Optional[int] = None):
+def loom(
+    path: str, targets: list[str], force_run: bool = False, jobs: Optional[int] = None
+):
     """Build one of the configured targets."""
     if not targets:
         targets = ["phony(all)"]
@@ -80,7 +91,10 @@ def loom(path: str, targets: list[str], force_run: bool = False, jobs: Optional[
 
 
 def cli():
-    argh.dispatch_command(loom)
+    parser = ArgumentParser(formatter_class=RichHelpFormatter)
+    argh.set_default_command(parser, loom)
+    argh.dispatch(parser)
+
 
 if __name__ == "__main__":
     cli()

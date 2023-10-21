@@ -50,6 +50,7 @@ def stat(path: Path, deps: Optional[list[Path]] = None) -> FileStat:
     deps = None if deps is None else [normal_relative(d) for d in deps]
     return FileStat.from_path(path, deps)
 
+
 def isgeneric(annot):
     return hasattr(annot, "__origin__") and hasattr(annot, "__args__")
 
@@ -69,10 +70,20 @@ def construct(annot: Any, json: Any) -> Any:
 
 
 def is_object_type(dtype: Type[Any]) -> TypeGuard[Type[dict[str, Any]]]:
-    return isgeneric(dtype) and typing.get_origin(dtype) is dict and typing.get_args(dtype)[0] is str
+    return (
+        isgeneric(dtype)
+        and typing.get_origin(dtype) is dict
+        and typing.get_args(dtype)[0] is str
+    )
+
 
 def is_optional_type(dtype: Type[Any]) -> TypeGuard[Type[Optional[Any]]]:
-    return isgeneric(dtype) and typing.get_origin(dtype) is Union and typing.get_args(dtype)[1] is types.NoneType
+    return (
+        isgeneric(dtype)
+        and typing.get_origin(dtype) is Union
+        and typing.get_args(dtype)[1] is types.NoneType
+    )
+
 
 def _construct(annot: Type[T], json: Any) -> T:
     """Construct an object from a given type from a JSON stream.
@@ -89,7 +100,9 @@ def _construct(annot: Type[T], json: Any) -> T:
         return cast(T, json)
     if is_object_type(annot):
         assert isinstance(json, dict)
-        return cast(T, {k: construct(typing.get_args(annot)[1], v) for k, v in json.items()})
+        return cast(
+            T, {k: construct(typing.get_args(annot)[1], v) for k, v in json.items()}
+        )
     if annot is Any:
         return cast(T, json)
     # if annot is dict or isgeneric(annot) and typing.get_origin(annot) is dict:
@@ -120,10 +133,7 @@ def _construct(annot: Type[T], json: Any) -> T:
     raise ValueError(f"Couldn't construct {annot} from {repr(json)}")
 
 
-
-def read_from_file(
-    data_type: Type[T], path: Path, section: Optional[str] = None
-) -> T:
+def read_from_file(data_type: Type[T], path: Path, section: Optional[str] = None) -> T:
     """Read a config from given `path` in given `section`. The path should refer to
     a TOML or JSON file that should decode to a `Config` object. If `section` is given, only
     that section is decoded to a `Config` object. The `section` string may contain
@@ -150,7 +160,10 @@ def read_from_file(
             for s in section.split("."):
                 data = data[s]
     except KeyError as e:
-        raise HelpfulUserError(f"Data file `{path}` should contain section `{section}`.") from e
+        raise HelpfulUserError(
+            f"Data file `{path}` should contain section `{section}`."
+        ) from e
 
     return construct(data_type, data)
+
 ```
