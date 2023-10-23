@@ -36,7 +36,7 @@ async def test_hello(tmp_path: Path):
             f'   print("Hello, World!", file=f)\n',
         )
         db.phony("all", [tgt])
-        await db.run(Phony("all"))
+        await db.run(Phony("all"), db)
         os.sync()
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World!\n"
@@ -52,7 +52,7 @@ async def test_hello_stdout(tmp_path: Path):
         )
         db.phony("all", [tgt])
 
-        await db.run(Phony("all"))
+        await db.run(Phony("all"), db)
         os.sync()
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World!\n"
@@ -66,7 +66,7 @@ async def test_runtime(tmp_path: Path):
             db.phony(f"sleep{a}", [], language="Bash", script=f"sleep 0.2\n")
         db.phony("all", [Phony(f"sleep{a}") for a in range(4)])
         async with timer() as t:
-            await db.run(Phony("all"))
+            await db.run(Phony("all"), db)
 
         assert t.time is not None
         assert t.time > 0.1 and t.time < 0.4
@@ -108,7 +108,7 @@ async def test_rebuild(tmp_path: Path):
             stdout=c,
             script="print(int(open('b','r').read()) * int(open('a','r').read()))",
         )
-        await db.run(c)
+        await db.run(c, db)
         assert all(x.exists() for x in (a, b, c))
         assert c.read_text() == "12\n"
 
@@ -119,7 +119,7 @@ async def test_rebuild(tmp_path: Path):
         assert db.index[b].needs_run()
 
         db.reset()
-        await db.run(c)
+        await db.run(c, db)
         os.sync()
 
         assert stat(a) < stat(i2)

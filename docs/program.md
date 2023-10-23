@@ -99,7 +99,7 @@ async def resolve_tasks(program: Program) -> TaskDB:
 
         for inc in program.include:
             if inc in db.index:
-                await db.run(inc)
+                await db.run(inc, db)
             if not inc.exists():
                 raise MissingInclude(inc)
 

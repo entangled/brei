@@ -53,12 +53,25 @@ def str_to_target(s: str) -> Path | Phony:
 
 
 @dataclass
-class Task(Lazy[Path, None]):
+class Variable:
+    name: str
+
+
+@dataclass
+class Task(Lazy[Path | Variable, None]):
     language: Optional[str] = None
     path: Optional[Path] = None
     script: Optional[str] = None
     stdin: Optional[Path] = None
     stdout: Optional[Path] = None
+
+    @property
+    def target_paths(self):
+        return (p for p in self.targets if isinstance(p, Path))
+
+    @property
+    def dependency_paths(self):
+        return (p for p in self.dependencies if isinstance(p, Path))
 
     def __str__(self):
         tgts = ", ".join(str(t) for t in self.targets)
@@ -91,10 +104,10 @@ class Task(Lazy[Path, None]):
         return len(self.real_dependencies) == 0
 
     def needs_run(self) -> bool:
-        if any(not path.exists() for path in self.targets):
+        if any(not p.exists() for p in self.target_paths):
             return True
-        target_stats = [stat(p) for p in self.targets]
-        dep_stats = [stat(p) for p in self.real_dependencies]
+        target_stats = [stat(p) for p in self.target_paths]
+        dep_stats = [stat(p) for p in self.dependency_paths]
         if any(t < d for t in target_stats for d in dep_stats):
             return True
         return False
@@ -145,14 +158,11 @@ class Task(Lazy[Path, None]):
 
 
 @dataclass
-class TaskDB(LazyDB[Path, Task]):
+class TaskDB(LazyDB[Path | Variable, Task]):
     runners: dict[str, Runner] = field(default_factory=lambda: copy(DEFAULT_RUNNERS))
     throttle: Optional[asyncio.Semaphore] = None
     force_run: bool = False
-
-    async def run(self, t: Phony | Path, *args):
-        log.debug(str(t))
-        return await super().run(t, self, *args)
+    environment: dict[str, str] = field(default_factory=dict)
 
     def on_missing(self, t: Path):
         if not t.exists():

@@ -30,7 +30,7 @@ async def test_loom(tmp_path):
         prg = Program.read(src)
         db = await resolve_tasks(prg)
         assert db.index[tgt].stdout == tgt
-        await db.run(Phony("all"))
+        await db.run(Phony("all"), db)
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World\n"
 
@@ -69,7 +69,7 @@ async def test_include(tmp_path):
         prg = Program.read(src)
         db = await resolve_tasks(prg)
         assert db.index[tgt].stdout == tgt
-        await db.run(Phony("all"))
+        await db.run(Phony("all"), db)
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World\n"
 
@@ -102,7 +102,7 @@ async def test_pattern(tmp_path):
         prg = Program.read(src)
         db = await resolve_tasks(prg)
         assert db.index[tgt].stdout == tgt
-        await db.run(Phony("all"))
+        await db.run(Phony("all"), db)
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World\n"
 
@@ -145,6 +145,6 @@ async def test_rot13(tmp_path):
         prg = Program.read(src)
         db = await resolve_tasks(prg)
         assert db.index[tgt].stdout == tgt
-        await db.run(Phony("all"))
+        await db.run(Phony("all"), db)
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World!\n"

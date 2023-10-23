@@ -6,55 +6,55 @@
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-21T21:37:07.229807",
-      "hexdigest": "6e7613dba6ac47570870cdf398ab1a1f0e90083dabaf2cb6984892a28dcd9951",
-      "size": 4471
+      "modified": "2023-10-21T22:00:59.761942",
+      "hexdigest": "560059fd6f53433b5fe491552096a781f9c12d279e93e071404d1da4821dd93a",
+      "size": 4482
     },
     {
       "path": "docs/index.md",
       "deps": null,
-      "modified": "2023-10-21T21:38:15.624094",
-      "hexdigest": "b13d81da5d6054e55ac647af6e5adfa66c7b3851267b86ea4b9bd7582fbb41a7",
-      "size": 4645
+      "modified": "2023-10-21T22:08:57.328889",
+      "hexdigest": "031771c5debd60b28f55ce4e20a438b0ebb2fb14a72d08f70db8e64a8ee35f54",
+      "size": 4648
     },
     {
       "path": "docs/lazy.md",
       "deps": null,
-      "modified": "2023-10-21T21:37:39.730943",
-      "hexdigest": "155e37562dde0520a79351af7841b7252bda48ca2627f2409f302d254b8f65a5",
-      "size": 6256
+      "modified": "2023-10-21T22:00:59.864942",
+      "hexdigest": "3141848ae3c3f0defa963c252c0df59bbedb86bf48ed57b59b8f3397ddca1c77",
+      "size": 6267
     },
     {
       "path": "loom/task.py",
       "deps": [
         "docs/tasks.md"
       ],
-      "modified": "2023-10-21T21:32:58.246762",
-      "hexdigest": "d49a0fe13e18899ee3d13497ac82b8ba4ddcd7e7024755b352c8ac0d6bdc2491",
-      "size": 6754
+      "modified": "2023-10-23T09:32:30.604429",
+      "hexdigest": "01c9e2db762b5d52df90979f0fd4dd8597214e564ea344ea581e5ea531876456",
+      "size": 6982
     },
     {
       "path": "docs/tasks.md",
       "deps": null,
-      "modified": "2023-10-21T21:32:58.330762",
-      "hexdigest": "4833b971883f74d30835d3f4be63121de32373529c3e3f58d503233897fd3440",
-      "size": 6740
+      "modified": "2023-10-23T09:32:30.703430",
+      "hexdigest": "dbe2bd1b2dc561b02987f891c98751632db60bfce2ce654ad5f41d43159cd6a6",
+      "size": 6968
     },
     {
       "path": "loom/program.py",
       "deps": [
         "docs/program.md"
       ],
-      "modified": "2023-10-21T21:01:05.311303",
-      "hexdigest": "1202eeec70b37d35dbd8d9b3f1a6cc79b9ca470fedc52885d342e6d3a1eab996",
-      "size": 3143
+      "modified": "2023-10-23T09:37:22.452540",
+      "hexdigest": "1d994b2377c3ce17be2a7262cac0161b8c37d6b72de2ac8414c2f2c196935bfc",
+      "size": 3147
     },
     {
       "path": "docs/program.md",
       "deps": null,
-      "modified": "2023-10-21T21:01:05.398303",
-      "hexdigest": "294d62ca73a3de3b773305d662cc66131814ae890c2fec85ab63305a4e5524f4",
-      "size": 3130
+      "modified": "2023-10-23T09:37:22.554541",
+      "hexdigest": "43400f177116149877ec4c217ad7acbaa01dd2319c5226eb82e4d28e89c0f1df",
+      "size": 3134
     },
     {
       "path": "loom/target.py",
@@ -95,9 +95,9 @@
       "deps": [
         "docs/utility.md"
       ],
-      "modified": "2023-10-21T21:22:14.822161",
-      "hexdigest": "39a3c8b074fa1c0f5d2effc436a85c630b9ee1c9ca70f39e892b6708eb0a53b2",
-      "size": 5624
+      "modified": "2023-10-21T21:51:21.680503",
+      "hexdigest": "4163236b7aa6b97cfff0e0fa616daf6f078720b1f5e4739c8b87583d36e8fd4a",
+      "size": 5626
     },
     {
       "path": "test/test_result.py",
@@ -111,9 +111,9 @@
     {
       "path": "docs/utility.md",
       "deps": null,
-      "modified": "2023-10-21T21:22:14.903161",
-      "hexdigest": "1dc93d25ded56c8d0fcaf91922dc431115ecaef19c920ae071a69c8a73b288d4",
-      "size": 5608
+      "modified": "2023-10-21T21:51:21.779504",
+      "hexdigest": "336c7b63a98573b39c189b286eadbedfe70e610b23aaee06cf64b7e774a3b6c6",
+      "size": 5610
     },
     {
       "path": "loom/errors.py",
@@ -145,9 +145,9 @@
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-21T21:38:15.526093",
-      "hexdigest": "edfe8f8200b8e6ccac430fd7108cb767aff61d3fcc308be59b1b1bd1e949f0d0",
-      "size": 1672
+      "modified": "2023-10-21T22:08:57.236889",
+      "hexdigest": "d6078bd312321b47ada4837ab25e4562379e3c60f3e1a83a329997a131186831",
+      "size": 1675
     },
     {
       "path": "examples/rot13.toml",

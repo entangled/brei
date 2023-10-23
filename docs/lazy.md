@@ -133,11 +133,11 @@ class Lazy(Generic[T, R]):
         assert isinstance(self._result, Ok)
         return self._result.value
 
-    async def run(self) -> R:
+    async def run(self, *_) -> R:
         raise NotImplementedError()
 
     async def run_after_deps(self, recurse, *args) -> Result[R]:
-        dep_res = await asyncio.gather(*(recurse(dep) for dep in self.dependencies))
+        dep_res = await asyncio.gather(*(recurse(dep, *args) for dep in self.dependencies))
         if not all(dep_res):
             return DependencyFailure(
                 {k: v for (k, v) in zip(self.dependencies, dep_res) if not v}

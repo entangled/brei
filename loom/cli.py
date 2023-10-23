@@ -24,14 +24,14 @@ async def main(
     if throttle:
         db.throttle = asyncio.Semaphore(throttle)
     db.force_run = force_run
-    await asyncio.gather(*(db.run_name(t) for t in target_strs))
+    await asyncio.gather(*(db.run_name(t, db) for t in target_strs))
 
 
 @argh.arg(
     "path",
     help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
 )
-@argh.arg("targets", nargs="+", help="name of targets to run")
+@argh.arg("targets", nargs="+", help="names of tasks to run")
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
 def loom(

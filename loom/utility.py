@@ -153,9 +153,9 @@ def read_from_file(data_type: Type[T], path: Path, section: Optional[str] = None
     if not path.exists():
         raise HelpfulUserError(f"File not found: {path}")
     with open(path, "rb") as f:
-        if path.suffix == "toml":
+        if path.suffix == ".toml":
             data: Any = tomllib.load(f)
-        elif path.suffix == "json":
+        elif path.suffix == ".json":
             data = json.load(f)
         else:
             raise HelpfulUserError(f"Unrecognized file format: {path}")
