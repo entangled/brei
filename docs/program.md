@@ -10,12 +10,18 @@ from pathlib import Path
 
 import tomllib
 
-from loom.lazy import Phony
+from loom.result import Failure, Ok
 
+from .lazy import MissingDependency, Phony
+from .template_strings import Variable
+from .logging import logger
 from .errors import UserError
 
 from .utility import construct
-from .task import Task, TaskDB, Pattern, Runner
+from .task import Task, TaskDB, Pattern, Runner, TaskProxy, TemplateTask, TemplateVariable
+
+
+log = logger()
 
 
 @dataclass
@@ -41,20 +47,9 @@ class PatternCall:
 
 
 @dataclass
-class TaskProxy:
-    targets: list[Path] = field(default_factory=list)
-    dependencies: list[Phony | Path] = field(default_factory=list)
-    name: Optional[str] = None
-    language: Optional[str] = None
-    path: Optional[Path] = None
-    script: Optional[str] = None
-    stdin: Optional[Path] = None
-    stdout: Optional[Path] = None
-
-
-@dataclass
 class Program:
     task: list[TaskProxy] = field(default_factory=list)
+    environment: dict[str, str] = field(default_factory=dict)
     pattern: dict[str, Pattern] = field(default_factory=dict)
     call: list[PatternCall] = field(default_factory=list)
     include: list[Path] = field(default_factory=list)
@@ -76,26 +71,35 @@ async def resolve_tasks(program: Program) -> TaskDB:
     pattern_index = dict()
 
     async def go(program: Program):
-        tasks = [Task(**t.__dict__) for t in program.task]
+        for var, template in program.environment.items():
+            db.add(TemplateVariable([Variable(var)], [], template))
+
+        task_templates = [TemplateTask([], [], t) for t in program.task]
         pattern_index.update(program.pattern)
         delayed_calls: list[PatternCall] = []
+        delayed_templates: list[TemplateTask] = []
 
         db.runners.update(program.runner)
 
-        for t in tasks:
-            db.add(t)
-
         for c in program.call:
             if c.pattern not in pattern_index:
-                logging.debug(
+                log.debug(
                     "pattern `%s` not available, waiting for includes to resolve",
                     c.pattern,
                 )
                 delayed_calls.append(c)
                 continue
             p = pattern_index[c.pattern]
-            task = p.call(c.args)
-            db.add(task)
+            task_templates.append(TemplateTask([], [], p.call(c.args)))
+
+        for tt in task_templates:
+            task = await tt.run_cached(db.run, db)
+            match task:
+                case Failure():
+                    tt.reset()
+                    delayed_templates.append(tt)
+                case Ok(t):
+                    db.add(t)
 
         for inc in program.include:
             if inc in db.index:
@@ -108,12 +112,20 @@ async def resolve_tasks(program: Program) -> TaskDB:
 
         for c in delayed_calls:
             if c.pattern not in pattern_index:
-                logging.debug(
+                log.debug(
                     "pattern `%s` still not available, now this is an error", c.pattern
                 )
                 raise MissingPattern(c.pattern)
             p = pattern_index[c.pattern]
-            db.add(p.call(c.args))
+            delayed_templates.append(TemplateTask([], [], p.call(c.args)))
+
+        for tt in delayed_templates:
+            task = await tt.run_cached(db.run, db)
+            match task:
+                case Ok(t):
+                    db.add(t)
+                case Failure():
+                    raise UserError(f"Missing dependency in {tt.dependencies}")
 
         return db
 

@@ -66,7 +66,7 @@ Result = Failure | Ok[R]
 
 ``` {.python file=loom/lazy.py}
 from __future__ import annotations
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from typing import Generic, Iterable, Optional, Self, TypeVar
 import asyncio
 
@@ -92,6 +92,9 @@ class Phony(FromStr):
     def __str__(self):
         return f"#{self.name}"
 
+    def __hash__(self):
+        return hash(str(self))
+
 
 @dataclass
 class Lazy(Generic[T, R]):
@@ -111,8 +114,7 @@ class Lazy(Generic[T, R]):
     """
 
     targets: list[T]
-    dependencies: list[Phony | T]
-    name: Optional[str] = None
+    dependencies: list[T]
 
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
     _result: Optional[Result[R]] = field(default=None, init=False)
@@ -133,7 +135,7 @@ class Lazy(Generic[T, R]):
         assert isinstance(self._result, Ok)
         return self._result.value
 
-    async def run(self, *_) -> R:
+    async def run(self, ctx) -> R:
         raise NotImplementedError()
 
     async def run_after_deps(self, recurse, *args) -> Result[R]:
@@ -157,6 +159,10 @@ class Lazy(Generic[T, R]):
     def reset(self):
         self._result = None
 
+    def fields(self):
+        return { f.name: getattr(self, f.name)
+                 for f in fields(self) if f.name[0] != '_' }
+
 
 TaskT = TypeVar("TaskT", bound=Lazy)
 
@@ -171,12 +177,8 @@ class LazyDB(Generic[T, TaskT]):
 
     tasks: list[TaskT] = field(default_factory=list)
     index: dict[T, TaskT] = field(default_factory=dict)
-    name_index: dict[str, TaskT] = field(default_factory=dict)
 
-    async def run(self, t: Phony | T, *args) -> Result[R]:
-        if isinstance(t, Phony):
-            return await self.run_name(t.name, *args)
-
+    async def run(self, t: T, *args) -> Result[R]:
         if t not in self.index:
             try:
                 task = self.on_missing(t)
@@ -186,11 +188,6 @@ class LazyDB(Generic[T, TaskT]):
             task = self.index[t]
         return await task.run_cached(self.run, *args)
 
-    async def run_name(self, t: str, *args) -> Result[R]:
-        if t not in self.name_index:
-            raise HelpfulUserError(f"Task `#{t}` not found.")
-        return await self.name_index[t].run_cached(self.run, *args)
-
     def on_missing(self, _: T) -> TaskT:
         raise MissingDependency()
 
@@ -199,8 +196,6 @@ class LazyDB(Generic[T, TaskT]):
         self.tasks.append(task)
         for target in task.targets:
             self.index[target] = task
-        if task.name:
-            self.name_index[task.name] = task
 
     def clean(self):
         self.tasks = []

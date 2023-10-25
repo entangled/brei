@@ -1,4 +1,5 @@
 from contextlib import chdir
+from dataclasses import dataclass
 from pathlib import Path
 import sys
 import time
@@ -6,48 +7,38 @@ import time
 import pytest
 from loom.lazy import Phony
 from loom.program import Program, resolve_tasks
+from loom.task import Task
 
 
-hello_world_loom = """
+@dataclass
+class LoomTest:
+    script: str
+    post_state: list[tuple[str, str]]
+
+
+hello_world = LoomTest("""
 [[task]]
 name = "all"
 dependencies = ["hello.txt"]
 
 [[task]]
-targets = ["hello.txt"]
 stdout = "hello.txt"
 language = "Bash"
 script = "echo 'Hello, World'"
-"""
+""", [ ("hello.txt", "Hello, World") ])
 
 
-@pytest.mark.asyncio
-async def test_loom(tmp_path):
-    with chdir(tmp_path):
-        src = Path("hello.toml")
-        tgt = Path("hello.txt")
-        src.write_text(hello_world_loom)
-        prg = Program.read(src)
-        db = await resolve_tasks(prg)
-        assert db.index[tgt].stdout == tgt
-        await db.run(Phony("all"), db)
-        assert tgt.exists()
-        assert tgt.read_text() == "Hello, World\n"
-
-
-include_loom = """
+include = LoomTest("""
 include = [
     "generated_wf.toml"
 ] 
 
 [[task]]
-targets = ["generated_wf.toml"]
 stdout = "generated_wf.toml"
 language = "Python"
 script = '''
 print(\"\"\"
 [[task]]
-targets = ["hello.txt"]
 stdout = "hello.txt"
 language = "Bash"
 script = "echo 'Hello, World'"
@@ -57,30 +48,16 @@ script = "echo 'Hello, World'"
 [[task]]
 name = "all"
 dependencies = ["hello.txt"]
-"""
+""", [ ("hello.txt", "Hello, World") ])
 
 
-@pytest.mark.asyncio
-async def test_include(tmp_path):
-    with chdir(tmp_path):
-        src = Path("hello.toml")
-        tgt = Path("hello.txt")
-        src.write_text(include_loom)
-        prg = Program.read(src)
-        db = await resolve_tasks(prg)
-        assert db.index[tgt].stdout == tgt
-        await db.run(Phony("all"), db)
-        assert tgt.exists()
-        assert tgt.read_text() == "Hello, World\n"
-
-
-pattern_loom = """
+pattern = LoomTest("""
 [pattern.echo]
-targets = ["{stdout}"]
-stdout = "{stdout}"
+targets = ["${stdout}"]
+stdout = "${stdout}"
 language = "Python"
 script = '''
-print("{text}")
+print("${text}")
 '''
 
 [[task]]
@@ -90,24 +67,10 @@ dependencies = ["hello.txt"]
 [[call]]
 pattern = "echo"
 args = { stdout = "hello.txt", text = "Hello, World" }
-"""
+""", [ ("hello.txt", "Hello, World") ])
 
 
-@pytest.mark.asyncio
-async def test_pattern(tmp_path):
-    with chdir(tmp_path):
-        src = Path("hello.toml")
-        tgt = Path("hello.txt")
-        src.write_text(pattern_loom)
-        prg = Program.read(src)
-        db = await resolve_tasks(prg)
-        assert db.index[tgt].stdout == tgt
-        await db.run(Phony("all"), db)
-        assert tgt.exists()
-        assert tgt.read_text() == "Hello, World\n"
-
-
-rot_13_loom = """
+rot_13 = LoomTest("""
 [[task]]
 stdout = "secret.txt"
 language = "Python"
@@ -116,8 +79,8 @@ print("Uryyb, Jbeyq!")
 \"\"\"
 
 [pattern.rot13]
-stdout = "{stdout}"
-stdin = "{stdin}"
+stdout = "${stdout}"
+stdin = "${stdin}"
 language = "Bash"
 script = \"\"\"
 tr a-zA-Z n-za-mN-ZA-M
@@ -132,19 +95,71 @@ pattern = "rot13"
 [[task]]
 name = "all"
 dependencies = ["hello.txt"]
-"""
+""", [ ("hello.txt", "Hello, World!") ])
 
 
-@pytest.mark.skipif(sys.platform == "win32", reason="no `tr` on windows")
+templated_task = LoomTest("""
+[environment]
+msg = "Hello, World!"
+
+[[task]]
+stdout = "hello.txt"
+language = "Bash"
+script = "echo '${msg}'"
+
+[[task]]
+name = "all"
+dependencies = ["hello.txt"]
+""", [("hello.txt", "Hello, World!")])
+
+
+variable_stdout = LoomTest("""
+[pattern.echo]
+language = "Bash"
+script = "echo '${text}'"
+stdout = "${stdout}"
+
+[[call]]
+pattern = "echo"
+  [call.args]
+  text = "Hello, World!"
+  stdout = "var(msg)"
+
+[[task]]
+language = "Bash"
+script = "cat"
+stdin = "var(msg)"
+stdout = "hello.txt"
+
+[[call]]
+pattern = "echo"
+  [call.args]
+  text = "goodbye.txt"
+  stdout = "var(file_name)"
+
+[[task]]
+language = "Bash"
+script = "cat"
+stdin = "var(msg)"
+stdout = "${file_name}"
+
+[[task]]
+name = "all"
+dependencies = ["hello.txt", "${file_name}"]
+""", [("hello.txt", "Hello, World!"), ("goodbye.txt", "Hello, World!")])
+
+@pytest.mark.parametrize("test", [hello_world, include, pattern, rot_13, templated_task, variable_stdout])
 @pytest.mark.asyncio
-async def test_rot13(tmp_path):
+async def test_loom(tmp_path, test):
     with chdir(tmp_path):
-        src = Path("hello.toml")
-        tgt = Path("hello.txt")
-        src.write_text(rot_13_loom)
+        src = Path("loom.toml")
+        src.write_text(test.script)
         prg = Program.read(src)
         db = await resolve_tasks(prg)
-        assert db.index[tgt].stdout == tgt
         await db.run(Phony("all"), db)
-        assert tgt.exists()
-        assert tgt.read_text() == "Hello, World!\n"
+
+        for (tgt, content) in test.post_state:
+            tgt = Path(tgt)
+            assert tgt.exists()
+            assert tgt.read_text().strip() == content.strip()
+

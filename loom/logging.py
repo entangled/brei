@@ -4,4 +4,7 @@ import logging
 
 def logger():
     return logging.getLogger("loom")
+
+
+logger().level = logging.DEBUG
 # ~/~ end

@@ -97,6 +97,9 @@ import logging
 
 def logger():
     return logging.getLogger("loom")
+
+
+logger().level = logging.DEBUG
 ```
 
 ``` {.python file=loom/cli.py}
@@ -106,6 +109,7 @@ import re
 from typing import Optional
 import argh  # type: ignore
 import asyncio
+from loom.lazy import Phony
 
 from loom.utility import read_from_file
 from rich_argparse import RichHelpFormatter
@@ -125,7 +129,7 @@ async def main(
     if throttle:
         db.throttle = asyncio.Semaphore(throttle)
     db.force_run = force_run
-    await asyncio.gather(*(db.run_name(t, db) for t in target_strs))
+    await asyncio.gather(*(db.run(Phony(t), db) for t in target_strs))
 
 
 @argh.arg(
