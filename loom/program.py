@@ -1,22 +1,21 @@
 # ~/~ begin <<docs/program.md#loom/program.py>>[init]
 from __future__ import annotations
 from copy import copy
-import logging
-from typing import Any, Generic, Optional
-from dataclasses import dataclass, field, asdict, fields
+import itertools
+from typing import Any
+from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 
 import tomllib
 
-from loom.result import Failure, Ok
 
-from .lazy import MissingDependency, Phony
-from .template_strings import Variable, gather_args
+from .template_strings import gather_args
 from .logging import logger
 from .errors import UserError
 
 from .utility import construct
-from .task import Task, TaskDB, Pattern, Runner, TaskProxy, TemplateTask, TemplateVariable
+from .task import Variable, TaskDB, Pattern, Runner, TaskProxy, TemplateTask, TemplateVariable
 
 
 log = logger()
@@ -38,10 +37,30 @@ class MissingPattern(UserError):
         return f"Pattern `{self.name}` not found."
 
 
+class Join(Enum):
+    ZIP = 1
+    PRODUCT = 2
+
+
 @dataclass
 class PatternCall:
     pattern: str
-    args: dict[str, Any]
+    args: dict[str, str | list[str]]
+    join: Join = Join.ZIP
+
+    @property
+    def all_args(self):
+        if all(isinstance(v, str) for v in self.args.values()):
+            yield self.args
+            return
+
+        if self.join == Join.ZIP:
+            for v in zip(*map(lambda x: itertools.repeat(x) if isinstance(x, str) else x, self.args.values())):
+                yield dict(zip(self.args.keys(), v))
+
+        else:  # cartesian join
+            for v in itertools.product(*map(lambda x: [x] if isinstance(x, str) else x, self.args.values())):
+                yield dict(zip(self.args.keys(), v))
 
 
 @dataclass
@@ -52,10 +71,6 @@ class Program:
     call: list[PatternCall] = field(default_factory=list)
     include: list[str] = field(default_factory=list)
     runner: dict[str, Runner] = field(default_factory=dict)
-
-    # def write(self, path: Path):
-    #     with open(path, "w") as f_out:
-    #         tomlkit.dump(self.__dict__, f_out)
 
     @staticmethod
     def read(path: Path) -> Program:
@@ -88,7 +103,8 @@ async def resolve_tasks(program: Program) -> TaskDB:
                 delayed_calls.append(c)
                 continue
             p = pattern_index[c.pattern]
-            task_templates.append(p.call(c.args))
+            for args in c.all_args:
+                task_templates.append(p.call(args))
 
         for tt in task_templates:
             # we could check for resolvability here, but I don't like the
@@ -119,11 +135,12 @@ async def resolve_tasks(program: Program) -> TaskDB:
                 )
                 raise MissingPattern(c.pattern)
             p = pattern_index[c.pattern]
-            tt = p.call(c.args)
-            if gather_args(tt.targets):
-                delayed_templates.append(tt)
-            else:
-                db.add(TemplateTask([], [], tt))
+            for args in c.all_args:
+                tt = p.call(c.args)
+                if gather_args(tt.targets):
+                    delayed_templates.append(tt)
+                else:
+                    db.add(TemplateTask([], [], tt))
 
         for tt in delayed_templates:
             if not db.is_resolvable(tt.all_targets):

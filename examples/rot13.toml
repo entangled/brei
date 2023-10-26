@@ -13,8 +13,8 @@ print("Uryyb, Jbeyq!")
 # ~/~ end
 # ~/~ begin <<docs/index.md#rot13-pattern>>[init]
 [pattern.rot13]
-stdout = "{stdout}"
-stdin = "{stdin}"
+stdout = "${stdout}"
+stdin = "${stdin}"
 language = "Bash"
 script = """
 tr a-zA-Z n-za-mN-ZA-M

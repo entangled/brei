@@ -39,20 +39,12 @@ We can trace these variable substitutions using the same lazy evaluation strateg
 ``` {.python file=loom/template_strings.py}
 from dataclasses import dataclass, is_dataclass, fields
 from string import Template
-from types import NoneType
 from typing import Any, Generic, Mapping, TypeVar, cast
 from functools import singledispatch
 
 
 from .lazy import Lazy
 
-
-@dataclass()
-class Variable:
-    name: str
-
-    def __hash__(self):
-        return hash(f"var({self.name})")
 
 
 T = TypeVar("T")
@@ -71,7 +63,7 @@ def substitute(template, env: Mapping[str, str]):
 
 @substitute.register
 def _(template: str, env: Mapping[str, str]) -> str:
-    return Template(template).substitute(env)
+    return Template(template).safe_substitute(env)
 
 
 @substitute.register
@@ -108,31 +100,20 @@ def _(template: list) -> set[str]:
 @gather_args.register
 def _(_template: None) -> set[str]:
     return set()
-
-
-@dataclass
-class TemplateSubstitution(Lazy[Variable, T], Generic[T]):
-    template: T
-
-    def __post_init__(self):
-        self.dependencies += [Variable(arg) for arg in gather_args(self.template)]
-
-    async def run(self, env) -> T:
-        return cast(T, substitute(self.template, env))
 ```
 
 ``` {.python file=test/test_template_strings.py}
 from dataclasses import dataclass
 from typing import Iterable, Optional
 import pytest
-from loom.template_strings import TemplateSubstitution, Variable, gather_args, substitute
-from loom.lazy import LazyDB, Phony
-import string
+from loom.task import TemplateVariable, Variable
+from loom.template_strings import gather_args, substitute
+from loom.lazy import LazyDB
 
 
-class Environment(LazyDB[Variable, TemplateSubstitution[str]]):
+class Environment(LazyDB[Variable, TemplateVariable]):
     def __setitem__(self, k: str, v: str):
-        self.add(TemplateSubstitution([Variable(k)], [], v))
+        self.add(TemplateVariable([Variable(k)], [], v))
 
     def __getitem__(self, k: str) -> str:
         return self.index[Variable(k)].result
@@ -144,7 +125,7 @@ class Environment(LazyDB[Variable, TemplateSubstitution[str]]):
         return (k.name for k in self.index if isinstance(k, Variable))
 
     @property
-    def variables(self):
+    def environment(self):
         return self
 
 
@@ -166,8 +147,7 @@ class MyData:
     some_none: Optional[str] = None
 
 
-@pytest.mark.asyncio
-async def test_template_dtype():
+def test_template_dtype():
     data = MyData(
         some_list = ["${x} bar", "bar ${x} bar"],
         some_prop = "bar ${x}"

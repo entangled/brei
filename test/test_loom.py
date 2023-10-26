@@ -5,9 +5,17 @@ import pytest
 from contextlib import asynccontextmanager, chdir
 from pathlib import Path
 import time
-from entangled.filedb import stat
+from loom.utility import stat
 from loom.lazy import Phony
-from loom.task import TaskDB
+from loom.task import TaskDB, Task
+
+
+class TaskDBTester(TaskDB):
+    def target(self, tgt, deps, **kwargs):
+        self.add(Task([tgt], deps, **kwargs))
+
+    def phony(self, name, deps, **kwargs):
+        self.add(Task([], deps, name=name, **kwargs))
 
 
 @dataclass
@@ -26,7 +34,7 @@ async def timer():
 @pytest.mark.asyncio
 async def test_hello(tmp_path: Path):
     with chdir(tmp_path):
-        db = TaskDB()
+        db = TaskDBTester()
         tgt = Path("hello.txt")
         db.target(
             tgt,
@@ -45,7 +53,7 @@ async def test_hello(tmp_path: Path):
 @pytest.mark.asyncio
 async def test_hello_stdout(tmp_path: Path):
     with chdir(tmp_path):
-        db = TaskDB()
+        db = TaskDBTester()
         tgt = Path("hello.txt")
         db.target(
             tgt, [], language="Python", stdout=tgt, script='print("Hello, World!")\n'
@@ -61,7 +69,7 @@ async def test_hello_stdout(tmp_path: Path):
 @pytest.mark.asyncio
 async def test_runtime(tmp_path: Path):
     with chdir(tmp_path):
-        db = TaskDB()
+        db = TaskDBTester()
         for a in range(4):
             db.phony(f"sleep{a}", [], language="Bash", script=f"sleep 0.2\n")
         db.phony("all", [Phony(f"sleep{a}") for a in range(4)])
@@ -75,7 +83,7 @@ async def test_runtime(tmp_path: Path):
 @pytest.mark.asyncio
 async def test_rebuild(tmp_path: Path):
     with chdir(tmp_path):
-        db = TaskDB()
+        db = TaskDBTester()
 
         # Set input
         i1, i2 = (Path(f"i{n}") for n in [1, 2])

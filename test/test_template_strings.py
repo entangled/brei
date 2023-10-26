@@ -2,14 +2,14 @@
 from dataclasses import dataclass
 from typing import Iterable, Optional
 import pytest
-from loom.template_strings import TemplateSubstitution, Variable, gather_args, substitute
-from loom.lazy import LazyDB, Phony
-import string
+from loom.task import TemplateVariable, Variable
+from loom.template_strings import gather_args, substitute
+from loom.lazy import LazyDB
 
 
-class Environment(LazyDB[Variable, TemplateSubstitution[str]]):
+class Environment(LazyDB[Variable, TemplateVariable]):
     def __setitem__(self, k: str, v: str):
-        self.add(TemplateSubstitution([Variable(k)], [], v))
+        self.add(TemplateVariable([Variable(k)], [], v))
 
     def __getitem__(self, k: str) -> str:
         return self.index[Variable(k)].result
@@ -21,7 +21,7 @@ class Environment(LazyDB[Variable, TemplateSubstitution[str]]):
         return (k.name for k in self.index if isinstance(k, Variable))
 
     @property
-    def variables(self):
+    def environment(self):
         return self
 
 
@@ -43,8 +43,7 @@ class MyData:
     some_none: Optional[str] = None
 
 
-@pytest.mark.asyncio
-async def test_template_dtype():
+def test_template_dtype():
     data = MyData(
         some_list = ["${x} bar", "bar ${x} bar"],
         some_prop = "bar ${x}"

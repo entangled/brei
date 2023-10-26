@@ -1,28 +1,24 @@
 # ~/~ begin <<docs/utility.md#loom/utility.py>>[init]
 from __future__ import annotations
-from typing import Iterable, Optional, Self, Type, TypeGuard, TypeVar, Any, Union, cast
-from enum import Enum
-from contextlib import contextmanager
-from datetime import datetime
-import os
-from pathlib import Path
+
+from typing import Optional, Self, Type, TypeGuard, TypeVar, Any, Union, cast
 import typing
-import types
 from dataclasses import dataclass, is_dataclass
-from .errors import HelpfulUserError, InputError
+from enum import Enum
+
+from pathlib import Path
+from datetime import datetime
+
+import os
+import types
 import traceback
 import tomllib
 import json
 
+from .errors import HelpfulUserError, InputError
+
 
 T = TypeVar("T")
-
-
-def cat_maybes(it: Iterable[Optional[T]]) -> Iterable[T]:
-    def pred(x: Optional[T]) -> TypeGuard[T]:
-        return x is not None
-
-    return filter(pred, it)
 
 
 def normal_relative(path: Path) -> Path:
@@ -35,7 +31,7 @@ class FileStat:
     modified: datetime
 
     @staticmethod
-    def from_path(path: Path, deps: Optional[list[Path]]):
+    def from_path(path: Path):
         stat = os.stat(path)
         return FileStat(path, datetime.fromtimestamp(stat.st_mtime))
 
@@ -43,10 +39,9 @@ class FileStat:
         return self.modified < other.modified
 
 
-def stat(path: Path, deps: Optional[list[Path]] = None) -> FileStat:
+def stat(path: Path) -> FileStat:
     path = normal_relative(path)
-    deps = None if deps is None else [normal_relative(d) for d in deps]
-    return FileStat.from_path(path, deps)
+    return FileStat.from_path(path)
 
 
 def isgeneric(annot):
@@ -121,6 +116,8 @@ def _construct(annot: Type[T], json: Any) -> T:
             try:
                 return cast(T, _construct(dtype, json))
             except ValueError:
+                continue
+            except AssertionError:
                 continue
         raise ValueError("None of the choices in type union match data.")
     if type(annot) is type and issubclass(annot, FromStr) and isinstance(json, str):

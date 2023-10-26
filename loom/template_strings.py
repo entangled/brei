@@ -1,20 +1,12 @@
 # ~/~ begin <<docs/template_strings.md#loom/template_strings.py>>[init]
 from dataclasses import dataclass, is_dataclass, fields
 from string import Template
-from types import NoneType
 from typing import Any, Generic, Mapping, TypeVar, cast
 from functools import singledispatch
 
 
 from .lazy import Lazy
 
-
-@dataclass()
-class Variable:
-    name: str
-
-    def __hash__(self):
-        return hash(f"var({self.name})")
 
 
 T = TypeVar("T")
@@ -33,7 +25,7 @@ def substitute(template, env: Mapping[str, str]):
 
 @substitute.register
 def _(template: str, env: Mapping[str, str]) -> str:
-    return Template(template).substitute(env)
+    return Template(template).safe_substitute(env)
 
 
 @substitute.register
@@ -70,15 +62,4 @@ def _(template: list) -> set[str]:
 @gather_args.register
 def _(_template: None) -> set[str]:
     return set()
-
-
-@dataclass
-class TemplateSubstitution(Lazy[Variable, T], Generic[T]):
-    template: T
-
-    def __post_init__(self):
-        self.dependencies += [Variable(arg) for arg in gather_args(self.template)]
-
-    async def run(self, env) -> T:
-        return cast(T, substitute(self.template, env))
 # ~/~ end

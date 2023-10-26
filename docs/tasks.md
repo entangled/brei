@@ -10,30 +10,26 @@ from pathlib import Path
 import re
 import string
 from tempfile import NamedTemporaryFile
-from typing import Any, Generic, Optional, TypeVar, Union
+from typing import Any, Optional, Union
 from asyncio import create_subprocess_exec
 from textwrap import indent
 
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
 from .logging import logger
-from .errors import UserError
-from .template_strings import Variable, TemplateSubstitution, gather_args, substitute
-
-
-@dataclass
-class FailedTaskError(UserError):
-    error_code: int
-    stderr: str
-
-    def __str__(self):
-        return (
-            f"process returned code {self.error_code}\n"
-            f"standard error output: {self.stderr}"
-        )
+from .errors import FailedTaskError
+from .template_strings import gather_args, substitute
 
 
 log = logger()
+
+
+@dataclass()
+class Variable:
+    name: str
+
+    def __hash__(self):
+        return hash(f"var({self.name})")
 
 
 @dataclass
@@ -89,11 +85,11 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     def __post_init__(self):
         if self.name is not None:
             self.targets.append(Phony(self.name))
-        if self.stdin:
+        if self.stdin and self.stdin not in self.dependencies:
             self.dependencies.append(self.stdin)
         if self.path and self.path not in self.dependencies:
             self.dependencies.append(self.path)
-        if self.stdout:
+        if self.stdout and self.stdout not in self.targets:
             self.targets.append(self.stdout)
 
     def always_run(self) -> bool:
@@ -194,6 +190,14 @@ class TaskProxy:
     stdin: Optional[str] = None
     stdout: Optional[str] = None
 
+    @property
+    def all_targets(self):
+        return self.targets + ([self.stdout] if self.stdout else []) + ([f"#{self.name}"] if self.name else [])
+
+    @property
+    def all_dependencies(self):
+        return self.dependencies + ([self.stdin] if self.stdin else []) + ([self.path] if self.path else [])
+
 
 @dataclass
 class TemplateVariable(Lazy[Variable, str]):
@@ -207,22 +211,25 @@ class TemplateVariable(Lazy[Variable, str]):
 
 
 @dataclass
-class TemplateTask(Lazy[Variable, Task]):
+class TemplateTask(Lazy[Path | Phony | Variable, Task]):
     template: TaskProxy
 
     def __post_init__(self):
+        assert not gather_args(self.template.targets)
+        self.targets += [str_to_target(t) for t in self.template.all_targets]
         self.dependencies += [Variable(arg) for arg in gather_args(self.template)]
 
     async def run(self, ctx):
         proxy = substitute(self.template, ctx.environment)
-        tgts = [str_to_target(t) for t in proxy.targets]
-        deps = [str_to_target(t) for t in proxy.dependencies]
+        tgts = [str_to_target(t) for t in proxy.all_targets]
+        deps = [str_to_target(t) for t in proxy.all_dependencies]
         path = Path(proxy.path) if proxy.path else None
         stdin = str_to_target(proxy.stdin) if proxy.stdin else None
         stdout = str_to_target(proxy.stdout) if proxy.stdout else None
         assert not isinstance(stdin, Phony) and not isinstance(stdout, Phony)
         task = Task(tgts, deps, proxy.name, proxy.language, path, proxy.script, stdin, stdout)
         return task
+
 
 @dataclass
 class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVariable]):
@@ -235,13 +242,15 @@ class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVaria
             return Task([t], [])
         raise MissingDependency()
 
-    def target(self, target_path: Union[str, Path], deps: list[Path | Phony | Variable], **kwargs):
-        task = Task([Path(target_path)], deps, **kwargs)
-        self.add(task)
+    def is_resolvable(self, s: Any) -> bool:
+        return all(v in self.index for v in map(Variable, gather_args(s)))
 
-    def phony(self, name: str, deps: list[Path | Phony | Variable], **kwargs):
-        task = Task([], deps, name=name, **kwargs)
-        self.add(task)
+    async def resolve_object(self, s: Any) -> Any:
+        vars = gather_args(s)
+        await asyncio.gather(*(self.run(Variable(v), self) for v in vars))
+        result = substitute(s, self.environment)
+        log.debug(f"substituting {s} => {result}")
+        return result
 
     @property
     def environment(self):
@@ -263,9 +272,6 @@ class Environment:
 
 
 class Pattern(TaskProxy):
-    def validate(self):
-        assert (self.path is None) ^ (self.script is None)
-
     def call(self, args: dict[str, Any]) -> TaskProxy:
         return substitute(self, args)
 ```

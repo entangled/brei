@@ -8,30 +8,26 @@ from pathlib import Path
 import re
 import string
 from tempfile import NamedTemporaryFile
-from typing import Any, Generic, Optional, TypeVar, Union
+from typing import Any, Optional, Union
 from asyncio import create_subprocess_exec
 from textwrap import indent
 
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
 from .logging import logger
-from .errors import UserError
-from .template_strings import Variable, TemplateSubstitution, gather_args, substitute
-
-
-@dataclass
-class FailedTaskError(UserError):
-    error_code: int
-    stderr: str
-
-    def __str__(self):
-        return (
-            f"process returned code {self.error_code}\n"
-            f"standard error output: {self.stderr}"
-        )
+from .errors import FailedTaskError
+from .template_strings import gather_args, substitute
 
 
 log = logger()
+
+
+@dataclass()
+class Variable:
+    name: str
+
+    def __hash__(self):
+        return hash(f"var({self.name})")
 
 
 @dataclass
@@ -254,14 +250,6 @@ class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVaria
         log.debug(f"substituting {s} => {result}")
         return result
 
-    def target(self, target_path: Union[str, Path], deps: list[Path | Phony | Variable], **kwargs):
-        task = Task([Path(target_path)], deps, **kwargs)
-        self.add(task)
-
-    def phony(self, name: str, deps: list[Path | Phony | Variable], **kwargs):
-        task = Task([], deps, name=name, **kwargs)
-        self.add(task)
-
     @property
     def environment(self):
         return Environment(self)
@@ -282,9 +270,6 @@ class Environment:
 
 
 class Pattern(TaskProxy):
-    def validate(self):
-        assert (self.path is None) ^ (self.script is None)
-
     def call(self, args: dict[str, Any]) -> TaskProxy:
         return substitute(self, args)
 # ~/~ end

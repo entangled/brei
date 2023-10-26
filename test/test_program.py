@@ -148,7 +148,36 @@ name = "all"
 dependencies = ["hello.txt", "${file_name}"]
 """, [("hello.txt", "Hello, World!"), ("goodbye.txt", "Hello, World!")])
 
-@pytest.mark.parametrize("test", [hello_world, include, pattern, rot_13, templated_task, variable_stdout])
+
+array_call = LoomTest("""
+[pattern.echo]
+language = "Bash"
+script = "echo '${a}${b}'"
+stdout = "${pre}-${a}-${b}"
+
+[[call]]
+pattern = "echo"
+  [call.args]
+  pre = "zip"
+  a = ["1", "2", "3"]
+  b = ["a", "b", "c"]
+
+[[call]]
+pattern = "echo"
+join = "product"
+  [call.args]
+  pre = "prod"
+  a = ["1", "2"]
+  b = ["a", "b"]
+
+[[task]]
+name = "all"
+dependencies = ["zip-1-a", "zip-2-b", "zip-3-c",
+                "prod-1-a", "prod-1-b", "prod-2-a", "prod-2-b"]
+""", [("zip-1-a", "1a"), ("zip-2-b", "2b"), ("zip-3-c", "3c"),
+      ("prod-1-a", "1a"), ("prod-1-b", "1b"), ("prod-2-a", "2a"), ("prod-2-b", "2b")])
+
+@pytest.mark.parametrize("test", [hello_world, include, pattern, rot_13, templated_task, variable_stdout, array_call])
 @pytest.mark.asyncio
 async def test_loom(tmp_path, test):
     with chdir(tmp_path):
