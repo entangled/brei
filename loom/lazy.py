@@ -1,17 +1,18 @@
 # ~/~ begin <<docs/lazy.md#loom/lazy.py>>[init]
 from __future__ import annotations
 from dataclasses import dataclass, field, fields
-from typing import Generic, Iterable, Optional, Self, TypeVar
+from typing import Generic, Iterable, Optional, Self, TypeVar, cast
 import asyncio
 
-from loom.errors import HelpfulUserError
-from loom.utility import FromStr
-
-from .result import Result, Ok, DependencyFailure, TaskFailure, MissingFailure
+from .errors import HelpfulUserError
+from .utility import FromStr
+from .logging import logger
+from .result import Failure, Result, Ok, DependencyFailure, TaskFailure, MissingFailure
 
 T = TypeVar("T")
 R = TypeVar("R")
 
+log = logger()
 
 @dataclass
 class Phony(FromStr):
@@ -67,6 +68,8 @@ class Lazy(Generic[T, R]):
         if not self._result:
             raise ValueError("Task has failed.")
         assert isinstance(self._result, Ok)
+        if isinstance(self._result.value, Lazy):
+            return self._result.value.result
         return self._result.value
 
     async def run(self, ctx) -> R:
@@ -120,13 +123,20 @@ class LazyDB(Generic[T, TaskT]):
                 return MissingFailure(t)
         else:
             task = self.index[t]
-        return await task.run_cached(self.run, *args)
+
+        while True:
+            match (result := await task.run_cached(self.run, *args)):
+                case Ok(x) if isinstance(x, Lazy):
+                    task = cast(TaskT, x)
+                case _:
+                    return result
 
     def on_missing(self, _: T) -> TaskT:
         raise MissingDependency()
 
     def add(self, task: TaskT):
         """Add a task to the DB."""
+        log.debug(f"adding task ===\n{task}")
         self.tasks.append(task)
         for target in task.targets:
             self.index[target] = task

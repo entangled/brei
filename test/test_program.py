@@ -156,6 +156,7 @@ async def test_loom(tmp_path, test):
         src.write_text(test.script)
         prg = Program.read(src)
         db = await resolve_tasks(prg)
+
         await db.run(Phony("all"), db)
 
         for (tgt, content) in test.post_state:

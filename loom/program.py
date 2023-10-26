@@ -11,7 +11,7 @@ import tomllib
 from loom.result import Failure, Ok
 
 from .lazy import MissingDependency, Phony
-from .template_strings import Variable
+from .template_strings import Variable, gather_args
 from .logging import logger
 from .errors import UserError
 
@@ -50,7 +50,7 @@ class Program:
     environment: dict[str, str] = field(default_factory=dict)
     pattern: dict[str, Pattern] = field(default_factory=dict)
     call: list[PatternCall] = field(default_factory=list)
-    include: list[Path] = field(default_factory=list)
+    include: list[str] = field(default_factory=list)
     runner: dict[str, Runner] = field(default_factory=dict)
 
     # def write(self, path: Path):
@@ -72,10 +72,10 @@ async def resolve_tasks(program: Program) -> TaskDB:
         for var, template in program.environment.items():
             db.add(TemplateVariable([Variable(var)], [], template))
 
-        task_templates = [TemplateTask([], [], t) for t in program.task]
+        task_templates = copy(program.task)
         pattern_index.update(program.pattern)
         delayed_calls: list[PatternCall] = []
-        delayed_templates: list[TemplateTask] = []
+        delayed_templates: list[TaskProxy] = []
 
         db.runners.update(program.runner)
 
@@ -88,24 +88,28 @@ async def resolve_tasks(program: Program) -> TaskDB:
                 delayed_calls.append(c)
                 continue
             p = pattern_index[c.pattern]
-            task_templates.append(TemplateTask([], [], p.call(c.args)))
+            task_templates.append(p.call(c.args))
 
         for tt in task_templates:
-            task = await tt.run_cached(db.run, db)
-            match task:
-                case Failure():
-                    tt.reset()
-                    delayed_templates.append(tt)
-                case Ok(t):
-                    db.add(t)
+            # we could check for resolvability here, but I don't like the
+            # idea that order then matters. this way the rule is:
+            # > if a task has a templated target, those variables should be
+            # > resolvable after all other tasks were added, seeing that the
+            # > task to resolve these variables can't have templated targets
+            # > themselves.
+            if gather_args(tt.all_targets):
+                delayed_templates.append(tt)
+            else:
+                db.add(TemplateTask([], [], tt))
 
         for inc in program.include:
-            if inc in db.index:
-                await db.run(inc, db)
-            if not inc.exists():
-                raise MissingInclude(inc)
+            incp = Path(await db.resolve_object(inc))
+            if incp in db.index:
+                await db.run(incp, db)
+            if not incp.exists():
+                raise MissingInclude(incp)
 
-            prg = Program.read(inc)
+            prg = Program.read(incp)
             await go(prg)
 
         for c in delayed_calls:
@@ -115,15 +119,17 @@ async def resolve_tasks(program: Program) -> TaskDB:
                 )
                 raise MissingPattern(c.pattern)
             p = pattern_index[c.pattern]
-            delayed_templates.append(TemplateTask([], [], p.call(c.args)))
+            tt = p.call(c.args)
+            if gather_args(tt.targets):
+                delayed_templates.append(tt)
+            else:
+                db.add(TemplateTask([], [], tt))
 
         for tt in delayed_templates:
-            task = await tt.run_cached(db.run, db)
-            match task:
-                case Ok(t):
-                    db.add(t)
-                case Failure():
-                    raise UserError(f"Missing dependency in {tt.dependencies}")
+            if not db.is_resolvable(tt.all_targets):
+                raise UserError(f"Task has unresolvable targets: {tt.targets}")
+            tt = await db.resolve_object(tt)
+            db.add(TemplateTask([], [], tt))
 
         return db
 
