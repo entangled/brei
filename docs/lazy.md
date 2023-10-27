@@ -1,4 +1,16 @@
 # Laziness
+Loom executes workflows in Asyncio, through lazy evaluation and memoization. The `Lazy` class contains a `asyncio.lock` and a `Result` object. When multiple tasks ask for the result of the same dependent task, the lock makes sure a computation is perforemed only once. Once the lock is free, all future requests immediately return the memoized result.
+
+      .------.        .------. 
+     |  Lazy  | -->  |  Task  |
+      `------'        `------' 
+
+      .--------.        .--------. 
+     |  LazyDB  | -->  |  TaskDB  |
+      `--------'        `--------' 
+
+
+
 Module `loom.lazy` presents us with a `Lazy` tasks that have targets and a set of dependencies. A `Task` will have an abstract method `run`. Then the purpose is to run those tasks in correct order and possibly in parallel.
 
 This is achieved by memoizing results and keeping locks on the `Lazy` task when it is still evaluating.

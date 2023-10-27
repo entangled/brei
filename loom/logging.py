@@ -6,6 +6,6 @@ def logger():
     return logging.getLogger("loom")
 
 
-logging.basicConfig(level=logging.DEBUG)
-logger().level = logging.DEBUG
+logging.basicConfig(level=logging.INFO)
+logger().level = logging.INFO
 # ~/~ end

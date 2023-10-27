@@ -1,0 +1,25 @@
+# ~/~ begin <<docs/index.md#examples/include-gen.toml>>[init]
+include = [
+    "./gen.json"
+]
+
+[[task]]
+stdout = "./gen.json"
+language = "Python"
+script = """
+import json
+tasks = [
+    {"stdout": f"out{i}.dat",
+     "script": f"echo '{i}'",
+     "language": "Bash"} for i in range(10)
+]
+tasks.append({"name": "write-outs", "dependencies": [
+    f"out{i}.dat" for i in range(10)
+]})
+print(json.dumps(tasks))
+"""
+
+[[task]]
+name = "all"
+dependencies = ["#write-outs"]
+# ~/~ end

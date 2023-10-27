@@ -1,2 +1,25 @@
 # ~/~ begin <<docs/index.md#examples/versioned_output.toml>>[init]
+[environment]
+data_dir = "./data"
+output_dir = "./output/${commit}"
+
+[[task]]
+language = "Bash"
+stdout = "var(commit)"
+script = "git rev-parse HEAD"
+
+[[task]]
+targets = ["${output_dir}/data.h5"]
+dependencies = ["${data_dir}/input.h5", "#prepare"]
+language = "Python"
+path = "scripts/run.py"
+
+[[task]]
+name = "prepare"
+language = "Bash"
+script = "mkdir -p ${output_dir}"
+
+[[task]]
+name = "all"
+dependencies = ["${output_dir}/data.h5"]
 # ~/~ end
