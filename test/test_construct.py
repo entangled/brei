@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
-from loom.lazy import Phony
-from loom.utility import construct
+from brei.lazy import Phony
+from brei.utility import construct
 
 
 def test_construct_path():

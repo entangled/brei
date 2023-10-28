@@ -1,4 +1,4 @@
-from loom.task import Phony
+from brei.task import Phony
 
 # from entangled.parsing import
 

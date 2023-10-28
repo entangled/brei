@@ -2,9 +2,9 @@
 from dataclasses import dataclass
 from typing import Iterable, Optional
 import pytest
-from loom.task import TemplateVariable, Variable
-from loom.template_strings import gather_args, substitute
-from loom.lazy import LazyDB
+from brei.task import TemplateVariable, Variable
+from brei.template_strings import gather_args, substitute
+from brei.lazy import LazyDB
 
 
 class Environment(LazyDB[Variable, TemplateVariable]):

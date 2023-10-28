@@ -5,9 +5,9 @@ import sys
 import time
 
 import pytest
-from loom.lazy import Phony
-from loom.program import Program, resolve_tasks
-from loom.task import Task
+from brei.lazy import Phony
+from brei.program import Program, resolve_tasks
+from brei.task import Task
 
 
 @dataclass

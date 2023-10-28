@@ -5,9 +5,9 @@ import pytest
 from contextlib import asynccontextmanager, chdir
 from pathlib import Path
 import time
-from loom.utility import stat
-from loom.lazy import Phony
-from loom.task import TaskDB, Task
+from brei.utility import stat
+from brei.lazy import Phony
+from brei.task import TaskDB, Task
 
 
 class TaskDBTester(TaskDB):

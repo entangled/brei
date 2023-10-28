@@ -3,8 +3,8 @@ import asyncio
 import pytest
 from dataclasses import dataclass
 from typing import Any
-from loom.errors import CyclicWorkflowError
-from loom.lazy import Lazy, LazyDB
+from brei.errors import CyclicWorkflowError
+from brei.lazy import Lazy, LazyDB
 import uuid
 
 

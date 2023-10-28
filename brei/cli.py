@@ -6,10 +6,10 @@ import tomllib
 from typing import Optional
 import argh  # type: ignore
 import asyncio
-from loom.errors import HelpfulUserError
-from loom.lazy import Phony
+from brei.errors import HelpfulUserError
+from brei.lazy import Phony
 
-from loom.utility import construct, read_from_file
+from brei.utility import construct, read_from_file
 from rich_argparse import RichHelpFormatter
 
 from .program import Program, resolve_tasks

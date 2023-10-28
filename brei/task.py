@@ -13,7 +13,7 @@ from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
 
-from loom.result import TaskFailure
+from brei.result import TaskFailure
 
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat

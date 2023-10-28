@@ -1,5 +1,5 @@
 # ~/~ begin <<docs/lazy.md#test/test_result.py>>[init]
-from loom.result import Failure, TaskFailure, Ok
+from brei.result import Failure, TaskFailure, Ok
 from hypothesis import given
 from hypothesis.strategies import builds, booleans, text, integers
 
