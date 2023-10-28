@@ -1,11 +1,21 @@
 # ~/~ begin <<docs/errors.md#loom/errors.py>>[init]
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Generic, TypeVar
 
 
 class UserError(Exception):
     def __str__(self):
         return "Unknown user error."
+
+
+T = TypeVar("T")
+
+@dataclass
+class CyclicWorkflowError(UserError, Generic[T]):
+    cycle: list[T]
+
+    def __str__(self):
+        return f"Cycle detected: {self.cycle}"
 
 
 @dataclass

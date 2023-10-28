@@ -2,12 +2,13 @@ from __future__ import annotations
 import pytest
 from dataclasses import dataclass
 from typing import Any
-from loom.lazy import Lazy, LazyDB, Phony
+from loom.errors import CyclicWorkflowError
+from loom.lazy import Lazy, LazyDB
 import uuid
 
 
-class PyFunc(Lazy[Phony | str, Any]):
-    def __init__(self, db: LazyDB, foo: Any, tgt: str, deps: list[Phony | str]):
+class PyFunc(Lazy[str, Any]):
+    def __init__(self, db: LazyDB, foo: Any, tgt: str, deps: list[str]):
         super().__init__([tgt], deps)
         self.db = db
         self.foo = foo
@@ -84,3 +85,27 @@ async def test_noodles():
     assert w_result.value == 13
     assert exec_order[-1] == "w"
     assert exec_order[0] == "x"
+
+
+@pytest.mark.timeout(1)
+@pytest.mark.asyncio
+async def test_cycles():
+    db = PyTaskDB()
+
+    @db.lazy
+    def add(x, y):
+        return x + y
+
+    @db.lazy
+    def pure(x):
+        return x
+
+    w = pure(1)
+    x = add(w, w)
+    y = add(x, x)
+    z = add(y, y)
+    x.requires.append(z.creates[0])
+
+    with pytest.raises(CyclicWorkflowError):
+        await z.eval()
+

@@ -22,6 +22,7 @@ hypothesis = "^6.88.1"
 mypy = "^1.6.1"
 pytest-asyncio = "^0.21.1"
 deadcode = "^2.2.2"
+pytest-timeout = "^2.2.0"
 
 [build-system]
 requires = ["poetry-core"]

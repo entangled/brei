@@ -24,9 +24,9 @@
       "deps": [
         "docs/errors.md"
       ],
-      "modified": "2023-10-28T19:19:58.716690",
-      "hexdigest": "166a0275bd547e564b50d19182efc9887485ceb0b4d507292af2e8b893d97966",
-      "size": 717
+      "modified": "2023-10-28T22:52:21.096511",
+      "hexdigest": "17b54f57df27e24c653b5eb727cbb40ae70d4e41f5598dec2f9e5829b54035fd",
+      "size": 907
     },
     {
       "path": "loom/lazy.py",
@@ -112,9 +112,9 @@
     {
       "path": "docs/errors.md",
       "deps": null,
-      "modified": "2023-10-28T19:24:19.620959",
-      "hexdigest": "2929d74d51755ec1891dce0b51a61686ca9417fd01db9e8248e0071b4a2fee79",
-      "size": 694
+      "modified": "2023-10-28T22:52:21.230511",
+      "hexdigest": "f0e6f3739e7bfdc12446c96d19d90dbcee9c90f17e45dfa09b1c95fcf30920ca",
+      "size": 883
     },
     {
       "path": "docs/target.md",
