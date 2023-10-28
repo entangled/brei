@@ -29,3 +29,14 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 packages = ["loom"]
+
+[[tool.loom.task]]
+name = "test"
+language = "Bash"
+script = """
+coverage run --source=loom -m pytest
+coverage xml
+coverage report
+mypy
+"""
+
