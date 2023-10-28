@@ -234,8 +234,8 @@ def loom(
 
         program = read_from_file(Program, input_path, section)
 
-    elif Path("loom.toml").exists():
-        program = read_from_file(Program, Path("loom.toml"))
+    elif Path("brei.toml").exists():
+        program = read_from_file(Program, Path("brei.toml"))
 
     elif Path("pyproject.toml").exists():
         with open("pyproject.toml", "rb") as f_in:
@@ -245,7 +245,7 @@ def loom(
                 data = data[s]
         except KeyError as e:
             raise HelpfulUserError(
-                f"With out the `-f` argument, Brei looks for `loom.toml` first, then for "
+                f"With out the `-f` argument, Brei looks for `brei.toml` first, then for "
                 f"a `[tool.brei]` section in `pyproject.toml`. A `pyproject.toml` file was "
                 f"found, but contained no `[tool.brei]` section."
             ) from e

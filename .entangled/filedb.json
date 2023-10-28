@@ -50,8 +50,8 @@
     {
       "path": "docs/index.md",
       "deps": null,
-      "modified": "2023-10-29T00:49:16.801232",
-      "hexdigest": "eb8fdfe84013e2187b46da8697408e36022807e49f96e41728d23fe50081d03e",
+      "modified": "2023-10-29T01:03:30.074419",
+      "hexdigest": "1a987bbbe2b15f10d5ae01a440b615b6a716bdb54ee948d912bbd49581d754bf",
       "size": 7192
     },
     {
@@ -215,30 +215,30 @@
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-29T00:55:24.402604",
-      "hexdigest": "fd60e2998facb70d4e0819e7248696c96c471489097cc7b20244a17b7498f02d",
-      "size": 2730
+      "modified": "2023-10-29T01:03:08.089335",
+      "hexdigest": "fda5f6cdb83f9df853990a571ccc021a9fab8aa2d33ed031f264214017689c85",
+      "size": 2731
     }
   ],
   "source": [],
   "target": [
     "examples/rot13.toml",
-    "examples/echo.toml",
-    "brei/lazy.py",
-    "brei/cli.py",
-    "examples/versioned_output.toml",
-    "brei/task.py",
-    "brei/program.py",
-    "examples/tasks.toml",
-    "examples/hello-includes.toml",
     "brei/errors.py",
     "examples/include-gen.toml",
+    "brei/template_strings.py",
     "brei/result.py",
+    "brei/task.py",
+    "brei/utility.py",
+    "brei/lazy.py",
+    "brei/program.py",
     "brei/__init__.py",
-    "brei/logging.py",
     "test/test_template_strings.py",
     "test/test_result.py",
-    "brei/template_strings.py",
-    "brei/utility.py"
+    "examples/tasks.toml",
+    "brei/cli.py",
+    "examples/versioned_output.toml",
+    "brei/logging.py",
+    "examples/echo.toml",
+    "examples/hello-includes.toml"
   ]
 }

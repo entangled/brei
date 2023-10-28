@@ -8,7 +8,7 @@ readme = "README.md"
 packages = []
 
 [tool.poetry.scripts]
-loom = "brei.cli:cli"
+brei = "brei.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -23,6 +23,7 @@ mypy = "^1.6.1"
 pytest-asyncio = "^0.21.1"
 deadcode = "^2.2.2"
 pytest-timeout = "^2.2.0"
+coverage = "^7.3.2"
 
 [build-system]
 requires = ["poetry-core"]
@@ -31,7 +32,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 packages = ["brei"]
 
-[[tool.loom.task]]
+[[tool.brei.task]]
 name = "test"
 script = """
 coverage run --source=brei -m pytest
