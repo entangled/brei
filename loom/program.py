@@ -152,14 +152,14 @@ async def resolve_tasks(program: Program) -> TaskDB:
             p = template_index[c.template]
             for args in c.all_args:
                 tt = p.call(c.args)
-                if gather_args(tt.targets):
+                if gather_args(tt.creates):
                     delayed_templates.append(tt)
                 else:
                     db.add(TemplateTask([], [], tt))
 
         for tt in delayed_templates:
             if not db.is_resolvable(tt.all_targets):
-                raise UserError(f"Task has unresolvable targets: {tt.targets}")
+                raise UserError(f"Task has unresolvable targets: {tt.creates}")
             tt = await db.resolve_object(tt)
             db.add(TemplateTask([], [], tt))
 

@@ -14,13 +14,13 @@ Tasks are the elemental units of work in Loom. A task is the single execution of
 
 ``` {.toml file=examples/tasks.toml}
 [[task]]
-targets = ["hello.txt"]
-language = "Bash"
+creates = ["hello.txt"]
+runner = "Bash"
 script = "echo 'Hello, World!' > hello.txt"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 
 [[task]]
 name = "clean"
@@ -33,32 +33,32 @@ This defines to named tasks `all` and `clean`, where `all` depends on the creati
 We can use patterns to create reusable items. Variables follow Python's `string.Template` syntax (similar to many scripting languages), `${var_name}` substitutes for the contents of the `var_name` variable. Use two dollar signs `$$` to make a `$` literal.
 
 ``` {.toml file=examples/rot13.toml}
-[pattern.echo]
+[template.echo]
 stdout = "${stdout}"
-language = "Bash"
+runner = "Bash"
 script = "echo ${text}"
 
 [pattern.rot13]
 stdout = "${stdout}"
 stdin = "${stdin}"
-language = "Bash"
+runner = "Bash"
 script = "tr a-zA-Z n-za-mN-ZA-M"
 
 [[call]]
-pattern = "echo"
+template = "echo"
   [call.args]
   stdout = "secret1.txt"
   text = "Uryyb, Jbeyq!"
 
 [[call]]
-pattern = "rot13"
+template = "rot13"
   [call.args]
   stdin = "secret.txt"
   stdout = "msg.txt"
 
 [[task]]
 name = "all"
-dependencies = ["msg.txt"]
+requires = ["msg.txt"]
 ```
 
 ### Variables: Writing output to flexible target
@@ -70,24 +70,24 @@ data_dir = "./data"
 output_dir = "./output/${commit}"
 
 [[task]]
-language = "Bash"
+runner = "Bash"
 stdout = "var(commit)"
 script = "git rev-parse HEAD"
 
 [[task]]
-targets = ["${output_dir}/data.h5"]
-dependencies = ["${data_dir}/input.h5", "#prepare"]
-language = "Python"
+creates = ["${output_dir}/data.h5"]
+requires = ["${data_dir}/input.h5", "#prepare"]
+runner = "Python"
 path = "scripts/run.py"
 
 [[task]]
 name = "prepare"
-language = "Bash"
+runner = "Bash"
 script = "mkdir -p ${output_dir}"
 
 [[task]]
 name = "all"
-dependencies = ["${output_dir}/data.h5"]
+requires = ["${output_dir}/data.h5"]
 ```
 
 Also note the following:
@@ -102,8 +102,8 @@ Also note the following:
 You can include parts of a workflow from other files, both TOML and JSON.
 
 ``` {.toml file=examples/echo.toml}
-[pattern.echo]
-language = "Bash"
+[template.echo]
+runner = "Bash"
 stdout = "${stdout}"
 script = "echo '${text}'"
 ```
@@ -114,14 +114,14 @@ include = [
 ]
 
 [[call]]
-pattern = "echo"
+template = "echo"
   [call.args]
   stdout = "hello.txt"
   text = "Hello, World!"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 ```
 
 It is even possible to include files that still need to be generated. The following generates a file with ten tasks, includes that file and runs those tasks.
@@ -133,7 +133,7 @@ include = [
 
 [[task]]
 stdout = "./gen.json"
-language = "Python"
+runner = "Python"
 script = """
 import json
 tasks = [
@@ -149,7 +149,7 @@ print(json.dumps(tasks))
 
 [[task]]
 name = "all"
-dependencies = ["#write-outs"]
+requires = ["#write-outs"]
 ```
 
 ### Remarks

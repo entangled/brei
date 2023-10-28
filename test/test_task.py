@@ -17,7 +17,7 @@ class PyFunc(Lazy[Phony | str, Any]):
         return self.foo(*args)
 
     async def eval(self):
-        return await self.db.run(self.targets[0])
+        return await self.db.run(self.creates[0])
 
 
 @dataclass
@@ -37,7 +37,7 @@ class PyTaskDB(LazyDB[str, Any]):
             deps = []
             for arg in args:
                 if isinstance(arg, Lazy):
-                    deps.append(arg.targets[0])
+                    deps.append(arg.creates[0])
                 else:
                     dep = uuid.uuid4().hex
                     self.add(PyLiteral(dep, arg))

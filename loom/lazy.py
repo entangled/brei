@@ -49,7 +49,7 @@ class Lazy(Generic[T, R]):
             throws an exception if accessed before the task is complete.
     """
 
-    targets: list[T]
+    creates: list[T]
     requires: list[T]
 
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
@@ -140,7 +140,7 @@ class LazyDB(Generic[T, TaskT]):
         """Add a task to the DB."""
         log.debug(f"adding task ===\n{task}")
         self.tasks.append(task)
-        for target in task.targets:
+        for target in task.creates:
             self.index[target] = task
 
     def clean(self):

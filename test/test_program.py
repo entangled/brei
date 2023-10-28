@@ -53,7 +53,6 @@ requires = ["hello.txt"]
 
 template = LoomTest("""
 [template.echo]
-targets = ["${stdout}"]
 stdout = "${stdout}"
 runner = "Python"
 script = '''

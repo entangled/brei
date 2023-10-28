@@ -1,28 +1,28 @@
 # ~/~ begin <<docs/index.md#examples/rot13.toml>>[init]
-[pattern.echo]
+[template.echo]
 stdout = "${stdout}"
-language = "Bash"
+runner = "Bash"
 script = "echo ${text}"
 
 [pattern.rot13]
 stdout = "${stdout}"
 stdin = "${stdin}"
-language = "Bash"
+runner = "Bash"
 script = "tr a-zA-Z n-za-mN-ZA-M"
 
 [[call]]
-pattern = "echo"
+template = "echo"
   [call.args]
   stdout = "secret1.txt"
   text = "Uryyb, Jbeyq!"
 
 [[call]]
-pattern = "rot13"
+template = "rot13"
   [call.args]
   stdin = "secret.txt"
   stdout = "msg.txt"
 
 [[task]]
 name = "all"
-dependencies = ["msg.txt"]
+requires = ["msg.txt"]
 # ~/~ end

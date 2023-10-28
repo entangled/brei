@@ -4,12 +4,12 @@ include = [
 ]
 
 [[call]]
-pattern = "echo"
+template = "echo"
   [call.args]
   stdout = "hello.txt"
   text = "Hello, World!"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 # ~/~ end

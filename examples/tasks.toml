@@ -1,12 +1,12 @@
 # ~/~ begin <<docs/index.md#examples/tasks.toml>>[init]
 [[task]]
-targets = ["hello.txt"]
-language = "Bash"
+creates = ["hello.txt"]
+runner = "Bash"
 script = "echo 'Hello, World!' > hello.txt"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 
 [[task]]
 name = "clean"

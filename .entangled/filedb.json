@@ -6,8 +6,8 @@
       "deps": [
         "docs/tasks.md"
       ],
-      "modified": "2023-10-28T20:25:06.811727",
-      "hexdigest": "72908505f6b045d9ab20b3d15b4ab7b1de1abf1801faa3839c6479f4f5fcbf7d",
+      "modified": "2023-10-28T20:32:17.119880",
+      "hexdigest": "db40a6e21ac1ecbfae8280ff59edbb95d2ef7f13a99c197969c857b548851f02",
       "size": 8876
     },
     {
@@ -15,7 +15,7 @@
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-28T20:29:13.693637",
+      "modified": "2023-10-28T20:29:19.300636",
       "hexdigest": "9ee2948e90fd665f9b6a829d0a0a0ac17dc788a1c17338ad03b9581b0ea0eefe",
       "size": 2769
     },
@@ -33,8 +33,8 @@
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-28T20:23:19.553928",
-      "hexdigest": "85cf2f20c0e1f4e1c7045fc01b4a36c0b77fe1ff15ed298aee6abbd04f879da6",
+      "modified": "2023-10-28T20:35:18.281228",
+      "hexdigest": "dfa39a2b720fb4f543f36814313d1b5a8ecd087df9836958a96be17736e2e25c",
       "size": 4551
     },
     {
@@ -51,17 +51,17 @@
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-27T16:16:08.707273",
-      "hexdigest": "e36040033dee1a6cb73c7df27cc352c1c9131098bf8e14de0c29e10f10518801",
-      "size": 479
+      "modified": "2023-10-28T20:38:58.080720",
+      "hexdigest": "c006c60f6327c741389561b9c3658f6adf696480b47deb7eed47ffd382c57eec",
+      "size": 475
     },
     {
       "path": "loom/program.py",
       "deps": [
         "docs/program.md"
       ],
-      "modified": "2023-10-28T19:27:39.555774",
-      "hexdigest": "ac9d601899c5114a552679b31895f70df295ba6bef53b8c7c1861be0d49f0577",
+      "modified": "2023-10-28T20:33:11.108965",
+      "hexdigest": "b90d71ec9fc2ddded88134580d861fcd970e70e85b333525f605ff9ea589b56e",
       "size": 4886
     },
     {
@@ -133,22 +133,22 @@
     {
       "path": "docs/lazy.md",
       "deps": null,
-      "modified": "2023-10-28T20:23:19.683925",
-      "hexdigest": "db697279e4bdb3cce5d12a2a367ea341a3f29087e1bfc2581f8615df5cdf955c",
+      "modified": "2023-10-28T20:35:18.429229",
+      "hexdigest": "2a352eb99a0eb1c204ad48c0d86b5dea1151267ef6bf9461740c71631e03686c",
       "size": 6897
     },
     {
       "path": "docs/index.md",
       "deps": null,
-      "modified": "2023-10-28T20:29:13.924637",
-      "hexdigest": "8c0471164517b8a9f1b8bba69778dd1c065e73d4ab0b1f9d829cb1d1e537b0be",
-      "size": 7265
+      "modified": "2023-10-28T20:41:44.638064",
+      "hexdigest": "529969c7a53f41d7ca517380617b506785bf6946efa99e7b2eb39fbc3353c8b0",
+      "size": 7230
     },
     {
       "path": "docs/program.md",
       "deps": null,
-      "modified": "2023-10-28T19:27:39.728774",
-      "hexdigest": "7ee4f01093870055e856dedbf8410be2934a7b03b33110d577be76bcb316c741",
+      "modified": "2023-10-28T20:33:11.258965",
+      "hexdigest": "6869a1b59d1f5cd84865c2daad50c3004d95a48150a8a1c5ce11f2f74859430b",
       "size": 4873
     },
     {
@@ -161,8 +161,8 @@
     {
       "path": "docs/tasks.md",
       "deps": null,
-      "modified": "2023-10-28T20:25:06.935727",
-      "hexdigest": "0fc512ce2ca5666b136d0163aea02bda31000958f160b9bdf3b9be6b7686b3c6",
+      "modified": "2023-10-28T20:32:17.259881",
+      "hexdigest": "54a7509ff8896d9af235081b64cf4032819bf44f67d8e5d793e57589a5ee2ca7",
       "size": 8862
     },
     {
@@ -179,44 +179,44 @@
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-27T16:16:08.701272",
-      "hexdigest": "ca50166c38328b90d72345be67676a8ac9d4c5b49c9cf312d2fe8375e8086be9",
-      "size": 510
+      "modified": "2023-10-28T20:41:35.213054",
+      "hexdigest": "fdb946b75da1d4de2eb04af575458aa0bd7511301f26216630e3a352e2e9b971",
+      "size": 497
     },
     {
       "path": "examples/tasks.toml",
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-27T16:16:08.693272",
-      "hexdigest": "6bd993f2e4aeeb7ce34ea9b9d74178eca119a2a22df4e303af379646a81862f4",
-      "size": 261
+      "modified": "2023-10-28T20:41:44.504064",
+      "hexdigest": "b19dc4354ecd143b0c9676dfea35ccf0bff61fde4ed803f8c78eb8394a36253b",
+      "size": 256
     },
     {
       "path": "examples/hello-includes.toml",
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-27T16:16:08.703272",
-      "hexdigest": "daf2ad6b63421a88235abbffc38070a56dc0658913546759243af5c9030fa895",
-      "size": 247
+      "modified": "2023-10-28T20:37:53.475601",
+      "hexdigest": "3d67de8ef7b078421a03212479e42676b4c69de8b06c2ac697f3e8d3c843b74f",
+      "size": 245
     },
     {
       "path": "examples/include-gen.toml",
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-27T16:16:08.706272",
-      "hexdigest": "2d92accaa4b5902628a668187892437cdf0c28816679f868ff9959f610e7e20c",
-      "size": 473
+      "modified": "2023-10-28T20:38:20.642651",
+      "hexdigest": "aec14aa8ab5351a477ec9448d888c2c84696e8612f95fb21ad0ceeaf314996dd",
+      "size": 468
     },
     {
       "path": "examples/echo.toml",
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-27T16:16:08.709272",
-      "hexdigest": "6144ce868e5389e42eb4a459a3491ac73a36589b9a9fc51bffe4724c72760747",
+      "modified": "2023-10-28T20:38:01.299615",
+      "hexdigest": "379076e0a5c0e02b3caccb4f2b3eadd46f0ec829bdce60bf3ca99d684f1d836a",
       "size": 144
     }
   ],

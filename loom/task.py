@@ -63,14 +63,14 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 
     @property
     def target_paths(self):
-        return (p for p in self.targets if isinstance(p, Path))
+        return (p for p in self.creates if isinstance(p, Path))
 
     @property
     def dependency_paths(self):
         return (p for p in self.requires if isinstance(p, Path))
 
     def __str__(self):
-        tgts = ", ".join(str(t) for t in self.targets)
+        tgts = ", ".join(str(t) for t in self.creates)
         deps = ", ".join(str(t) for t in self.requires)
         if self.script is not None:
             src = indent(self.script, prefix=" ▎ ", predicate=lambda _: True)
@@ -83,13 +83,13 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 
     def __post_init__(self):
         if self.name is not None:
-            self.targets.append(Phony(self.name))
+            self.creates.append(Phony(self.name))
         if self.stdin and self.stdin not in self.requires:
             self.requires.append(self.stdin)
         if self.path and self.path not in self.requires:
             self.requires.append(self.path)
-        if self.stdout and self.stdout not in self.targets:
-            self.targets.append(self.stdout)
+        if self.stdout and self.stdout not in self.creates:
+            self.creates.append(self.stdout)
 
     def always_run(self) -> bool:
         return len(self.real_requirements) == 0
@@ -179,7 +179,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 
 @dataclass
 class TaskProxy:
-    targets: list[str] = field(default_factory=list)
+    creates: list[str] = field(default_factory=list)
     requires: list[str] = field(default_factory=list)
     name: Optional[str] = None
     runner: Optional[str] = None
@@ -192,7 +192,7 @@ class TaskProxy:
     @property
     def all_targets(self):
         return (
-            self.targets
+            self.creates
             + ([self.stdout] if self.stdout else [])
             + ([f"#{self.name}"] if self.name else [])
         )
@@ -222,8 +222,8 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
     template: TaskProxy
 
     def __post_init__(self):
-        assert not gather_args(self.template.targets)
-        self.targets += [str_to_target(t) for t in self.template.all_targets]
+        assert not gather_args(self.template.creates)
+        self.creates += [str_to_target(t) for t in self.template.all_targets]
         self.requires += [Variable(arg) for arg in gather_args(self.template)]
 
     async def run(self, ctx):
