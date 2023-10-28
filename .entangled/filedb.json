@@ -42,7 +42,7 @@
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-23T16:17:07.345029",
+      "modified": "2023-10-29T00:28:11.941594",
       "hexdigest": "a0954c5bf9a0a5da166d7e870aeb7a161127107e0c8c216b3760d0d065502095",
       "size": 450
     },
@@ -133,7 +133,7 @@
     {
       "path": "docs/lazy.md",
       "deps": null,
-      "modified": "2023-10-28T23:45:05.207847",
+      "modified": "2023-10-29T00:28:12.190593",
       "hexdigest": "4ba257a701d3bcc0d0eb2ced31d2139a535ffe734d7cd546362104013cf594b5",
       "size": 7230
     },

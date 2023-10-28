@@ -1,4 +1,5 @@
 from __future__ import annotations
+import asyncio
 import pytest
 from dataclasses import dataclass
 from typing import Any
@@ -88,8 +89,14 @@ async def test_noodles():
 
 
 @pytest.mark.timeout(1)
-@pytest.mark.asyncio
-async def test_cycles():
+def test_cycles():
+    asyncio.run(atest_cycles())
+
+
+# pytest-asyncio doesn't like this test and triggers the weirdest
+# undefined behaviours. The exception manages to kill the event-loop
+# and stuff just escalates from there.
+async def atest_cycles():
     db = PyTaskDB()
 
     @db.lazy
