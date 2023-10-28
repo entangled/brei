@@ -80,10 +80,7 @@ print("Uryyb, Jbeyq!")
 [template.rot13]
 stdout = "${stdout}"
 stdin = "${stdin}"
-runner = "Bash"
-script = \"\"\"
-tr a-zA-Z n-za-mN-ZA-M
-\"\"\"
+script = "tr a-zA-Z n-za-mN-ZA-M"
 
 [[call]]
 template = "rot13"

@@ -13,11 +13,14 @@ from tempfile import NamedTemporaryFile
 from typing import Any, Optional
 from asyncio import create_subprocess_exec
 from textwrap import indent
+import shlex
+
+from loom.result import TaskFailure
 
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
 from .logging import logger
-from .errors import FailedTaskError
+from .errors import FailedTaskError, HelpfulUserError
 from .template_strings import gather_args, substitute
 
 
@@ -51,6 +54,10 @@ def str_to_target(s: str) -> Path | Phony | Variable:
         return Variable(m.group(1))
     else:
         return Path(s)
+
+
+def is_oneliner(s: str) -> bool:
+    return len(s.splitlines()) == 1
 
 
 @dataclass
@@ -140,10 +147,8 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
         if not self.always_run() and not self.needs_run() and not cfg.force_run:
             return
 
-        if self.runner is None or (self.path is None and self.script is None):
+        if (self.path is None and self.script is None):
             return
-
-        runner = cfg.runners[self.runner]
 
         match self.stdin:
             case Variable(x):
@@ -156,25 +161,49 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
                 stdin = None
                 input_data = None
 
-        with self.get_script_path() as path, self.get_stdout() as stdout:
-            args = [string.Template(arg).substitute(script=path) for arg in runner.args]
-            async with cfg.throttle or nullcontext():
-                proc = await create_subprocess_exec(
-                    runner.command,
-                    *args,
-                    stdin=stdin,
-                    stdout=stdout,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-                stdout_data, stderr_data = await proc.communicate(input_data)
+        if self.runner is None and self.script is not None:
+            if not is_oneliner(self.script):
+                assert self.stdin is None
+            with self.get_stdout() as stdout:
+                stdout_data = b""
+                for line in self.script.splitlines():
+                    async with cfg.throttle or nullcontext():
+                        proc = await create_subprocess_exec(
+                            *shlex.split(line),
+                            stdin=stdin,
+                            stdout=stdout,
+                            stderr=asyncio.subprocess.PIPE,
+                        )
+                        stdout_data_part, stderr_data = await proc.communicate(input_data)
+                        log.debug(f"return-code {proc.returncode}")
+                    if stdout_data_part:
+                        stdout_data += stdout_data_part
+                    if stderr_data:
+                        log.info(stderr_data.decode())
 
-        if stderr_data:
-            log.info(stderr_data.decode())
+        elif self.runner is not None:
+            with self.get_script_path() as path, self.get_stdout() as stdout:
+                runner = cfg.runners[self.runner]
+                args = [string.Template(arg).substitute(script=path) for arg in runner.args]
+                async with cfg.throttle or nullcontext():
+                    proc = await create_subprocess_exec(
+                        runner.command,
+                        *args,
+                        stdin=stdin,
+                        stdout=stdout,
+                        stderr=asyncio.subprocess.PIPE,
+                    )
+                    stdout_data, stderr_data = await proc.communicate(input_data)
+                    log.debug(f"return-code {proc.returncode}")
 
-        log.debug(f"return-code {proc.returncode}")
+            if stderr_data:
+                log.info(stderr_data.decode())
+
+        else:
+            return
 
         if self.needs_run():
-            raise FailedTaskError(proc.returncode or 0, stderr_data.decode())
+            raise TaskFailure("Task didn't achieve goals.")
 
         return stdout_data.decode().strip() if stdout_data else None
 

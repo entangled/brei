@@ -32,7 +32,6 @@ packages = ["loom"]
 
 [[tool.loom.task]]
 name = "test"
-language = "Bash"
 script = """
 coverage run --source=loom -m pytest
 coverage xml

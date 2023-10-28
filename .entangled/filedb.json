@@ -6,9 +6,9 @@
       "deps": [
         "docs/tasks.md"
       ],
-      "modified": "2023-10-28T20:32:17.119880",
-      "hexdigest": "db40a6e21ac1ecbfae8280ff59edbb95d2ef7f13a99c197969c857b548851f02",
-      "size": 8876
+      "modified": "2023-10-28T21:39:39.369895",
+      "hexdigest": "7a86d262b18b9d8090abc4f7a6b166ea2be2957c2ad53912831a98879b3a815f",
+      "size": 10086
     },
     {
       "path": "loom/cli.py",
@@ -161,9 +161,9 @@
     {
       "path": "docs/tasks.md",
       "deps": null,
-      "modified": "2023-10-28T20:32:17.259881",
-      "hexdigest": "54a7509ff8896d9af235081b64cf4032819bf44f67d8e5d793e57589a5ee2ca7",
-      "size": 8862
+      "modified": "2023-10-28T21:39:39.516896",
+      "hexdigest": "f0133e5c86b77039473b1d56bed1036bbfc779cd2a498cf139b3f07ecd2bdd3f",
+      "size": 10072
     },
     {
       "path": "test/test_template_strings.py",
@@ -222,23 +222,23 @@
   ],
   "source": [],
   "target": [
-    "examples/tasks.toml",
-    "examples/versioned_output.toml",
-    "examples/hello-includes.toml",
-    "loom/lazy.py",
-    "loom/logging.py",
-    "test/test_template_strings.py",
-    "loom/template_strings.py",
-    "loom/cli.py",
-    "loom/utility.py",
-    "loom/result.py",
-    "examples/rot13.toml",
-    "examples/include-gen.toml",
     "loom/task.py",
-    "test/test_result.py",
-    "loom/errors.py",
+    "loom/cli.py",
+    "examples/hello-includes.toml",
+    "examples/tasks.toml",
+    "loom/logging.py",
     "loom/program.py",
+    "loom/lazy.py",
     "loom/__init__.py",
-    "examples/echo.toml"
+    "test/test_template_strings.py",
+    "examples/include-gen.toml",
+    "examples/versioned_output.toml",
+    "loom/errors.py",
+    "examples/rot13.toml",
+    "test/test_result.py",
+    "loom/result.py",
+    "examples/echo.toml",
+    "loom/utility.py",
+    "loom/template_strings.py"
   ]
 }
