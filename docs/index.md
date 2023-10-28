@@ -222,7 +222,8 @@ async def main(
 
 @argh.arg("targets", nargs="+", help="names of tasks to run")
 @argh.arg(
-    "-f", "--input-file",
+    "-f",
+    "--input-file",
     help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
 )
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
@@ -232,7 +233,7 @@ def loom(
     input_file: Optional[str] = None,
     *,
     force_run: bool = False,
-    jobs: Optional[int] = None
+    jobs: Optional[int] = None,
 ):
     """Build one of the configured targets."""
     if input_file is not None:

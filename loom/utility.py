@@ -167,4 +167,5 @@ def read_from_file(data_type: Type[T], path: Path, section: Optional[str] = None
         ) from e
 
     return construct(data_type, data)
+
 # ~/~ end

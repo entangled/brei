@@ -15,7 +15,15 @@ from .logging import logger
 from .errors import UserError
 
 from .utility import construct
-from .task import Variable, TaskDB, Pattern, Runner, TaskProxy, TemplateTask, TemplateVariable
+from .task import (
+    Variable,
+    TaskDB,
+    Pattern,
+    Runner,
+    TaskProxy,
+    TemplateTask,
+    TemplateVariable,
+)
 
 
 log = logger()
@@ -55,11 +63,18 @@ class PatternCall:
             return
 
         if self.join == Join.ZIP:
-            for v in zip(*map(lambda x: itertools.repeat(x) if isinstance(x, str) else x, self.args.values())):
+            for v in zip(
+                *map(
+                    lambda x: itertools.repeat(x) if isinstance(x, str) else x,
+                    self.args.values(),
+                )
+            ):
                 yield dict(zip(self.args.keys(), v))
 
         else:  # cartesian join
-            for v in itertools.product(*map(lambda x: [x] if isinstance(x, str) else x, self.args.values())):
+            for v in itertools.product(
+                *map(lambda x: [x] if isinstance(x, str) else x, self.args.values())
+            ):
                 yield dict(zip(self.args.keys(), v))
 
 
@@ -151,4 +166,5 @@ async def resolve_tasks(program: Program) -> TaskDB:
         return db
 
     return await go(program)
+
 # ~/~ end

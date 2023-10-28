@@ -14,6 +14,7 @@ R = TypeVar("R")
 
 log = logger()
 
+
 @dataclass
 class Phony(FromStr):
     name: str
@@ -76,7 +77,9 @@ class Lazy(Generic[T, R]):
         raise NotImplementedError()
 
     async def run_after_deps(self, recurse, *args) -> Result[R]:
-        dep_res = await asyncio.gather(*(recurse(dep, *args) for dep in self.dependencies))
+        dep_res = await asyncio.gather(
+            *(recurse(dep, *args) for dep in self.dependencies)
+        )
         if not all(dep_res):
             return DependencyFailure(
                 {k: v for (k, v) in zip(self.dependencies, dep_res) if not v}
@@ -97,8 +100,7 @@ class Lazy(Generic[T, R]):
         self._result = None
 
     def fields(self):
-        return { f.name: getattr(self, f.name)
-                 for f in fields(self) if f.name[0] != '_' }
+        return {f.name: getattr(self, f.name) for f in fields(self) if f.name[0] != "_"}
 
 
 TaskT = TypeVar("TaskT", bound=Lazy)
@@ -148,4 +150,5 @@ class LazyDB(Generic[T, TaskT]):
     def reset(self):
         for t in self.tasks:
             t.reset()
+
 # ~/~ end

@@ -8,7 +8,7 @@ from pathlib import Path
 import re
 import string
 from tempfile import NamedTemporaryFile
-from typing import Any, Optional, Union
+from typing import Any, Optional
 from asyncio import create_subprocess_exec
 from textwrap import indent
 
@@ -43,9 +43,9 @@ DEFAULT_RUNNERS: dict[str, Runner] = {
 
 
 def str_to_target(s: str) -> Path | Phony | Variable:
-    if s[0] == '#':
+    if s[0] == "#":
         return Phony(s[1:])
-    elif (m := re.match(r"var\(([^\s\(\)]+)\)", s)):
+    elif m := re.match(r"var\(([^\s\(\)]+)\)", s):
         return Variable(m.group(1))
     else:
         return Path(s)
@@ -59,6 +59,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     script: Optional[str] = None
     stdin: Optional[Path | Variable] = None
     stdout: Optional[Path | Variable] = None
+    description: Optional[str] = None
 
     @property
     def target_paths(self):
@@ -132,7 +133,6 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             case _:
                 yield None
 
-
     async def run(self, cfg):
         log.debug(f"{self}")
         if not self.always_run() and not self.needs_run() and not cfg.force_run:
@@ -187,14 +187,23 @@ class TaskProxy:
     script: Optional[str] = None
     stdin: Optional[str] = None
     stdout: Optional[str] = None
+    description: Optional[str] = None
 
     @property
     def all_targets(self):
-        return self.targets + ([self.stdout] if self.stdout else []) + ([f"#{self.name}"] if self.name else [])
+        return (
+            self.targets
+            + ([self.stdout] if self.stdout else [])
+            + ([f"#{self.name}"] if self.name else [])
+        )
 
     @property
     def all_dependencies(self):
-        return self.dependencies + ([self.stdin] if self.stdin else []) + ([self.path] if self.path else [])
+        return (
+            self.dependencies
+            + ([self.stdin] if self.stdin else [])
+            + ([self.path] if self.path else [])
+        )
 
 
 @dataclass
@@ -225,7 +234,17 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
         stdin = str_to_target(proxy.stdin) if proxy.stdin else None
         stdout = str_to_target(proxy.stdout) if proxy.stdout else None
         assert not isinstance(stdin, Phony) and not isinstance(stdout, Phony)
-        task = Task(tgts, deps, proxy.name, proxy.language, path, proxy.script, stdin, stdout)
+        task = Task(
+            tgts,
+            deps,
+            proxy.name,
+            proxy.language,
+            path,
+            proxy.script,
+            stdin,
+            stdout,
+            proxy.description,
+        )
         return task
 
 
@@ -272,4 +291,5 @@ class Environment:
 class Pattern(TaskProxy):
     def call(self, args: dict[str, Any]) -> TaskProxy:
         return substitute(self, args)
+
 # ~/~ end

@@ -35,4 +35,5 @@ class FailedTaskError(UserError):
             f"process returned code {self.error_code}\n"
             f"standard error output: {self.stderr}"
         )
+
 # ~/~ end
