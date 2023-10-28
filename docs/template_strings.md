@@ -105,8 +105,6 @@ def _(template: list) -> set[str]:
 @gather_args.register
 def _(_template: None) -> set[str]:
     return set()
-
-
 ```
 
 ``` {.python file=test/test_template_strings.py}

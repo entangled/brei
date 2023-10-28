@@ -6,7 +6,7 @@ from loom.lazy import Lazy, LazyDB, Phony
 import uuid
 
 
-class PyFunc(Lazy[str, Any]):
+class PyFunc(Lazy[Phony | str, Any]):
     def __init__(self, db: LazyDB, foo: Any, tgt: str, deps: list[Phony | str]):
         super().__init__([tgt], deps)
         self.db = db

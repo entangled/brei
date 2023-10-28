@@ -56,7 +56,7 @@ def str_to_target(s: str) -> Path | Phony | Variable:
 @dataclass
 class Task(Lazy[Path | Phony | Variable, str | None]):
     name: Optional[str] = None
-    language: Optional[str] = None
+    runner: Optional[str] = None
     path: Optional[Path] = None
     script: Optional[str] = None
     stdin: Optional[Path | Variable] = None
@@ -140,10 +140,10 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
         if not self.always_run() and not self.needs_run() and not cfg.force_run:
             return
 
-        if self.language is None or (self.path is None and self.script is None):
+        if self.runner is None or (self.path is None and self.script is None):
             return
 
-        runner = cfg.runners[self.language]
+        runner = cfg.runners[self.runner]
 
         match self.stdin:
             case Variable(x):
@@ -184,7 +184,7 @@ class TaskProxy:
     targets: list[str] = field(default_factory=list)
     dependencies: list[str] = field(default_factory=list)
     name: Optional[str] = None
-    language: Optional[str] = None
+    runner: Optional[str] = None
     path: Optional[str] = None
     script: Optional[str] = None
     stdin: Optional[str] = None
@@ -240,7 +240,7 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
             tgts,
             deps,
             proxy.name,
-            proxy.language,
+            proxy.runner,
             path,
             proxy.script,
             stdin,
@@ -290,9 +290,7 @@ class Environment:
         return self.db.index[Variable(k)].result
 
 
-class Pattern(TaskProxy):
+class Template(TaskProxy):
     def call(self, args: dict[str, Any]) -> TaskProxy:
         return substitute(self, args)
-
-
 ```

@@ -228,6 +228,4 @@ class LazyDB(Generic[T, TaskT]):
     def reset(self):
         for t in self.tasks:
             t.reset()
-
-
 ```

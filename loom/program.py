@@ -18,7 +18,7 @@ from .utility import construct
 from .task import (
     Variable,
     TaskDB,
-    Pattern,
+    Template,
     Runner,
     TaskProxy,
     TemplateTask,
@@ -38,11 +38,11 @@ class MissingInclude(UserError):
 
 
 @dataclass
-class MissingPattern(UserError):
+class MissingTemplate(UserError):
     name: str
 
     def __str__(self):
-        return f"Pattern `{self.name}` not found."
+        return f"Template `{self.name}` not found."
 
 
 class Join(Enum):
@@ -51,8 +51,8 @@ class Join(Enum):
 
 
 @dataclass
-class PatternCall:
-    pattern: str
+class TemplateCall:
+    template: str
     args: dict[str, str | list[str]]
     join: Join = Join.ZIP
 
@@ -82,8 +82,8 @@ class PatternCall:
 class Program:
     task: list[TaskProxy] = field(default_factory=list)
     environment: dict[str, str] = field(default_factory=dict)
-    pattern: dict[str, Pattern] = field(default_factory=dict)
-    call: list[PatternCall] = field(default_factory=list)
+    template: dict[str, Template] = field(default_factory=dict)
+    call: list[TemplateCall] = field(default_factory=list)
     include: list[str] = field(default_factory=list)
     runner: dict[str, Runner] = field(default_factory=dict)
 
@@ -96,28 +96,28 @@ class Program:
 
 async def resolve_tasks(program: Program) -> TaskDB:
     db = TaskDB()
-    pattern_index = dict()
+    template_index = dict()
 
     async def go(program: Program):
         for var, template in program.environment.items():
             db.add(TemplateVariable([Variable(var)], [], template))
 
         task_templates = copy(program.task)
-        pattern_index.update(program.pattern)
-        delayed_calls: list[PatternCall] = []
+        template_index.update(program.template)
+        delayed_calls: list[TemplateCall] = []
         delayed_templates: list[TaskProxy] = []
 
         db.runners.update(program.runner)
 
         for c in program.call:
-            if c.pattern not in pattern_index:
+            if c.template not in template_index:
                 log.debug(
-                    "pattern `%s` not available, waiting for includes to resolve",
-                    c.pattern,
+                    "template `%s` not available, waiting for includes to resolve",
+                    c.template,
                 )
                 delayed_calls.append(c)
                 continue
-            p = pattern_index[c.pattern]
+            p = template_index[c.template]
             for args in c.all_args:
                 task_templates.append(p.call(args))
 
@@ -144,12 +144,12 @@ async def resolve_tasks(program: Program) -> TaskDB:
             await go(prg)
 
         for c in delayed_calls:
-            if c.pattern not in pattern_index:
+            if c.template not in template_index:
                 log.debug(
-                    "pattern `%s` still not available, now this is an error", c.pattern
+                    "template `%s` still not available, now this is an error", c.template
                 )
-                raise MissingPattern(c.pattern)
-            p = pattern_index[c.pattern]
+                raise MissingTemplate(c.template)
+            p = template_index[c.template]
             for args in c.all_args:
                 tt = p.call(c.args)
                 if gather_args(tt.targets):
@@ -166,5 +166,4 @@ async def resolve_tasks(program: Program) -> TaskDB:
         return db
 
     return await go(program)
-
 # ~/~ end

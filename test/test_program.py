@@ -23,7 +23,7 @@ dependencies = ["hello.txt"]
 
 [[task]]
 stdout = "hello.txt"
-language = "Bash"
+runner = "Bash"
 script = "echo 'Hello, World'"
 """, [ ("hello.txt", "Hello, World") ])
 
@@ -35,12 +35,12 @@ include = [
 
 [[task]]
 stdout = "generated_wf.toml"
-language = "Python"
+runner = "Python"
 script = '''
 print(\"\"\"
 [[task]]
 stdout = "hello.txt"
-language = "Bash"
+runner = "Bash"
 script = "echo 'Hello, World'"
 \"\"\")
 '''
@@ -51,11 +51,11 @@ dependencies = ["hello.txt"]
 """, [ ("hello.txt", "Hello, World") ])
 
 
-pattern = LoomTest("""
-[pattern.echo]
+template = LoomTest("""
+[template.echo]
 targets = ["${stdout}"]
 stdout = "${stdout}"
-language = "Python"
+runner = "Python"
 script = '''
 print("${text}")
 '''
@@ -65,7 +65,7 @@ name = "all"
 dependencies = ["hello.txt"]
 
 [[call]]
-pattern = "echo"
+template = "echo"
 args = { stdout = "hello.txt", text = "Hello, World" }
 """, [ ("hello.txt", "Hello, World") ])
 
@@ -73,21 +73,21 @@ args = { stdout = "hello.txt", text = "Hello, World" }
 rot_13 = LoomTest("""
 [[task]]
 stdout = "secret.txt"
-language = "Python"
+runner = "Python"
 script = \"\"\"
 print("Uryyb, Jbeyq!")
 \"\"\"
 
-[pattern.rot13]
+[template.rot13]
 stdout = "${stdout}"
 stdin = "${stdin}"
-language = "Bash"
+runner = "Bash"
 script = \"\"\"
 tr a-zA-Z n-za-mN-ZA-M
 \"\"\"
 
 [[call]]
-pattern = "rot13"
+template = "rot13"
   [call.args]
   stdin = "secret.txt"
   stdout = "hello.txt"
@@ -104,7 +104,7 @@ msg = "Hello, World!"
 
 [[task]]
 stdout = "hello.txt"
-language = "Bash"
+runner = "Bash"
 script = "echo '${msg}'"
 
 [[task]]
@@ -114,31 +114,31 @@ dependencies = ["hello.txt"]
 
 
 variable_stdout = LoomTest("""
-[pattern.echo]
-language = "Bash"
+[template.echo]
+runner = "Bash"
 script = "echo '${text}'"
 stdout = "${stdout}"
 
 [[call]]
-pattern = "echo"
+template = "echo"
   [call.args]
   text = "Hello, World!"
   stdout = "var(msg)"
 
 [[task]]
-language = "Bash"
+runner = "Bash"
 script = "cat"
 stdin = "var(msg)"
 stdout = "hello.txt"
 
 [[call]]
-pattern = "echo"
+template = "echo"
   [call.args]
   text = "goodbye.txt"
   stdout = "var(file_name)"
 
 [[task]]
-language = "Bash"
+runner = "Bash"
 script = "cat"
 stdin = "var(msg)"
 stdout = "${file_name}"
@@ -150,20 +150,20 @@ dependencies = ["hello.txt", "${file_name}"]
 
 
 array_call = LoomTest("""
-[pattern.echo]
-language = "Bash"
+[template.echo]
+runner = "Bash"
 script = "echo '${a}${b}'"
 stdout = "${pre}-${a}-${b}"
 
 [[call]]
-pattern = "echo"
+template = "echo"
   [call.args]
   pre = "zip"
   a = ["1", "2", "3"]
   b = ["a", "b", "c"]
 
 [[call]]
-pattern = "echo"
+template = "echo"
 join = "product"
   [call.args]
   pre = "prod"
@@ -177,7 +177,7 @@ dependencies = ["zip-1-a", "zip-2-b", "zip-3-c",
 """, [("zip-1-a", "1a"), ("zip-2-b", "2b"), ("zip-3-c", "3c"),
       ("prod-1-a", "1a"), ("prod-1-b", "1b"), ("prod-2-a", "2a"), ("prod-2-b", "2b")])
 
-@pytest.mark.parametrize("test", [hello_world, include, pattern, rot_13, templated_task, variable_stdout, array_call])
+@pytest.mark.parametrize("test", [hello_world, include, template, rot_13, templated_task, variable_stdout, array_call])
 @pytest.mark.asyncio
 async def test_loom(tmp_path, test):
     with chdir(tmp_path):
