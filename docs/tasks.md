@@ -69,11 +69,11 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 
     @property
     def dependency_paths(self):
-        return (p for p in self.dependencies if isinstance(p, Path))
+        return (p for p in self.requires if isinstance(p, Path))
 
     def __str__(self):
         tgts = ", ".join(str(t) for t in self.targets)
-        deps = ", ".join(str(t) for t in self.dependencies)
+        deps = ", ".join(str(t) for t in self.requires)
         if self.script is not None:
             src = indent(self.script, prefix=" ▎ ", predicate=lambda _: True)
         elif self.path is not None:
@@ -86,15 +86,15 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     def __post_init__(self):
         if self.name is not None:
             self.targets.append(Phony(self.name))
-        if self.stdin and self.stdin not in self.dependencies:
-            self.dependencies.append(self.stdin)
-        if self.path and self.path not in self.dependencies:
-            self.dependencies.append(self.path)
+        if self.stdin and self.stdin not in self.requires:
+            self.requires.append(self.stdin)
+        if self.path and self.path not in self.requires:
+            self.requires.append(self.path)
         if self.stdout and self.stdout not in self.targets:
             self.targets.append(self.stdout)
 
     def always_run(self) -> bool:
-        return len(self.real_dependencies) == 0
+        return len(self.real_requirements) == 0
 
     def needs_run(self) -> bool:
         if any(not p.exists() for p in self.target_paths):
@@ -182,7 +182,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 @dataclass
 class TaskProxy:
     targets: list[str] = field(default_factory=list)
-    dependencies: list[str] = field(default_factory=list)
+    requires: list[str] = field(default_factory=list)
     name: Optional[str] = None
     runner: Optional[str] = None
     path: Optional[str] = None
@@ -202,7 +202,7 @@ class TaskProxy:
     @property
     def all_dependencies(self):
         return (
-            self.dependencies
+            self.requires
             + ([self.stdin] if self.stdin else [])
             + ([self.path] if self.path else [])
         )
@@ -213,7 +213,7 @@ class TemplateVariable(Lazy[Variable, str]):
     template: str
 
     def __post_init__(self):
-        self.dependencies += [Variable(arg) for arg in gather_args(self.template)]
+        self.requires += [Variable(arg) for arg in gather_args(self.template)]
 
     async def run(self, ctx) -> str:
         return substitute(self.template, ctx.environment)
@@ -226,7 +226,7 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
     def __post_init__(self):
         assert not gather_args(self.template.targets)
         self.targets += [str_to_target(t) for t in self.template.all_targets]
-        self.dependencies += [Variable(arg) for arg in gather_args(self.template)]
+        self.requires += [Variable(arg) for arg in gather_args(self.template)]
 
     async def run(self, ctx):
         proxy = substitute(self.template, ctx.environment)

@@ -19,7 +19,7 @@ class LoomTest:
 hello_world = LoomTest("""
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 
 [[task]]
 stdout = "hello.txt"
@@ -47,7 +47,7 @@ script = "echo 'Hello, World'"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 """, [ ("hello.txt", "Hello, World") ])
 
 
@@ -62,7 +62,7 @@ print("${text}")
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 
 [[call]]
 template = "echo"
@@ -94,7 +94,7 @@ template = "rot13"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 """, [ ("hello.txt", "Hello, World!") ])
 
 
@@ -109,7 +109,7 @@ script = "echo '${msg}'"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt"]
+requires = ["hello.txt"]
 """, [("hello.txt", "Hello, World!")])
 
 
@@ -145,7 +145,7 @@ stdout = "${file_name}"
 
 [[task]]
 name = "all"
-dependencies = ["hello.txt", "${file_name}"]
+requires = ["hello.txt", "${file_name}"]
 """, [("hello.txt", "Hello, World!"), ("goodbye.txt", "Hello, World!")])
 
 
@@ -172,7 +172,7 @@ join = "product"
 
 [[task]]
 name = "all"
-dependencies = ["zip-1-a", "zip-2-b", "zip-3-c",
+requires = ["zip-1-a", "zip-2-b", "zip-3-c",
                 "prod-1-a", "prod-1-b", "prod-2-a", "prod-2-b"]
 """, [("zip-1-a", "1a"), ("zip-2-b", "2b"), ("zip-3-c", "3c"),
       ("prod-1-a", "1a"), ("prod-1-b", "1b"), ("prod-2-a", "2a"), ("prod-2-b", "2b")])

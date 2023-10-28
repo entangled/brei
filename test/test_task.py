@@ -13,7 +13,7 @@ class PyFunc(Lazy[Phony | str, Any]):
         self.foo = foo
 
     async def run(self):
-        args = [self.db.index[t].result for t in self.dependencies]
+        args = [self.db.index[t].result for t in self.requires]
         return self.foo(*args)
 
     async def eval(self):

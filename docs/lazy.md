@@ -128,14 +128,14 @@ class Lazy(Generic[T, R]):
     """
 
     targets: list[T]
-    dependencies: list[T]
+    requires: list[T]
 
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
     _result: Optional[Result[R]] = field(default=None, init=False)
 
     @property
-    def real_dependencies(self) -> list[T]:
-        return [d for d in self.dependencies if not isinstance(d, Phony)]
+    def real_requirements(self) -> list[T]:
+        return [d for d in self.requires if not isinstance(d, Phony)]
 
     def __bool__(self):
         return self._result is not None and bool(self._result)
@@ -156,11 +156,11 @@ class Lazy(Generic[T, R]):
 
     async def run_after_deps(self, recurse, *args) -> Result[R]:
         dep_res = await asyncio.gather(
-            *(recurse(dep, *args) for dep in self.dependencies)
+            *(recurse(dep, *args) for dep in self.requires)
         )
         if not all(dep_res):
             return DependencyFailure(
-                {k: v for (k, v) in zip(self.dependencies, dep_res) if not v}
+                {k: v for (k, v) in zip(self.requires, dep_res) if not v}
             )
         try:
             return Ok(await self.run(*args))

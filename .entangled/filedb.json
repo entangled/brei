@@ -6,16 +6,16 @@
       "deps": [
         "docs/tasks.md"
       ],
-      "modified": "2023-10-28T19:24:19.485959",
-      "hexdigest": "59984da3ba275f31316a3c6f6e6147208d20eb7d1454e5ad9802f4b8da93949d",
-      "size": 8916
+      "modified": "2023-10-28T20:25:06.811727",
+      "hexdigest": "72908505f6b045d9ab20b3d15b4ab7b1de1abf1801faa3839c6479f4f5fcbf7d",
+      "size": 8876
     },
     {
       "path": "loom/cli.py",
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-28T19:14:11.728588",
+      "modified": "2023-10-28T20:29:13.693637",
       "hexdigest": "9ee2948e90fd665f9b6a829d0a0a0ac17dc788a1c17338ad03b9581b0ea0eefe",
       "size": 2769
     },
@@ -33,9 +33,9 @@
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-28T19:19:58.710690",
-      "hexdigest": "742c9f970b437483668aad5dd70d82c1481d38fb0b6551b37f5e7857a943de09",
-      "size": 4566
+      "modified": "2023-10-28T20:23:19.553928",
+      "hexdigest": "85cf2f20c0e1f4e1c7045fc01b4a36c0b77fe1ff15ed298aee6abbd04f879da6",
+      "size": 4551
     },
     {
       "path": "test/test_result.py",
@@ -133,16 +133,16 @@
     {
       "path": "docs/lazy.md",
       "deps": null,
-      "modified": "2023-10-28T19:24:19.631959",
-      "hexdigest": "2f15b530e4214eb9c86927c31d929e07cf386e149839f786c4460977f7004f85",
-      "size": 6913
+      "modified": "2023-10-28T20:23:19.683925",
+      "hexdigest": "db697279e4bdb3cce5d12a2a367ea341a3f29087e1bfc2581f8615df5cdf955c",
+      "size": 6897
     },
     {
       "path": "docs/index.md",
       "deps": null,
-      "modified": "2023-10-28T19:14:11.818590",
-      "hexdigest": "551fc6dd99e8ca26ceb8fc2b8707046546c1336bc77ea4e444bb2a6897167b62",
-      "size": 7571
+      "modified": "2023-10-28T20:29:13.924637",
+      "hexdigest": "8c0471164517b8a9f1b8bba69778dd1c065e73d4ab0b1f9d829cb1d1e537b0be",
+      "size": 7265
     },
     {
       "path": "docs/program.md",
@@ -161,9 +161,9 @@
     {
       "path": "docs/tasks.md",
       "deps": null,
-      "modified": "2023-10-28T19:24:19.636959",
-      "hexdigest": "5cd1e383d637ffb62ca31c01a071908ccfed96818a5d7a5b6db94af2493474b4",
-      "size": 8902
+      "modified": "2023-10-28T20:25:06.935727",
+      "hexdigest": "0fc512ce2ca5666b136d0163aea02bda31000958f160b9bdf3b9be6b7686b3c6",
+      "size": 8862
     },
     {
       "path": "test/test_template_strings.py",

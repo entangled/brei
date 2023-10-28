@@ -61,7 +61,7 @@ name = "all"
 dependencies = ["msg.txt"]
 ```
 
-### Example 3: Writing output to flexible target
+### Variables: Writing output to flexible target
 For many science applications its desirable to know which version of a software generated some output. You may write the output of a command to the contents of a variable, by using `"var(name)"` as a target.
 
 ``` {.toml file=examples/versioned_output.toml}
@@ -124,7 +124,7 @@ name = "all"
 dependencies = ["hello.txt"]
 ```
 
-It is even possible to include files that still need to be generated.
+It is even possible to include files that still need to be generated. The following generates a file with ten tasks, includes that file and runs those tasks.
 
 ``` {.toml file=examples/include-gen.toml}
 include = [
@@ -152,21 +152,8 @@ name = "all"
 dependencies = ["#write-outs"]
 ```
 
-Loom executes workflows in Asyncio, through lazy evaluation and memoization.
-The `Lazy` class contains a `asyncio.lock` and a `Result` object. When multiple
-tasks ask for the result of the same dependent task, the lock makes sure a
-computation is perforemed only once. Once the lock is free, all future requests
-immediately return the memoized result.
-
-      .------.        .------. 
-     |  Lazy  | -->  |  Task  |
-      `------'        `------' 
-
-      .--------.        .--------. 
-     |  LazyDB  | -->  |  TaskDB  |
-      `--------'        `--------' 
-
-
+### Remarks
+A lot of the above examples use Bash for brevity. If you need your workflows also execute on a Windows machine, it is advised to write scripts in Python.
 
 ``` {.python file=loom/__init__.py}
 from .program import Program, resolve_tasks
