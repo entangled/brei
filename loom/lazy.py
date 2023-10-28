@@ -1,10 +1,11 @@
 # ~/~ begin <<docs/lazy.md#loom/lazy.py>>[init]
 from __future__ import annotations
+from copy import copy
 from dataclasses import dataclass, field, fields
 from typing import Generic, Iterable, Optional, Self, TypeVar, cast
 import asyncio
 
-from .errors import HelpfulUserError
+from .errors import CyclicWorkflowError, HelpfulUserError
 from .utility import FromStr
 from .logging import logger
 from .result import Failure, Result, Ok, DependencyFailure, TaskFailure, MissingFailure
@@ -73,27 +74,27 @@ class Lazy(Generic[T, R]):
             return self._result.value.result
         return self._result.value
 
-    async def run(self, ctx) -> R:
+    async def run(self, *, db) -> R:
         raise NotImplementedError()
 
-    async def run_after_deps(self, recurse, *args) -> Result[R]:
+    async def run_after_deps(self, recurse, visited: dict[T, None], **kwargs) -> Result[R]:
         dep_res = await asyncio.gather(
-            *(recurse(dep, *args) for dep in self.requires)
+            *(recurse(dep, copy(visited), **kwargs) for dep in self.requires)
         )
         if not all(dep_res):
             return DependencyFailure(
                 {k: v for (k, v) in zip(self.requires, dep_res) if not v}
             )
         try:
-            return Ok(await self.run(*args))
+            return Ok(await self.run(**kwargs))
         except TaskFailure as f:
             return f
 
-    async def run_cached(self, recurse, *args) -> Result[R]:
+    async def run_cached(self, recurse, visited: dict[T, None], **kwargs) -> Result[R]:
         async with self._lock:
             if self._result is not None:
                 return self._result
-            self._result = await self.run_after_deps(recurse, *args)
+            self._result = await self.run_after_deps(recurse, visited, **kwargs)
             return self._result
 
     def reset(self):
@@ -117,7 +118,12 @@ class LazyDB(Generic[T, TaskT]):
     tasks: list[TaskT] = field(default_factory=list)
     index: dict[T, TaskT] = field(default_factory=dict)
 
-    async def run(self, t: T, *args) -> Result[R]:
+    async def run(self, t: T, visited: dict[T, None] | None = None, **kwargs) -> Result[R]:
+        visited = visited or dict()
+        if t in visited:
+            raise CyclicWorkflowError(list(visited.keys()))
+        visited[t] = None
+
         if t not in self.index:
             try:
                 task = self.on_missing(t)
@@ -127,7 +133,7 @@ class LazyDB(Generic[T, TaskT]):
             task = self.index[t]
 
         while True:
-            match (result := await task.run_cached(self.run, *args)):
+            match (result := await task.run_cached(self.run, visited, **kwargs)):
                 case Ok(x) if isinstance(x, Lazy):
                     task = cast(TaskT, x)
                 case _:

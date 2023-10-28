@@ -10,7 +10,7 @@ from pathlib import Path
 import re
 import string
 from tempfile import NamedTemporaryFile
-from typing import Any, Optional
+from typing import IO, Any, BinaryIO, Optional, TextIO
 from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
@@ -142,18 +142,19 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             case _:
                 yield None
 
-    async def run(self, cfg):
+    async def run(self, *, db: TaskDB):
         log.debug(f"{self}")
-        if not self.always_run() and not self.needs_run() and not cfg.force_run:
+        if not self.always_run() and not self.needs_run() and not db.force_run:
             return
 
         if (self.path is None and self.script is None):
             return
 
+        stdin: TextIO | int | None = None
         match self.stdin:
             case Variable(x):
                 stdin = asyncio.subprocess.PIPE
-                input_data = cfg.environment[x].encode()
+                input_data = db.environment[x].encode()
             case x if isinstance(x, Path):
                 stdin = open(x, "r")
                 input_data = None
@@ -167,7 +168,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             with self.get_stdout() as stdout:
                 stdout_data = b""
                 for line in self.script.splitlines():
-                    async with cfg.throttle or nullcontext():
+                    async with db.throttle or nullcontext():
                         proc = await create_subprocess_exec(
                             *shlex.split(line),
                             stdin=stdin,
@@ -183,9 +184,9 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 
         elif self.runner is not None:
             with self.get_script_path() as path, self.get_stdout() as stdout:
-                runner = cfg.runners[self.runner]
+                runner = db.runners[self.runner]
                 args = [string.Template(arg).substitute(script=path) for arg in runner.args]
-                async with cfg.throttle or nullcontext():
+                async with db.throttle or nullcontext():
                     proc = await create_subprocess_exec(
                         runner.command,
                         *args,
@@ -244,8 +245,8 @@ class TemplateVariable(Lazy[Variable, str]):
     def __post_init__(self):
         self.requires += [Variable(arg) for arg in gather_args(self.template)]
 
-    async def run(self, ctx) -> str:
-        return substitute(self.template, ctx.environment)
+    async def run(self, *, db) -> str:
+        return substitute(self.template, db.environment)
 
 
 @dataclass
@@ -257,8 +258,8 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
         self.creates += [str_to_target(t) for t in self.template.all_targets]
         self.requires += [Variable(arg) for arg in gather_args(self.template)]
 
-    async def run(self, ctx):
-        proxy = substitute(self.template, ctx.environment)
+    async def run(self, *, db):
+        proxy = substitute(self.template, db.environment)
         tgts = [str_to_target(t) for t in proxy.all_targets]
         deps = [str_to_target(t) for t in proxy.all_dependencies]
         path = Path(proxy.path) if proxy.path else None
@@ -295,7 +296,7 @@ class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVaria
 
     async def resolve_object(self, s: Any) -> Any:
         vars = gather_args(s)
-        await asyncio.gather(*(self.run(Variable(v), self) for v in vars))
+        await asyncio.gather(*(self.run(Variable(v), db=self) for v in vars))
         result = substitute(s, self.environment)
         log.debug(f"substituting {s} => {result}")
         return result

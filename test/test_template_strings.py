@@ -31,7 +31,7 @@ async def test_template_string():
     env["x"] = "Hello, ${y}!"
     env["y"] = "World"
     env["z"] = "print('${x}')"
-    await env.run(Variable("z"), env)
+    await env.run(Variable("z"), db=env)
     assert env["x"] == "Hello, World!"
     assert env["z"] == "print('Hello, World!')"
 

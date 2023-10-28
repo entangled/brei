@@ -136,7 +136,7 @@ async def resolve_tasks(program: Program) -> TaskDB:
         for inc in program.include:
             incp = Path(await db.resolve_object(inc))
             if incp in db.index:
-                await db.run(incp, db)
+                await db.run(incp, db=db)
             if not incp.exists():
                 raise MissingInclude(incp)
 

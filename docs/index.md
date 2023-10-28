@@ -204,12 +204,12 @@ async def main(
     if throttle:
         db.throttle = asyncio.Semaphore(throttle)
     db.force_run = force_run
-    await asyncio.gather(*(db.run(Phony(t), db) for t in target_strs))
+    await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
 
 
 @argh.arg("targets", nargs="+", help="names of tasks to run")
 @argh.arg(
-    "-f",
+    "-i",
     "--input-file",
     help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
 )
@@ -217,8 +217,8 @@ async def main(
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
 def loom(
     targets: list[str],
-    input_file: Optional[str] = None,
     *,
+    input_file: Optional[str] = None,
     force_run: bool = False,
     jobs: Optional[int] = None,
 ):

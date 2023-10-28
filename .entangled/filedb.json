@@ -6,18 +6,18 @@
       "deps": [
         "docs/tasks.md"
       ],
-      "modified": "2023-10-28T21:39:39.369895",
-      "hexdigest": "7a86d262b18b9d8090abc4f7a6b166ea2be2957c2ad53912831a98879b3a815f",
-      "size": 10086
+      "modified": "2023-10-28T23:34:14.885900",
+      "hexdigest": "0248b504797ff2482a8d99fe896f765333e7fb7b6da85c10bd3a7580bef3094f",
+      "size": 10160
     },
     {
       "path": "loom/cli.py",
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-10-28T20:29:19.300636",
-      "hexdigest": "9ee2948e90fd665f9b6a829d0a0a0ac17dc788a1c17338ad03b9581b0ea0eefe",
-      "size": 2769
+      "modified": "2023-10-28T23:42:12.344727",
+      "hexdigest": "12f7a277fdf49f95635b187d3b7a53fd015f6f8e11f247d5dcb77bf8123533e2",
+      "size": 2772
     },
     {
       "path": "loom/errors.py",
@@ -33,9 +33,9 @@
       "deps": [
         "docs/lazy.md"
       ],
-      "modified": "2023-10-28T20:35:18.281228",
-      "hexdigest": "dfa39a2b720fb4f543f36814313d1b5a8ecd087df9836958a96be17736e2e25c",
-      "size": 4551
+      "modified": "2023-10-28T23:53:33.673258",
+      "hexdigest": "fc002c43499c69dfd34b714b1e248c9ed982a57b624ac502fc89b8ccf7a44461",
+      "size": 4884
     },
     {
       "path": "test/test_result.py",
@@ -60,9 +60,9 @@
       "deps": [
         "docs/program.md"
       ],
-      "modified": "2023-10-28T20:33:11.108965",
-      "hexdigest": "b90d71ec9fc2ddded88134580d861fcd970e70e85b333525f605ff9ea589b56e",
-      "size": 4886
+      "modified": "2023-10-28T23:26:11.214074",
+      "hexdigest": "9a6cfea372c50c0506aeafd26533a85092a16c0015e6f7c84eae83ee8607645e",
+      "size": 4889
     },
     {
       "path": "loom/logging.py",
@@ -133,46 +133,46 @@
     {
       "path": "docs/lazy.md",
       "deps": null,
-      "modified": "2023-10-28T20:35:18.429229",
-      "hexdigest": "2a352eb99a0eb1c204ad48c0d86b5dea1151267ef6bf9461740c71631e03686c",
-      "size": 6897
+      "modified": "2023-10-28T23:45:05.207847",
+      "hexdigest": "4ba257a701d3bcc0d0eb2ced31d2139a535ffe734d7cd546362104013cf594b5",
+      "size": 7230
     },
     {
       "path": "docs/index.md",
       "deps": null,
-      "modified": "2023-10-28T20:41:44.638064",
-      "hexdigest": "529969c7a53f41d7ca517380617b506785bf6946efa99e7b2eb39fbc3353c8b0",
-      "size": 7230
+      "modified": "2023-10-28T23:42:12.472727",
+      "hexdigest": "13d1ad1ad873936d0bbee94edeb26f5cddaa9493ce15c2d6cabab4d1af291937",
+      "size": 7233
     },
     {
       "path": "docs/program.md",
       "deps": null,
-      "modified": "2023-10-28T20:33:11.258965",
-      "hexdigest": "6869a1b59d1f5cd84865c2daad50c3004d95a48150a8a1c5ce11f2f74859430b",
-      "size": 4873
+      "modified": "2023-10-28T23:26:11.348074",
+      "hexdigest": "8dfdaeb491c9d040ec04a3853caa8dfbf5ed7d1aa363d1e98c239ee43bf4b008",
+      "size": 4876
     },
     {
       "path": "docs/template_strings.md",
       "deps": null,
-      "modified": "2023-10-28T19:24:19.628959",
-      "hexdigest": "55151cef39889451131465fd0a8f51e56c23788a4f639b2f04cc0db3d54bd348",
-      "size": 4642
+      "modified": "2023-10-29T00:12:13.386945",
+      "hexdigest": "d88c255491afbd647d61f03162c6e20f3449962ec3176479e6e05fc5edfab44a",
+      "size": 4645
     },
     {
       "path": "docs/tasks.md",
       "deps": null,
-      "modified": "2023-10-28T21:39:39.516896",
-      "hexdigest": "f0133e5c86b77039473b1d56bed1036bbfc779cd2a498cf139b3f07ecd2bdd3f",
-      "size": 10072
+      "modified": "2023-10-28T23:34:15.032900",
+      "hexdigest": "604e284033137cb18889d3561d18bbf859b268a6ec9e894771a313d8a26934bf",
+      "size": 10146
     },
     {
       "path": "test/test_template_strings.py",
       "deps": [
         "docs/template_strings.md"
       ],
-      "modified": "2023-10-26T18:32:44.084855",
-      "hexdigest": "6f04d3a79cb81ceed71bc58b50ba2454048aae739f32aa97b9408d2d879ac2be",
-      "size": 1563
+      "modified": "2023-10-29T00:12:13.248945",
+      "hexdigest": "caf01c9b0679ff3ade96193ebcd0c8d7477bfebbd9907aef44ed26032e43b67a",
+      "size": 1566
     },
     {
       "path": "examples/versioned_output.toml",

@@ -182,7 +182,7 @@ async def test_loom(tmp_path, test):
         prg = Program.read(src)
         db = await resolve_tasks(prg)
 
-        await db.run(Phony("all"), db)
+        await db.run(Phony("all"), db=db)
 
         for (tgt, content) in test.post_state:
             tgt = Path(tgt)
