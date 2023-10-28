@@ -36,7 +36,7 @@ targets = ["${output_path}/run.h5"]
 
 We can trace these variable substitutions using the same lazy evaluation strategy as the workflow itself.
 
-``` {.python file=loom/template_strings.py}
+``` {.python file=brei/template_strings.py}
 from dataclasses import dataclass, is_dataclass, fields
 from string import Template
 from typing import Any, Generic, Mapping, TypeVar, cast
@@ -111,9 +111,9 @@ def _(_template: None) -> set[str]:
 from dataclasses import dataclass
 from typing import Iterable, Optional
 import pytest
-from loom.task import TemplateVariable, Variable
-from loom.template_strings import gather_args, substitute
-from loom.lazy import LazyDB
+from brei.task import TemplateVariable, Variable
+from brei.template_strings import gather_args, substitute
+from brei.lazy import LazyDB
 
 
 class Environment(LazyDB[Variable, TemplateVariable]):

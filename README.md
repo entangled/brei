@@ -1,4 +1,4 @@
-# loom
+# Brei
 Minimal workflow system and alternative to Make.
 
 - Read from TOML or JSON

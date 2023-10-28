@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/tasks.md#loom/task.py>>[init]
+# ~/~ begin <<docs/tasks.md#brei/task.py>>[init]
 from __future__ import annotations
 import asyncio
 from contextlib import contextmanager, nullcontext
@@ -13,8 +13,7 @@ from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
 
-from brei.result import TaskFailure
-
+from .result import TaskFailure
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
 from .logging import logger

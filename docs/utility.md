@@ -1,6 +1,6 @@
 # Utils
 
-``` {.python file=loom/utility.py}
+``` {.python file=brei/utility.py}
 from __future__ import annotations
 
 from typing import Optional, Self, Type, TypeGuard, TypeVar, Any, Union, cast

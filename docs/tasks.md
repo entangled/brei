@@ -1,6 +1,6 @@
 # Tasks
 
-``` {.python file=loom/task.py}
+``` {.python file=brei/task.py}
 from __future__ import annotations
 import asyncio
 from contextlib import contextmanager, nullcontext
@@ -15,8 +15,7 @@ from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
 
-from loom.result import TaskFailure
-
+from .result import TaskFailure
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
 from .logging import logger

@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/lazy.md#loom/lazy.py>>[init]
+# ~/~ begin <<docs/lazy.md#brei/lazy.py>>[init]
 from __future__ import annotations
 from copy import copy
 from dataclasses import dataclass, field, fields

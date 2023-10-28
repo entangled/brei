@@ -1,9 +1,9 @@
-# ~/~ begin <<docs/index.md#loom/logging.py>>[init]
+# ~/~ begin <<docs/index.md#brei/logging.py>>[init]
 import logging
 
 
 def logger():
-    return logging.getLogger("loom")
+    return logging.getLogger("brei")
 
 
 logging.basicConfig(level=logging.INFO)

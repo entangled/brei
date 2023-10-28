@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/lazy.md#loom/result.py>>[init]
+# ~/~ begin <<docs/lazy.md#brei/result.py>>[init]
 from typing import TypeVar, Generic
 from dataclasses import dataclass
 

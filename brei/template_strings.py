@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/template_strings.md#loom/template_strings.py>>[init]
+# ~/~ begin <<docs/template_strings.md#brei/template_strings.py>>[init]
 from dataclasses import dataclass, is_dataclass, fields
 from string import Template
 from typing import Any, Generic, Mapping, TypeVar, cast

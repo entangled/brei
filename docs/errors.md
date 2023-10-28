@@ -1,4 +1,4 @@
-``` {.python file=loom/errors.py}
+``` {.python file=brei/errors.py}
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 

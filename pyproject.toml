@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "loom"
+name = "brei"
 version = "0.1.0"
 description = "A minimal build system."
 authors = ["Johan Hidding <j.hidding@esciencecenter.nl>"]
@@ -8,7 +8,7 @@ readme = "README.md"
 packages = []
 
 [tool.poetry.scripts]
-loom = "loom.cli:cli"
+loom = "brei.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -29,12 +29,12 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
-packages = ["loom"]
+packages = ["brei"]
 
 [[tool.loom.task]]
 name = "test"
 script = """
-coverage run --source=loom -m pytest
+coverage run --source=brei -m pytest
 coverage xml
 coverage report
 mypy

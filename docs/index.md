@@ -1,5 +1,5 @@
-# Welcome to Loom
-Loom is a small workflow system in Python. The primary reason for creating Loom is to replace GNU Make, in order to be compatible on systems that are naturally deprived of this wonder of human ingenuity. Design goals are:
+# Welcome to Brei
+Brei is a small workflow system in Python. The primary reason for creating Brei is to replace GNU Make, in order to be compatible on systems that are naturally deprived of this wonder of human ingenuity. Design goals are:
 
 - Programmable workflows from TOML description
 - Ease of use
@@ -7,10 +7,10 @@ Loom is a small workflow system in Python. The primary reason for creating Loom 
 - Stay minimal: don't give in to feature bloat.
 
 ## How it works
-You give Loom a list of tasks that may depend on one another. Loom will run these when input files are newer than the target. Execution is lazy and in parallel.
+You give Brei a list of tasks that may depend on one another. Brei will run these when input files are newer than the target. Execution is lazy and in parallel.
 
 ### Tasks
-Tasks are the elemental units of work in Loom. A task is the single execution of a given script, and can be indicated to depend on previous tasks by explicitly listing targets and dependencies.
+Tasks are the elemental units of work in Brei. A task is the single execution of a given script, and can be indicated to depend on previous tasks by explicitly listing targets and dependencies.
 
 ``` {.toml file=examples/tasks.toml}
 [[task]]
@@ -155,7 +155,7 @@ requires = ["#write-outs"]
 ### Remarks
 A lot of the above examples use Bash for brevity. If you need your workflows also execute on a Windows machine, it is advised to write scripts in Python.
 
-``` {.python file=loom/__init__.py}
+``` {.python file=brei/__init__.py}
 from .program import Program, resolve_tasks
 from .task import Task, TaskDB
 
@@ -163,19 +163,19 @@ __all__ = ["Program", "resolve_tasks", "Task", "TaskDB"]
 ```
 
 
-``` {.python file=loom/logging.py}
+``` {.python file=brei/logging.py}
 import logging
 
 
 def logger():
-    return logging.getLogger("loom")
+    return logging.getLogger("brei")
 
 
 logging.basicConfig(level=logging.INFO)
 logger().level = logging.INFO
 ```
 
-``` {.python file=loom/cli.py}
+``` {.python file=brei/cli.py}
 from argparse import ArgumentParser
 from pathlib import Path
 import re
@@ -183,10 +183,11 @@ import tomllib
 from typing import Optional
 import argh  # type: ignore
 import asyncio
-from loom.errors import HelpfulUserError
-from loom.lazy import Phony
 
-from loom.utility import construct, read_from_file
+from .errors import HelpfulUserError
+from .lazy import Phony
+
+from .utility import construct, read_from_file
 from rich_argparse import RichHelpFormatter
 
 from .program import Program, resolve_tasks
@@ -211,7 +212,7 @@ async def main(
 @argh.arg(
     "-i",
     "--input-file",
-    help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
+    help="Brei TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
 )
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
@@ -237,17 +238,16 @@ def loom(
         program = read_from_file(Program, Path("loom.toml"))
 
     elif Path("pyproject.toml").exists():
-        section = "tool.loom"
         with open("pyproject.toml", "rb") as f_in:
             data = tomllib.load(f_in)
         try:
-            for s in ["tool", "loom"]:
+            for s in ["tool", "brei"]:
                 data = data[s]
         except KeyError as e:
             raise HelpfulUserError(
-                f"With out the `-f` argument, Loom looks for `loom.toml` first, then for "
-                f"a `[tool.loom]` section in `pyproject.toml`. A `pyproject.toml` file was "
-                f"found, but contained no `[tool.loom]` section."
+                f"With out the `-f` argument, Brei looks for `loom.toml` first, then for "
+                f"a `[tool.brei]` section in `pyproject.toml`. A `pyproject.toml` file was "
+                f"found, but contained no `[tool.brei]` section."
             ) from e
 
         program = construct(Program, data)

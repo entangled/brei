@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/errors.md#loom/errors.py>>[init]
+# ~/~ begin <<docs/errors.md#brei/errors.py>>[init]
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 

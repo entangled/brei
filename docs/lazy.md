@@ -19,7 +19,7 @@ This is achieved by memoizing results and keeping locks on the `Lazy` task when 
 One common problem when using workflow systems in Python, is that errors are not tracable to their source. It is quite common to get a stack-trace that leads to the internals of the workflow system, but not to the cause of the error. The way around this, is not to use Python's exception system (at least not in the outer layer), but rather signify errors by returning `Failure` objects.
 
 ``` {.python file=test/test_result.py}
-from loom.result import Failure, TaskFailure, Ok
+from brei.result import Failure, TaskFailure, Ok
 from hypothesis import given
 from hypothesis.strategies import builds, booleans, text, integers
 
@@ -33,7 +33,7 @@ def test_result(r):
     assert (r and hasattr(r, "value")) or (not r and isinstance(r, Failure))
 ```
 
-``` {.python file=loom/result.py}
+``` {.python file=brei/result.py}
 from typing import TypeVar, Generic
 from dataclasses import dataclass
 
@@ -76,7 +76,7 @@ class Ok(Generic[R]):
 Result = Failure | Ok[R]
 ```
 
-``` {.python file=loom/lazy.py}
+``` {.python file=brei/lazy.py}
 from __future__ import annotations
 from copy import copy
 from dataclasses import dataclass, field, fields

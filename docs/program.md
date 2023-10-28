@@ -1,6 +1,6 @@
 # Programs
 
-``` {.python file=loom/program.py}
+``` {.python file=brei/program.py}
 from __future__ import annotations
 from copy import copy
 import itertools

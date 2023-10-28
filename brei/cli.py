@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/index.md#loom/cli.py>>[init]
+# ~/~ begin <<docs/index.md#brei/cli.py>>[init]
 from argparse import ArgumentParser
 from pathlib import Path
 import re
@@ -6,10 +6,11 @@ import tomllib
 from typing import Optional
 import argh  # type: ignore
 import asyncio
-from brei.errors import HelpfulUserError
-from brei.lazy import Phony
 
-from brei.utility import construct, read_from_file
+from .errors import HelpfulUserError
+from .lazy import Phony
+
+from .utility import construct, read_from_file
 from rich_argparse import RichHelpFormatter
 
 from .program import Program, resolve_tasks
@@ -34,7 +35,7 @@ async def main(
 @argh.arg(
     "-i",
     "--input-file",
-    help="Loom TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
+    help="Brei TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
 )
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
@@ -60,17 +61,16 @@ def loom(
         program = read_from_file(Program, Path("loom.toml"))
 
     elif Path("pyproject.toml").exists():
-        section = "tool.loom"
         with open("pyproject.toml", "rb") as f_in:
             data = tomllib.load(f_in)
         try:
-            for s in ["tool", "loom"]:
+            for s in ["tool", "brei"]:
                 data = data[s]
         except KeyError as e:
             raise HelpfulUserError(
-                f"With out the `-f` argument, Loom looks for `loom.toml` first, then for "
-                f"a `[tool.loom]` section in `pyproject.toml`. A `pyproject.toml` file was "
-                f"found, but contained no `[tool.loom]` section."
+                f"With out the `-f` argument, Brei looks for `loom.toml` first, then for "
+                f"a `[tool.brei]` section in `pyproject.toml`. A `pyproject.toml` file was "
+                f"found, but contained no `[tool.brei]` section."
             ) from e
 
         program = construct(Program, data)

@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/program.md#loom/program.py>>[init]
+# ~/~ begin <<docs/program.md#brei/program.py>>[init]
 from __future__ import annotations
 from copy import copy
 import itertools
