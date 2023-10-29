@@ -77,7 +77,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
         return name + f"[{tgts}] <- [{deps}]\n" + src
 
     def __post_init__(self):
-        if self.name is not None:
+        if self.name and Phony(self.name) not in self.creates:
             self.creates.append(Phony(self.name))
         if self.stdin and self.stdin not in self.requires:
             self.requires.append(self.stdin)
@@ -87,7 +87,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             self.creates.append(self.stdout)
 
     def always_run(self) -> bool:
-        return len(self.real_requirements) == 0
+        return len(self.real_requirements) == 0 or len(list(self.target_paths)) == 0
 
     def needs_run(self) -> bool:
         if any(not p.exists() for p in self.target_paths):
@@ -129,10 +129,15 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
                 yield None
 
     async def run(self, *, db: TaskDB):
-        log.debug(f"{self}")
         if not self.always_run() and not self.needs_run() and not db.force_run:
+            tgts = " ".join(f"`{t}`" for t in self.target_paths)
+            log.info(f"Targets {tgts} already up-to-date.")
             return
 
+        targets = " ".join(f"`{t}`" for t in self.creates)
+        short_note = self.description or f"#{self.name}" or f"creating {targets}"
+        log.info(f"run: [green]{short_note}[/]", extra={'markup': True})
+        log.debug(f"{self}")
         if (self.path is None and self.script is None):
             return
 

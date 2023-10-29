@@ -17,7 +17,7 @@ from .errors import HelpfulUserError
 from .lazy import Phony
 from .utility import construct, read_from_file
 from .program import Program, resolve_tasks
-from .logging import logger
+from .logging import logger, configure_logger
 from .version import __version__
 
 
@@ -46,6 +46,7 @@ async def main(
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
 @argh.arg("-v", "--version", help="print version number and exit")
 @argh.arg("--list-runners", help="show default configured runners")
+@argh.arg("--debug", help="more verbose logging")
 def loom(
     targets: list[str],
     *,
@@ -53,7 +54,8 @@ def loom(
     force_run: bool = False,
     jobs: Optional[int] = None,
     version: bool = False,
-    list_runners: bool = False
+    list_runners: bool = False,
+    debug: bool = False
 ):
     """Build one of the configured targets."""
     if version:
@@ -103,6 +105,8 @@ def loom(
             "No input file given, no `loom.toml` found and no `pyproject.toml` found."
         )
 
+    jobs = int(jobs) if jobs else None
+    configure_logger(debug)
     asyncio.run(main(program, targets, force_run, jobs))
 
 

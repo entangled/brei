@@ -34,10 +34,27 @@ packages = ["brei"]
 
 [[tool.brei.task]]
 name = "test"
-script = """
-coverage run --source=brei -m pytest
-coverage xml
-coverage report
-mypy
-"""
+requires = ["#coverage-report", "#mypy"]
+
+[[tool.brei.task]]
+description = "Print coverage info"
+name = "coverage-report"
+requires = ["coverage.xml"]
+script = "coverage report"
+
+[[tool.brei.task]]
+description = "Write coverage report to XML"
+creates = ["coverage.xml"]
+requires = [".coverage"]
+script = "coverage xml"
+
+[[tool.brei.task]]
+creates = [".coverage"]
+description = "Run tests"
+script = "coverage run --source=brei -m pytest"
+
+[[tool.brei.task]]
+name = "mypy"
+description = "The MyPy static type checker"
+script = "mypy"
 
