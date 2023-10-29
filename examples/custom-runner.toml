@@ -1,0 +1,10 @@
+# ~/~ begin <<docs/index.md#examples/custom-runner.toml>>[init]
+[runner.lua]
+command = "lua"
+args = ["${script}"]
+
+[[task]]
+runner = "lua"
+stdout = "hello.txt"
+script = "print(\"Hello, World!\")"
+# ~/~ end

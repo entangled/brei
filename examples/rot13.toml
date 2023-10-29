@@ -1,13 +1,11 @@
 # ~/~ begin <<docs/index.md#examples/rot13.toml>>[init]
 [template.echo]
 stdout = "${stdout}"
-runner = "Bash"
 script = "echo ${text}"
 
 [pattern.rot13]
 stdout = "${stdout}"
 stdin = "${stdin}"
-runner = "Bash"
 script = "tr a-zA-Z n-za-mN-ZA-M"
 
 [[call]]

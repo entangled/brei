@@ -4,19 +4,17 @@ data_dir = "./data"
 output_dir = "./output/${commit}"
 
 [[task]]
-runner = "Bash"
 stdout = "var(commit)"
 script = "git rev-parse HEAD"
 
 [[task]]
 creates = ["${output_dir}/data.h5"]
 requires = ["${data_dir}/input.h5", "#prepare"]
-runner = "Python"
+runner = "python"
 path = "scripts/run.py"
 
 [[task]]
 name = "prepare"
-runner = "Bash"
 script = "mkdir -p ${output_dir}"
 
 [[task]]

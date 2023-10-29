@@ -19,29 +19,18 @@ from .utility import stat
 from .logging import logger
 from .errors import FailedTaskError, HelpfulUserError
 from .template_strings import gather_args, substitute
+from .runner import Runner, DEFAULT_RUNNERS
 
 
 log = logger()
 
 
-@dataclass()
+@dataclass
 class Variable:
     name: str
 
     def __hash__(self):
         return hash(f"var({self.name})")
-
-
-@dataclass
-class Runner:
-    command: str
-    args: list[str]
-
-
-DEFAULT_RUNNERS: dict[str, Runner] = {
-    "Python": Runner("python", ["${script}"]),
-    "Bash": Runner("bash", ["${script}"]),
-}
 
 
 def str_to_target(s: str) -> Path | Phony | Variable:

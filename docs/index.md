@@ -15,7 +15,7 @@ Tasks are the elemental units of work in Brei. A task is the single execution of
 ``` {.toml file=examples/tasks.toml}
 [[task]]
 creates = ["hello.txt"]
-runner = "Bash"
+runner = "bash"
 script = "echo 'Hello, World!' > hello.txt"
 
 [[task]]
@@ -29,19 +29,17 @@ script = "rm hello.txt"
 
 This defines to named tasks `all` and `clean`, where `all` depends on the creation of a file `hello.txt`. Giving a `name` to a task is similar to creating a 'phony' target in Make.
 
-### Patterns: Rot13
+### Templates: Rot13
 We can use patterns to create reusable items. Variables follow Python's `string.Template` syntax (similar to many scripting languages), `${var_name}` substitutes for the contents of the `var_name` variable. Use two dollar signs `$$` to make a `$` literal.
 
 ``` {.toml file=examples/rot13.toml}
 [template.echo]
 stdout = "${stdout}"
-runner = "Bash"
 script = "echo ${text}"
 
 [pattern.rot13]
 stdout = "${stdout}"
 stdin = "${stdin}"
-runner = "Bash"
 script = "tr a-zA-Z n-za-mN-ZA-M"
 
 [[call]]
@@ -70,19 +68,17 @@ data_dir = "./data"
 output_dir = "./output/${commit}"
 
 [[task]]
-runner = "Bash"
 stdout = "var(commit)"
 script = "git rev-parse HEAD"
 
 [[task]]
 creates = ["${output_dir}/data.h5"]
 requires = ["${data_dir}/input.h5", "#prepare"]
-runner = "Python"
+runner = "python"
 path = "scripts/run.py"
 
 [[task]]
 name = "prepare"
-runner = "Bash"
 script = "mkdir -p ${output_dir}"
 
 [[task]]
@@ -103,7 +99,6 @@ You can include parts of a workflow from other files, both TOML and JSON.
 
 ``` {.toml file=examples/echo.toml}
 [template.echo]
-runner = "Bash"
 stdout = "${stdout}"
 script = "echo '${text}'"
 ```
@@ -133,13 +128,12 @@ include = [
 
 [[task]]
 stdout = "./gen.json"
-runner = "Python"
+runner = "python"
 script = """
 import json
 tasks = [
     {"stdout": f"out{i}.dat",
-     "script": f"echo '{i}'",
-     "language": "Bash"} for i in range(10)
+     "script": f"echo '{i}'"} for i in range(10)
 ]
 tasks.append({"name": "write-outs", "dependencies": [
     f"out{i}.dat" for i in range(10)
@@ -152,8 +146,36 @@ name = "all"
 requires = ["#write-outs"]
 ```
 
+### Custom Runner
+By default, the contents of `script` is split in lines, then each line is passed through Python's `shlex.split` function and then run using `asyncio.create_subprocess_exec`. What that means is that the script will perform the same operations on all platforms, and arguments are collected similar to a normal Unix shell or Windows command prompt. However, you can choose to have the script run by any other means by providing the `runner` argument.
+
+``` {.bash .eval}
+brei --list-runners
+```
+
+
+``` {.toml file=examples/custom-runner.toml}
+[runner.lua]
+command = "lua"
+args = ["${script}"]
+
+[[task]]
+runner = "lua"
+stdout = "hello.txt"
+script = "print(\"Hello, World!\")"
+```
+
 ### Remarks
-A lot of the above examples use Bash for brevity. If you need your workflows also execute on a Windows machine, it is advised to write scripts in Python.
+
+If you need your workflows also execute on a Windows machine, it is advised to write scripts in Python.
+
+
+``` {.python file=brei/version.py}
+from importlib import metadata
+
+
+__version__ = metadata.version("brei")
+```
 
 ``` {.python file=brei/__init__.py}
 from .program import Program, resolve_tasks
@@ -179,19 +201,24 @@ logger().level = logging.INFO
 from argparse import ArgumentParser
 from pathlib import Path
 import re
+import sys
 import tomllib
 from typing import Optional
 import argh  # type: ignore
 import asyncio
+from rich.console import Console
 
+from rich_argparse import RichHelpFormatter
+from rich.table import Table
+
+from .runner import DEFAULT_RUNNERS
 from .errors import HelpfulUserError
 from .lazy import Phony
-
 from .utility import construct, read_from_file
-from rich_argparse import RichHelpFormatter
-
 from .program import Program, resolve_tasks
 from .logging import logger
+from .version import __version__
+
 
 log = logger()
 
@@ -208,7 +235,7 @@ async def main(
     await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
 
 
-@argh.arg("targets", nargs="+", help="names of tasks to run")
+@argh.arg("targets", nargs="*", help="names of tasks to run")
 @argh.arg(
     "-i",
     "--input-file",
@@ -216,14 +243,33 @@ async def main(
 )
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
+@argh.arg("-v", "--version", help="print version number and exit")
+@argh.arg("--list-runners", help="show default configured runners")
 def loom(
     targets: list[str],
     *,
     input_file: Optional[str] = None,
     force_run: bool = False,
     jobs: Optional[int] = None,
+    version: bool = False,
+    list_runners: bool = False
 ):
     """Build one of the configured targets."""
+    if version:
+        print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center. All Rights Reserved.")
+        sys.exit(0)
+
+    if list_runners:
+        t = Table(title="Default Runners", header_style="italic green", show_edge=False)
+        t.add_column("runner", style="bold yellow")
+        t.add_column("executable")
+        t.add_column("arguments")
+        for r, c in DEFAULT_RUNNERS.items():
+            t.add_row(r, c.command, f"{c.args}")
+        console = Console()
+        console.print(t)
+        sys.exit(0)
+
     if input_file is not None:
         if m := re.match(input_file, r"([^\[\]]+)\[([^\[\]\s]+)\]"):
             input_path = Path(m.group(1))

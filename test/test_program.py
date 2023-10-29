@@ -23,7 +23,6 @@ requires = ["hello.txt"]
 
 [[task]]
 stdout = "hello.txt"
-runner = "Bash"
 script = "echo 'Hello, World'"
 """, [ ("hello.txt", "Hello, World") ])
 
@@ -35,12 +34,11 @@ include = [
 
 [[task]]
 stdout = "generated_wf.toml"
-runner = "Python"
+runner = "python"
 script = '''
 print(\"\"\"
 [[task]]
 stdout = "hello.txt"
-runner = "Bash"
 script = "echo 'Hello, World'"
 \"\"\")
 '''
@@ -54,7 +52,7 @@ requires = ["hello.txt"]
 template = LoomTest("""
 [template.echo]
 stdout = "${stdout}"
-runner = "Python"
+runner = "python"
 script = '''
 print("${text}")
 '''
@@ -72,7 +70,7 @@ args = { stdout = "hello.txt", text = "Hello, World" }
 rot_13 = LoomTest("""
 [[task]]
 stdout = "secret.txt"
-runner = "Python"
+runner = "python"
 script = \"\"\"
 print("Uryyb, Jbeyq!")
 \"\"\"
@@ -100,7 +98,6 @@ msg = "Hello, World!"
 
 [[task]]
 stdout = "hello.txt"
-runner = "Bash"
 script = "echo '${msg}'"
 
 [[task]]
@@ -111,7 +108,6 @@ requires = ["hello.txt"]
 
 variable_stdout = LoomTest("""
 [template.echo]
-runner = "Bash"
 script = "echo '${text}'"
 stdout = "${stdout}"
 
@@ -122,7 +118,6 @@ template = "echo"
   stdout = "var(msg)"
 
 [[task]]
-runner = "Bash"
 script = "cat"
 stdin = "var(msg)"
 stdout = "hello.txt"
@@ -134,7 +129,6 @@ template = "echo"
   stdout = "var(file_name)"
 
 [[task]]
-runner = "Bash"
 script = "cat"
 stdin = "var(msg)"
 stdout = "${file_name}"
@@ -147,7 +141,6 @@ requires = ["hello.txt", "${file_name}"]
 
 array_call = LoomTest("""
 [template.echo]
-runner = "Bash"
 script = "echo '${a}${b}'"
 stdout = "${pre}-${a}-${b}"
 

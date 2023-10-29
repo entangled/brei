@@ -39,7 +39,7 @@ async def test_hello(tmp_path: Path):
         db.target(
             tgt,
             [],
-            runner="Python",
+            runner="python",
             script=f"with open('{tgt}', 'w') as f:\n"
             f'   print("Hello, World!", file=f)\n',
         )
@@ -56,7 +56,7 @@ async def test_hello_stdout(tmp_path: Path):
         db = TaskDBTester()
         tgt = Path("hello.txt")
         db.target(
-            tgt, [], runner="Python", stdout=tgt, script='print("Hello, World!")\n'
+            tgt, [], runner="python", stdout=tgt, script='print("Hello, World!")\n'
         )
         db.phony("all", [tgt])
 
@@ -71,7 +71,7 @@ async def test_runtime(tmp_path: Path):
     with chdir(tmp_path):
         db = TaskDBTester()
         for a in range(4):
-            db.phony(f"sleep{a}", [], runner="Bash", script=f"sleep 0.2\n")
+            db.phony(f"sleep{a}", [], runner="bash", script=f"sleep 0.2\n")
         db.phony("all", [Phony(f"sleep{a}") for a in range(4)])
         async with timer() as t:
             await db.run(Phony("all"), db=db)
@@ -96,7 +96,7 @@ async def test_rebuild(tmp_path: Path):
         db.target(
             a,
             [i1],
-            runner="Python",
+            runner="python",
             stdout=a,
             script="print(int(open('i1','r').read()) + 1)",
         )
@@ -104,7 +104,7 @@ async def test_rebuild(tmp_path: Path):
         db.target(
             b,
             [a, i2],
-            runner="Python",
+            runner="python",
             stdout=b,
             script="print(int(open('a','r').read()) * int(open('i2','r').read()))",
         )
@@ -112,7 +112,7 @@ async def test_rebuild(tmp_path: Path):
         db.target(
             c,
             [a, b],
-            runner="Python",
+            runner="python",
             stdout=c,
             script="print(int(open('b','r').read()) * int(open('a','r').read()))",
         )

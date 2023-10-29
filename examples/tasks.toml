@@ -1,7 +1,7 @@
 # ~/~ begin <<docs/index.md#examples/tasks.toml>>[init]
 [[task]]
 creates = ["hello.txt"]
-runner = "Bash"
+runner = "bash"
 script = "echo 'Hello, World!' > hello.txt"
 
 [[task]]

@@ -2,19 +2,24 @@
 from argparse import ArgumentParser
 from pathlib import Path
 import re
+import sys
 import tomllib
 from typing import Optional
 import argh  # type: ignore
 import asyncio
+from rich.console import Console
 
+from rich_argparse import RichHelpFormatter
+from rich.table import Table
+
+from .runner import DEFAULT_RUNNERS
 from .errors import HelpfulUserError
 from .lazy import Phony
-
 from .utility import construct, read_from_file
-from rich_argparse import RichHelpFormatter
-
 from .program import Program, resolve_tasks
 from .logging import logger
+from .version import __version__
+
 
 log = logger()
 
@@ -31,7 +36,7 @@ async def main(
     await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
 
 
-@argh.arg("targets", nargs="+", help="names of tasks to run")
+@argh.arg("targets", nargs="*", help="names of tasks to run")
 @argh.arg(
     "-i",
     "--input-file",
@@ -39,14 +44,33 @@ async def main(
 )
 @argh.arg("-B", "--force-run", help="rebuild all dependencies")
 @argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
+@argh.arg("-v", "--version", help="print version number and exit")
+@argh.arg("--list-runners", help="show default configured runners")
 def loom(
     targets: list[str],
     *,
     input_file: Optional[str] = None,
     force_run: bool = False,
     jobs: Optional[int] = None,
+    version: bool = False,
+    list_runners: bool = False
 ):
     """Build one of the configured targets."""
+    if version:
+        print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center. All Rights Reserved.")
+        sys.exit(0)
+
+    if list_runners:
+        t = Table(title="Default Runners", header_style="italic green", show_edge=False)
+        t.add_column("runner", style="bold yellow")
+        t.add_column("executable")
+        t.add_column("arguments")
+        for r, c in DEFAULT_RUNNERS.items():
+            t.add_row(r, c.command, f"{c.args}")
+        console = Console()
+        console.print(t)
+        sys.exit(0)
+
     if input_file is not None:
         if m := re.match(input_file, r"([^\[\]]+)\[([^\[\]\s]+)\]"):
             input_path = Path(m.group(1))

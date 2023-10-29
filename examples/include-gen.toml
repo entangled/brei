@@ -5,13 +5,12 @@ include = [
 
 [[task]]
 stdout = "./gen.json"
-runner = "Python"
+runner = "python"
 script = """
 import json
 tasks = [
     {"stdout": f"out{i}.dat",
-     "script": f"echo '{i}'",
-     "language": "Bash"} for i in range(10)
+     "script": f"echo '{i}'"} for i in range(10)
 ]
 tasks.append({"name": "write-outs", "dependencies": [
     f"out{i}.dat" for i in range(10)
