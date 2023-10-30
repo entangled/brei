@@ -153,7 +153,7 @@ template = "echo"
 
 [[call]]
 template = "echo"
-join = "product"
+join = "outer"
   [call.args]
   pre = "prod"
   a = ["1", "2"]

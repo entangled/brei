@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/index.md#brei/logging.py>>[init]
+# ~/~ begin <<docs/implementation.md#brei/logging.py>>[init]
 import logging
 from rich.highlighter import RegexHighlighter
 from rich.logging import RichHandler

@@ -6,10 +6,10 @@ Brei is a small workflow system in Python. The primary reason for creating Brei 
 - Ease of installation
 - Stay minimal: don't give in to feature bloat.
 
-## How it works
+# How it works
 You give Brei a list of tasks that may depend on one another. Brei will run these when input files are newer than the target. Execution is lazy and in parallel.
 
-### Tasks
+## Tasks
 Tasks are the elemental units of work in Brei. A task is the single execution of a given script, and can be indicated to depend on previous tasks by explicitly listing targets and dependencies.
 
 ``` {.toml file=examples/tasks.toml}
@@ -29,15 +29,20 @@ script = "rm hello.txt"
 
 This defines to named tasks `all` and `clean`, where `all` depends on the creation of a file `hello.txt`. Giving a `name` to a task is similar to creating a 'phony' target in Make.
 
-### Templates: Rot13
+## Templates
 We can use patterns to create reusable items. Variables follow Python's `string.Template` syntax (similar to many scripting languages), `${var_name}` substitutes for the contents of the `var_name` variable. Use two dollar signs `$$` to make a `$` literal.
 
 ``` {.toml file=examples/rot13.toml}
+[[task]]
+description = "Creating temporary directory"
+stdout = "var(dir)"
+script = "mktemp -d"
+
 [template.echo]
 stdout = "${stdout}"
 script = "echo ${text}"
 
-[pattern.rot13]
+[template.rot13]
 stdout = "${stdout}"
 stdin = "${stdin}"
 script = "tr a-zA-Z n-za-mN-ZA-M"
@@ -45,22 +50,71 @@ script = "tr a-zA-Z n-za-mN-ZA-M"
 [[call]]
 template = "echo"
   [call.args]
-  stdout = "secret1.txt"
+  stdout = "${dir}/secret.txt"
   text = "Uryyb, Jbeyq!"
 
 [[call]]
 template = "rot13"
   [call.args]
-  stdin = "secret.txt"
-  stdout = "msg.txt"
+  stdin = "${dir}/secret.txt"
+  stdout = "${dir}/msg.txt"
 
 [[task]]
 name = "all"
-requires = ["msg.txt"]
+requires = ["${dir}/msg.txt"]
+script = "cat ${dir}/msg.txt"
 ```
 
-### Variables: Writing output to flexible target
-For many science applications its desirable to know which version of a software generated some output. You may write the output of a command to the contents of a variable, by using `"var(name)"` as a target.
+``` {.bash .eval}
+brei -i examples/rot13.toml all
+```
+
+### Multiplexing
+
+You can call templates with lists of arguments to create many tasks. There are two ways to combine multiple arguments: `inner` and `outer`, configured with the `join` argument. The `inner` product uses `zip` to join the arguments, while `outer` uses `itertools.product` to join. The default is `inner`.
+
+``` {.toml file=examples/template_multiplexing.toml}
+[[task]]
+description = "Creating temporary directory"
+stdout = "var(dir)"
+script = "mktemp -d"
+
+[template.touch]
+description = "${pre} ${a} ${b}"
+creates = ["${dir}/${pre}-${a}-${b}"]
+script = "touch '${dir}/${pre}-${a}-${b}'"
+
+[[call]]
+template = "touch"
+collect = "inner"
+  [call.args]
+  pre = "inner"
+  a = ["x", "y", "z"]
+  b = ["1", "2", "3"]
+
+[[call]]
+template = "touch"
+collect = "outer"
+join = "outer"
+  [call.args]
+  pre = "outer"
+  a = ["x", "y"]
+  b = ["1", "2"]
+
+[[task]]
+name = "all"
+requires = ["#inner", "#outer"]
+```
+
+The `collect` argument creates a collection phony task containing all items in the call.
+
+``` {.bash .eval}
+brei -i examples/template_multiplexing.toml all
+```
+
+## Variables
+You may write the output of a command to the contents of a variable, by using `"var(name)"` as a target.
+For instance, in many science applications its desirable to know which version of a software generated some output. 
 
 ``` {.toml file=examples/versioned_output.toml}
 [environment]
@@ -79,7 +133,10 @@ path = "scripts/run.py"
 
 [[task]]
 name = "prepare"
-script = "mkdir -p ${output_dir}"
+script = """
+mkdir -p ${output_dir}
+ln -sf ${output_dir} output/latest
+"""
 
 [[task]]
 name = "all"
@@ -94,7 +151,7 @@ Also note the following:
 - The `[environment]` item lists global variables.
 - All string substitution is done lazily.
 
-### Includes
+## Includes
 You can include parts of a workflow from other files, both TOML and JSON.
 
 ``` {.toml file=examples/echo.toml}
@@ -123,22 +180,28 @@ It is even possible to include files that still need to be generated. The follow
 
 ``` {.toml file=examples/include-gen.toml}
 include = [
-    "./gen.json"
+    "${dir}/gen.json"
 ]
 
 [[task]]
-stdout = "./gen.json"
+description = "Creating temporary directory"
+stdout = "var(dir)"
+script = "mktemp -d"
+
+[[task]]
+description = "Generating workflow"
+stdout = "${dir}/gen.json"
 runner = "python"
 script = """
 import json
 tasks = [
-    {"stdout": f"out{i}.dat",
+    {"stdout": f"${dir}/out{i}.dat",
      "script": f"echo '{i}'"} for i in range(10)
 ]
-tasks.append({"name": "write-outs", "dependencies": [
+tasks.append({"name": "write-outs", "requires": [
     f"out{i}.dat" for i in range(10)
 ]})
-print(json.dumps(tasks))
+print(json.dumps({"task": tasks}))
 """
 
 [[task]]
@@ -146,187 +209,79 @@ name = "all"
 requires = ["#write-outs"]
 ```
 
-### Custom Runner
-By default, the contents of `script` is split in lines, then each line is passed through Python's `shlex.split` function and then run using `asyncio.create_subprocess_exec`. What that means is that the script will perform the same operations on all platforms, and arguments are collected similar to a normal Unix shell or Windows command prompt. However, you can choose to have the script run by any other means by providing the `runner` argument.
-
 ``` {.bash .eval}
-brei --list-runners
+brei -i examples/include-gen.toml all
 ```
+
+## Custom Runner
+By default, the contents of `script` is split in lines, then each line is passed through Python's `shlex.split` function and then run using `asyncio.create_subprocess_exec`. What that means is that the script will perform the same operations on all platforms, and arguments are collected similar to a normal Unix shell or Windows command prompt. However, you can choose to have the script run by any other means by providing the `runner` argument.
 
 
 ``` {.toml file=examples/custom-runner.toml}
+[[task]]
+description = "Creating temporary directory"
+stdout = "var(dir)"
+script = "mktemp -d"
+
 [runner.lua]
 command = "lua"
 args = ["${script}"]
 
 [[task]]
 runner = "lua"
-stdout = "hello.txt"
-script = "print(\"Hello, World!\")"
+stdout = "${dir}/hello.txt"
+script = """
+function fact (n)
+  if n == 0 then
+    return 1
+  else
+    return n * fact(n-1)
+  end
+end
+
+print("10! = ", fact(10))
+"""
+
+[[task]]
+name = "all"
+requires = ["${dir}/hello.txt"]
+script = "cat ${dir}/hello.txt"
 ```
 
-### Remarks
-
-If you need your workflows also execute on a Windows machine, it is advised to write scripts in Python.
-
-
-``` {.python file=brei/version.py}
-from importlib import metadata
-
-
-__version__ = metadata.version("brei")
+``` {.bash .eval}
+brei -i examples/custom-runner.toml all
 ```
 
-``` {.python file=brei/__init__.py}
-from .program import Program, resolve_tasks
-from .task import Task, TaskDB
+There are a number of runners configured by default.
 
-__all__ = ["Program", "resolve_tasks", "Task", "TaskDB"]
+``` {.bash .eval}
+brei --list-runners
 ```
 
+## Remarks
 
-``` {.python file=brei/logging.py}
-import logging
-from rich.highlighter import RegexHighlighter
-from rich.logging import RichHandler
+- If you need your workflows also execute on a Windows machine, it is advised to write scripts for the default runner (lists of commands) or in Python.
+- Brei is not meant for building programs, so it doesn't have the same feature set as GNU Make. If you need more complex logic, you can write a Brei generator. The generator creates tasks, writes them to JSON and then Brei can `include` the result from your generator task.
+- TOML is nice but not ideal: it can be tricky to see the difference beteween single `[...]` and double `[[...]]` square brackets. Sometimes TOML syntax will lead to very verbose notation, however, current alternatives are all worse.
+- Many modern programming languages that we like (Python, Rust, Julia) have their project settings in a TOML file. This way your Brei workflow can piggy-back on project files that are already there.
 
-def logger():
-    return logging.getLogger("brei")
+# Running
 
-def configure_logger(debug: bool):
-    class BackTickHighlighter(RegexHighlighter):
-        highlights = [r"`(?P<bold>[^`]*)`"]
+Brei is available on PyPI:
 
-    FORMAT = "%(message)s"
-    logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO,
-        format=FORMAT,
-        datefmt="[%X]",
-        handlers=[RichHandler(show_path=debug, highlighter=BackTickHighlighter())],
-    )
-
-# logging.basicConfig(level=logging.INFO)
-# logger().level = logging.INFO
+```
+pip install brei
 ```
 
-``` {.python file=brei/cli.py}
-from argparse import ArgumentParser
-from pathlib import Path
-import re
-import sys
-import tomllib
-from typing import Optional
-import argh  # type: ignore
-import asyncio
-from rich.console import Console
+Although for Python we recommend using virtual environments, for example [Poetry](https://python-poetry.org/). Once you've setup a project in Poetry
 
-from rich_argparse import RichHelpFormatter
-from rich.table import Table
-
-from .runner import DEFAULT_RUNNERS
-from .errors import HelpfulUserError
-from .lazy import Phony
-from .utility import construct, read_from_file
-from .program import Program, resolve_tasks
-from .logging import logger, configure_logger
-from .version import __version__
-
-
-log = logger()
-
-
-async def main(
-    program: Program, target_strs: list[str], force_run: bool, throttle: Optional[int]
-):
-    db = await resolve_tasks(program)
-    for t in db.tasks:
-        log.debug(str(t))
-    if throttle:
-        db.throttle = asyncio.Semaphore(throttle)
-    db.force_run = force_run
-    await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
-
-
-@argh.arg("targets", nargs="*", help="names of tasks to run")
-@argh.arg(
-    "-i",
-    "--input-file",
-    help="Brei TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
-)
-@argh.arg("-B", "--force-run", help="rebuild all dependencies")
-@argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
-@argh.arg("-v", "--version", help="print version number and exit")
-@argh.arg("--list-runners", help="show default configured runners")
-@argh.arg("--debug", help="more verbose logging")
-def loom(
-    targets: list[str],
-    *,
-    input_file: Optional[str] = None,
-    force_run: bool = False,
-    jobs: Optional[int] = None,
-    version: bool = False,
-    list_runners: bool = False,
-    debug: bool = False
-):
-    """Build one of the configured targets."""
-    if version:
-        print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center. All Rights Reserved.")
-        sys.exit(0)
-
-    if list_runners:
-        t = Table(title="Default Runners", header_style="italic green", show_edge=False)
-        t.add_column("runner", style="bold yellow")
-        t.add_column("executable")
-        t.add_column("arguments")
-        for r, c in DEFAULT_RUNNERS.items():
-            t.add_row(r, c.command, f"{c.args}")
-        console = Console()
-        console.print(t)
-        sys.exit(0)
-
-    if input_file is not None:
-        if m := re.match(input_file, r"([^\[\]]+)\[([^\[\]\s]+)\]"):
-            input_path = Path(m.group(1))
-            section = m.group(2)
-        else:
-            input_path = Path(input_file)
-            section = None
-
-        program = read_from_file(Program, input_path, section)
-
-    elif Path("brei.toml").exists():
-        program = read_from_file(Program, Path("brei.toml"))
-
-    elif Path("pyproject.toml").exists():
-        with open("pyproject.toml", "rb") as f_in:
-            data = tomllib.load(f_in)
-        try:
-            for s in ["tool", "brei"]:
-                data = data[s]
-        except KeyError as e:
-            raise HelpfulUserError(
-                f"With out the `-f` argument, Brei looks for `brei.toml` first, then for "
-                f"a `[tool.brei]` section in `pyproject.toml`. A `pyproject.toml` file was "
-                f"found, but contained no `[tool.brei]` section."
-            ) from e
-
-        program = construct(Program, data)
-    else:
-        raise HelpfulUserError(
-            "No input file given, no `loom.toml` found and no `pyproject.toml` found."
-        )
-
-    jobs = int(jobs) if jobs else None
-    configure_logger(debug)
-    asyncio.run(main(program, targets, force_run, jobs))
-
-
-def cli():
-    parser = ArgumentParser(formatter_class=RichHelpFormatter)
-    argh.set_default_command(parser, loom)
-    argh.dispatch(parser)
-
-
-if __name__ == "__main__":
-    cli()
 ```
+poetry add brei
+```
+
+Then `brei` should be available as a command-line executable.
+
+``` {.bash .eval}
+brei --help
+```
+

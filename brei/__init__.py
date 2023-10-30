@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/index.md#brei/__init__.py>>[init]
+# ~/~ begin <<docs/implementation.md#brei/__init__.py>>[init]
 from .program import Program, resolve_tasks
 from .task import Task, TaskDB
 

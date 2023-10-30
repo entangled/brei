@@ -16,6 +16,9 @@ class Failure:
 class MissingFailure(Failure, Generic[T]):
     target: T
 
+    def __str__(self):
+        return f"Missing dependency: {self.target}"
+
 
 @dataclass
 class TaskFailure(Failure, Exception):
@@ -29,6 +32,8 @@ class TaskFailure(Failure, Exception):
 class DependencyFailure(Failure, Generic[T]):
     dependencies: dict[T, Failure]
 
+    def __str__(self):
+        return "\n".join(f"{key} -> {fail}" for key, fail in self.dependencies.items())
 
 @dataclass
 class Ok(Generic[R]):

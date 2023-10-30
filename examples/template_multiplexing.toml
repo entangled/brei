@@ -1,0 +1,32 @@
+# ~/~ begin <<docs/index.md#examples/template_multiplexing.toml>>[init]
+[[task]]
+description = "Creating temporary directory"
+stdout = "var(dir)"
+script = "mktemp -d"
+
+[template.touch]
+description = "${pre} ${a} ${b}"
+creates = ["${dir}/${pre}-${a}-${b}"]
+script = "touch '${dir}/${pre}-${a}-${b}'"
+
+[[call]]
+template = "touch"
+collect = "inner"
+  [call.args]
+  pre = "inner"
+  a = ["x", "y", "z"]
+  b = ["1", "2", "3"]
+
+[[call]]
+template = "touch"
+collect = "outer"
+join = "outer"
+  [call.args]
+  pre = "outer"
+  a = ["x", "y"]
+  b = ["1", "2"]
+
+[[task]]
+name = "all"
+requires = ["#inner", "#outer"]
+# ~/~ end

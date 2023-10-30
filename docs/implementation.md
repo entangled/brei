@@ -1,4 +1,45 @@
-# ~/~ begin <<docs/implementation.md#brei/cli.py>>[init]
+# Implementation
+
+``` {.python file=brei/version.py}
+from importlib import metadata
+
+
+__version__ = metadata.version("brei")
+```
+
+``` {.python file=brei/__init__.py}
+from .program import Program, resolve_tasks
+from .task import Task, TaskDB
+
+__all__ = ["Program", "resolve_tasks", "Task", "TaskDB"]
+```
+
+
+``` {.python file=brei/logging.py}
+import logging
+from rich.highlighter import RegexHighlighter
+from rich.logging import RichHandler
+
+def logger():
+    return logging.getLogger("brei")
+
+def configure_logger(debug: bool):
+    class BackTickHighlighter(RegexHighlighter):
+        highlights = [r"`(?P<bold>[^`]*)`"]
+
+    FORMAT = "%(message)s"
+    logging.basicConfig(
+        level=logging.DEBUG if debug else logging.INFO,
+        format=FORMAT,
+        datefmt="[%X]",
+        handlers=[RichHandler(show_path=debug, highlighter=BackTickHighlighter())],
+    )
+
+# logging.basicConfig(level=logging.INFO)
+# logger().level = logging.INFO
+```
+
+``` {.python file=brei/cli.py}
 from argparse import ArgumentParser
 from pathlib import Path
 import re
@@ -128,4 +169,4 @@ def cli():
 
 if __name__ == "__main__":
     cli()
-# ~/~ end
+```

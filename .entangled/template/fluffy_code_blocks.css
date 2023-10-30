@@ -1,0 +1,42 @@
+/* #region Code blocks */
+.named-code-block {
+    border-radius: 5pt;
+    margin: 0 20pt 0 20pt;
+    background: rgb(180, 209, 253);
+    box-shadow: 1px 1px 3px #88888855;
+}
+
+.named-code-block p {
+        margin: 3pt 0pt 0pt 15pt;
+}
+.named-code-block .sourceCode {
+        margin: 0;
+}
+
+.named-code-block pre.sourceCode {
+        padding: 5pt 20pt 10pt 15pt;
+        border-radius: 0 0 5pt 5pt;
+        background: #f2f2f2;
+}
+
+.named-code-block div.sourceCode {
+    line-height: 140%;
+    border-radius: 0 0 5pt 5pt;
+    background: #f2f2f2;
+}
+
+:not(.named-code-block) > div.sourceCode {
+        margin: 0 20pt 0 20pt;
+        padding: 5pt 15pt 10pt 15pt;
+        border-radius: 5pt 5pt 5pt 5pt;
+}
+
+code {
+        font-size: smaller;
+        font-family: "Fira Code", monospace;
+}
+
+@supports (font-variation-settings: normal) {
+  code { font-family: 'Fira Code VF', monospace; }
+}
+/* #endregion */

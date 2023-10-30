@@ -1,10 +1,11 @@
 # ~/~ begin <<docs/program.md#brei/program.py>>[init]
 from __future__ import annotations
+import asyncio
 from copy import copy
-import itertools
-from typing import Any
+from itertools import chain, product, repeat
 from dataclasses import dataclass, field
 from enum import Enum
+import json
 from pathlib import Path
 
 import tomllib
@@ -12,9 +13,9 @@ import tomllib
 
 from .template_strings import gather_args
 from .logging import logger
-from .errors import UserError
+from .errors import HelpfulUserError, UserError
 
-from .utility import construct
+from .utility import construct, read_from_file
 from .task import (
     Variable,
     TaskDB,
@@ -46,15 +47,16 @@ class MissingTemplate(UserError):
 
 
 class Join(Enum):
-    ZIP = 1
-    PRODUCT = 2
+    INNER = 1
+    OUTER = 2
 
 
 @dataclass
 class TemplateCall:
     template: str
     args: dict[str, str | list[str]]
-    join: Join = Join.ZIP
+    collect: str | None = None
+    join: Join = Join.INNER
 
     @property
     def all_args(self):
@@ -62,17 +64,17 @@ class TemplateCall:
             yield self.args
             return
 
-        if self.join == Join.ZIP:
+        if self.join == Join.INNER:
             for v in zip(
                 *map(
-                    lambda x: itertools.repeat(x) if isinstance(x, str) else x,
+                    lambda x: repeat(x) if isinstance(x, str) else x,
                     self.args.values(),
                 )
             ):
                 yield dict(zip(self.args.keys(), v))
 
-        else:  # cartesian join
-            for v in itertools.product(
+        else:  # cartesian product
+            for v in product(
                 *map(lambda x: [x] if isinstance(x, str) else x, self.args.values())
             ):
                 yield dict(zip(self.args.keys(), v))
@@ -88,13 +90,43 @@ class Program:
     runner: dict[str, Runner] = field(default_factory=dict)
 
     @staticmethod
-    def read(path: Path) -> Program:
-        with open(path, "rb") as f_in:
-            data = tomllib.load(f_in)
-        return construct(Program, data)
+    def read(path: Path, section: str | None = None) -> Program:
+        return read_from_file(Program, path, section)
+
+
+def tasks_from_call(template: Template, call: TemplateCall) -> list[TaskProxy]:
+    tasks = [template.call(args) for args in call.all_args]
+    if call.collect:
+        targets = list(chain.from_iterable(t.creates for t in tasks))
+        collection = TaskProxy([], targets, name=call.collect)
+        return tasks + [collection]
+    else:
+        return tasks
+
+
+async def resolve_delayed(db: TaskDB, tasks: list[TaskProxy]) -> list[TaskProxy]:
+    """Resolve `tasks` (substituting variables in targets).
+
+    Returns: list of unresolvable tasks.
+    """
+    async def resolve(task: TaskProxy) -> TaskProxy | None:
+        if not db.is_resolvable(task.all_targets):
+            return task
+        tt = await db.resolve_object(task)
+        db.add(TemplateTask([], [], tt))
+        return None
+
+    return [t for t in await asyncio.gather(*map(resolve, tasks)) if t]
 
 
 async def resolve_tasks(program: Program) -> TaskDB:
+    """Resolve a program. A resolved program has all of its includes and
+    template calls done, so that only tasks remains. In order to resolve
+    a program, some tasks may need to be run. Variables that appear in
+    the `creates` field of a task (aka targets), will be resolved eagerly.
+
+    Returns: TaskDB instance.
+    """
     db = TaskDB()
     template_index = dict()
 
@@ -117,9 +149,8 @@ async def resolve_tasks(program: Program) -> TaskDB:
                 )
                 delayed_calls.append(c)
                 continue
-            p = template_index[c.template]
-            for args in c.all_args:
-                task_templates.append(p.call(args))
+
+            task_templates.extend(tasks_from_call(template_index[c.template], c))
 
         for tt in task_templates:
             # we could check for resolvability here, but I don't like the
@@ -132,6 +163,8 @@ async def resolve_tasks(program: Program) -> TaskDB:
                 delayed_templates.append(tt)
             else:
                 db.add(TemplateTask([], [], tt))
+
+        delayed_templates = await resolve_delayed(db, delayed_templates)
 
         for inc in program.include:
             incp = Path(await db.resolve_object(inc))
@@ -149,19 +182,17 @@ async def resolve_tasks(program: Program) -> TaskDB:
                     "template `%s` still not available, now this is an error", c.template
                 )
                 raise MissingTemplate(c.template)
-            p = template_index[c.template]
-            for args in c.all_args:
-                tt = p.call(c.args)
+
+            for tt in tasks_from_call(template_index[c.template], c):
                 if gather_args(tt.creates):
                     delayed_templates.append(tt)
                 else:
                     db.add(TemplateTask([], [], tt))
 
-        for tt in delayed_templates:
-            if not db.is_resolvable(tt.all_targets):
-                raise UserError(f"Task has unresolvable targets: {tt.creates}")
-            tt = await db.resolve_object(tt)
-            db.add(TemplateTask([], [], tt))
+        delayed_templates = await resolve_delayed(db, delayed_templates)
+        if delayed_templates:
+            unresolvable = [p for t in delayed_templates for p in t.creates if not db.is_resolvable(p)]
+            raise UserError(f"Task has unresolvable targets: {unresolvable}")
 
         return db
 

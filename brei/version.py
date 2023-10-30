@@ -1,4 +1,4 @@
-# ~/~ begin <<docs/index.md#brei/version.py>>[init]
+# ~/~ begin <<docs/implementation.md#brei/version.py>>[init]
 from importlib import metadata
 
 

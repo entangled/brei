@@ -15,7 +15,10 @@ path = "scripts/run.py"
 
 [[task]]
 name = "prepare"
-script = "mkdir -p ${output_dir}"
+script = """
+mkdir -p ${output_dir}
+ln -sf ${output_dir} output/latest
+"""
 
 [[task]]
 name = "all"

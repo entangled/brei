@@ -32,6 +32,11 @@ build-backend = "poetry.core.masonry.api"
 [tool.mypy]
 packages = ["brei"]
 
+[tool.brei]
+include = [
+  ".entangled/weave.toml"
+]
+
 [[tool.brei.task]]
 name = "test"
 requires = ["#coverage-report", "#mypy"]

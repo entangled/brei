@@ -110,7 +110,6 @@ TaskT = TypeVar("TaskT", bound=Lazy)
 class MissingDependency(Exception):
     pass
 
-
 @dataclass
 class LazyDB(Generic[T, TaskT]):
     """Collect tasks and coordinate running a task from a task identifier."""

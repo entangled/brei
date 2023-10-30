@@ -1,0 +1,49 @@
+[environment]
+title = "Brei"
+subtitle = "a minimal workflow system"
+
+pandoc_args = """
+${pandoc_format} ${pandoc_style} ${pandoc_template} ${pandoc_filters} \
+-M title='${title}' -M subtitle='${subtitle}'"""
+
+pandoc_format = "-s -t html5 --section-divs --toc --toc-depth 2"
+pandoc_template = "--template .entangled/template/template.html"
+pandoc_style = "--css light.css"
+pandoc_filters = """
+--lua-filter ${filter_dir}/annotate.lua \
+--lua-filter ${filter_dir}/details.lua \
+--lua-filter ${filter_dir}/eqnos.lua \
+--lua-filter ${filter_dir}/eval.lua"""
+
+filter_dir = ".entangled/filters"
+
+[[task]]
+name = "weave"
+requires = ["#html", "#static"]
+
+[[call]]
+template = "copy"
+collect = "static"
+  [call.args]
+  srcdir = ".entangled/template"
+  tgtdir = "site"
+  basename = ["dark.css", "light.css"]
+
+[[call]]
+template = "pandoc"
+collect = "html"
+  [call.args]
+  basename = ["index", "tasks", "template_strings", "program"]
+
+[template.pandoc]
+description = "pandoc `${basename}`"
+requires = ["docs/${basename}.md"]
+creates = ["site/${basename}.html"]
+script = "pandoc ${pandoc_args} -o 'site/${basename}.html' 'docs/${basename}.md'"
+
+[template.copy]
+description = "copy `${basename}`"
+requires = ["${srcdir}/${basename}"]
+creates = ["${tgtdir}/${basename}"]
+script = "cp '${srcdir}/${basename}' '${tgtdir}'"
+

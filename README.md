@@ -32,7 +32,15 @@ To run unit tests and type checker:
 
 ```
 poetry install
+poetry shell
 brei test
+```
+
+To build the documentation, run the `brei weave` workflow:
+
+```
+# poetry shell
+brei weave
 ```
 
 Some parts of Brei are literate. Run the entangled watch daemon while editing code,

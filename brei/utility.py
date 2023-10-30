@@ -22,7 +22,7 @@ T = TypeVar("T")
 
 
 def normal_relative(path: Path) -> Path:
-    return path.resolve().relative_to(Path.cwd())
+    return path.resolve()  # .relative_to(Path.cwd())
 
 
 @dataclass
@@ -58,7 +58,6 @@ def construct(annot: Any, json: Any) -> Any:
     try:
         return _construct(annot, json)
     except (AssertionError, ValueError) as e:
-        traceback.print_exc()
         raise InputError(annot, json) from e
 
 

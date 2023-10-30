@@ -26,7 +26,7 @@ from pathlib import Path
 import re
 import string
 from tempfile import NamedTemporaryFile
-from typing import IO, Any, BinaryIO, Optional, TextIO
+from typing import Any, Optional, TextIO
 from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
@@ -35,7 +35,6 @@ from .result import TaskFailure
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
 from .logging import logger
-from .errors import FailedTaskError, HelpfulUserError
 from .template_strings import gather_args, substitute
 from .runner import Runner, DEFAULT_RUNNERS
 
@@ -49,6 +48,9 @@ class Variable:
 
     def __hash__(self):
         return hash(f"var({self.name})")
+
+    def __str__(self):
+        return f"var({self.name})"
 
 
 def str_to_target(s: str) -> Path | Phony | Variable:
@@ -152,12 +154,14 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             log.info(f"Targets {tgts} already up-to-date.")
             return
 
-        targets = " ".join(f"`{t}`" for t in self.creates)
-        short_note = self.description or f"#{self.name}" or f"creating {targets}"
-        log.info(f"run: [green]{short_note}[/]", extra={'markup': True})
         log.debug(f"{self}")
         if (self.path is None and self.script is None):
             return
+
+        targets = " ".join(f"`{t}`" for t in self.creates)
+        short_note = self.description or (f"#{self.name}" if self.name else None) \
+            or f"creating {targets}"
+        log.info(f"[green]{short_note}[/]", extra={'markup': True})
 
         stdin: TextIO | int | None = None
         match self.stdin:
@@ -189,7 +193,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
                     if stdout_data_part:
                         stdout_data += stdout_data_part
                     if stderr_data:
-                        log.info(stderr_data.decode())
+                        log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
 
         elif self.runner is not None:
             with self.get_script_path() as path, self.get_stdout() as stdout:
@@ -207,7 +211,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
                     log.debug(f"return-code {proc.returncode}")
 
             if stderr_data:
-                log.info(stderr_data.decode())
+                log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
 
         else:
             return
