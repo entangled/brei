@@ -1,3 +1,4 @@
-site/* linguist-vendored
+site/* linguist-generated
+docs/* linguist-documentation
 .entangled/* linguist-vendored
 
