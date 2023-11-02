@@ -224,6 +224,11 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 
 @dataclass
 class TaskProxy:
+    """Input to create an actual Task.
+
+    An actual `Task` has no template variables remaining and untyped strings
+    are replaced with `Path` `Variable` or `Phony` objects.
+    """
     creates: list[str] = field(default_factory=list)
     requires: list[str] = field(default_factory=list)
     name: Optional[str] = None
@@ -334,6 +339,8 @@ class Environment:
 
 
 class Template(TaskProxy):
+    """A `Template` can receive the same arguments as a TaskProxy. The difference is 
+    that any template variables in the Template can be substituted with a `TemplateCall`."""
     def call(self, args: dict[str, Any]) -> TaskProxy:
         return substitute(self, args)
 ```

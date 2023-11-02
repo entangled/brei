@@ -27,13 +27,6 @@
       "size": 883
     },
     {
-      "path": "docs/target.md",
-      "deps": null,
-      "modified": "2023-10-26T23:51:09.686801",
-      "hexdigest": "c42033a07d0a0d0a737ca98acc61be3d60cfedbebca2b96db415d8658f0be0b8",
-      "size": 11
-    },
-    {
       "path": "docs/utility.md",
       "deps": null,
       "modified": "2023-11-01T13:05:22.957924",
@@ -43,9 +36,9 @@
     {
       "path": "docs/lazy.md",
       "deps": null,
-      "modified": "2023-11-01T20:54:43.267092",
-      "hexdigest": "7eb25f674b3c2cebf97bebaeb3a32bbe359efb659d1212f43a14ab81f9a5261d",
-      "size": 6879
+      "modified": "2023-11-02T15:37:15.436818",
+      "hexdigest": "d0f638ef826f389213d594b6d72ab9ead6db2fac653800e4136f2e8b3b6ee262",
+      "size": 6899
     },
     {
       "path": "docs/index.md",
@@ -57,23 +50,23 @@
     {
       "path": "docs/program.md",
       "deps": null,
-      "modified": "2023-10-30T13:55:07.742106",
-      "hexdigest": "9c295ec92ad6e7aeaebeac6fbea102a0cb8089c497b6edf9e676c2d2c2bc7015",
-      "size": 6132
+      "modified": "2023-11-02T16:26:50.478996",
+      "hexdigest": "e4ad5dcee7e549844a8145f8960491fe33a1f35cd13fff2a65de3fc5ea803565",
+      "size": 6672
     },
     {
       "path": "docs/template_strings.md",
       "deps": null,
-      "modified": "2023-10-29T00:49:16.803231",
-      "hexdigest": "64f51e8c7461ac06011786644bb3f5e38e19d8e981c12568f24f7fb42fb1245b",
-      "size": 4645
+      "modified": "2023-11-02T15:39:56.876799",
+      "hexdigest": "b4cf771180856087c0338a2167eec065b56dd93baffa8915ea13bbad1209a16c",
+      "size": 4634
     },
     {
       "path": "docs/tasks.md",
       "deps": null,
-      "modified": "2023-10-30T10:34:54.790448",
-      "hexdigest": "e77ad0c91af004af638cd0dc2b9006743343a22372b10cb67b316572f987ba07",
-      "size": 10813
+      "modified": "2023-11-02T16:22:09.635525",
+      "hexdigest": "676768e14a6f3025a076b14b7f0256a010f351b8e8cb92e1e1932f300547aef3",
+      "size": 11177
     },
     {
       "path": "test/test_template_strings.py",
@@ -134,9 +127,9 @@
       "deps": [
         "docs/program.md"
       ],
-      "modified": "2023-10-30T13:55:07.681105",
-      "hexdigest": "6f6b42c09828d36dafa62160057be5d3147db7c7ed980dba582279d645fd6b8c",
-      "size": 6145
+      "modified": "2023-11-02T16:26:50.292995",
+      "hexdigest": "75c0c0b2cf0f75b037785f6f85bde36c9a90e327e6c31a13ab7a90fd8990e8b2",
+      "size": 6685
     },
     {
       "path": "brei/errors.py",
@@ -179,9 +172,9 @@
       "deps": [
         "docs/tasks.md"
       ],
-      "modified": "2023-10-30T10:34:54.594448",
-      "hexdigest": "5b757d1bf7b4152d79bd2e589534261dfcb40c408868300adcef2018525f9036",
-      "size": 10557
+      "modified": "2023-11-02T16:22:09.452524",
+      "hexdigest": "7354b3d99b65ce8bdeb48fd75cb7079aa99f641f76f19473f485fde6790f9d5c",
+      "size": 10921
     },
     {
       "path": "brei/template_strings.py",
@@ -240,9 +233,9 @@
       "deps": [
         "docs/implementation.md"
       ],
-      "modified": "2023-10-31T12:18:17.790390",
-      "hexdigest": "24d27f9429fb1004aa992ca207be0bb4717c2be867b0d5a842404dff94cdf1cf",
-      "size": 234
+      "modified": "2023-11-02T16:39:31.056613",
+      "hexdigest": "aa2d8afb1d55bdfba5ecdcaaa47cb3a67cda7a8786dd1b8083756b36ed000419",
+      "size": 1613
     },
     {
       "path": "brei/cli.py",
@@ -256,9 +249,9 @@
     {
       "path": "docs/implementation.md",
       "deps": null,
-      "modified": "2023-11-02T15:20:43.933643",
-      "hexdigest": "cd5270fd8880d3559d99f67c4a2099b9e4132f6cf0f74330bf86141c2b56f1da",
-      "size": 5522
+      "modified": "2023-11-02T16:39:31.268615",
+      "hexdigest": "dbb8c95c4245fff4395f4f0c2b0aeb66663612411fb2c6b52861e5af5aaa4fa8",
+      "size": 7050
     },
     {
       "path": "examples/template_multiplexing.toml",
@@ -272,15 +265,15 @@
     {
       "path": "docs/contents.md",
       "deps": null,
-      "modified": "2023-11-01T11:28:44.726666",
-      "hexdigest": "c9e05a62f86575b714fc4d6d6d23518f5be76402421a8c2865aae0c67991f835",
-      "size": 435
+      "modified": "2023-11-02T15:46:06.423047",
+      "hexdigest": "286eff515a4e863174e04d4831b6d56855570aca7518da637f5587f791d28deb",
+      "size": 479
     },
     {
       "path": "docs/test_coverage.md",
       "deps": null,
-      "modified": "2023-11-01T13:05:03.025787",
-      "hexdigest": "20554856bdc7bef3ee7eeb726dbb58319bf2a28f0046cdf339c9ceede5bdc60c",
+      "modified": "2023-11-02T16:33:06.462278",
+      "hexdigest": "720c7c9ae91d941a38364f01915548d3fce5328f42b915cc3d97b099f12f06f8",
       "size": 1054
     },
     {

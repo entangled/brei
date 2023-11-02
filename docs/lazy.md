@@ -67,6 +67,8 @@ class Ok(Generic[R]):
 Result = Failure | Ok[R]
 ```
 
+## Lazy evaluation
+
 ``` {.python file=brei/lazy.py}
 from __future__ import annotations
 from copy import copy

@@ -1,5 +1,6 @@
 :::site-menu
 - [Home](index.md)
+- [API documentation (pdoc)](api/brei.html)
 - [Implementation](implementation.md)
 :::
 

@@ -1,8 +1,6 @@
----
-title: Lazy Templates
----
+# Template strings
 
-The goal is to have more flexible templates in Loom. I've looked into Jinja as a way to expand templates, but this is rejected due to large mostly unneeded complexity and ditto dependencies. A better alternative is to use Python's `string.Template` to do variable substition. Evaluation needs to be lazy, and I would like to be able to pipe standard output of a task to the contents of a variable. Considering this last point, we want to differentiate between writing output to the contents of a variable, and writing output to the file pointed to by the variable.
+The goal is to have more flexible templates in Brei. I've looked into Jinja as a way to expand templates, but this is rejected due to large mostly unneeded complexity and ditto dependencies. A better alternative is to use Python's `string.Template` to do variable substition. Evaluation needs to be lazy, and I would like to be able to pipe standard output of a task to the contents of a variable. Considering this last point, we want to differentiate between writing output to the contents of a variable, and writing output to the file pointed to by the variable.
 
 To assign the output of a command to a variable, we can have the following:
 

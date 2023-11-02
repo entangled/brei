@@ -1,13 +1,11 @@
-from dataclasses import dataclass
 import os
-from typing import Optional, Union
 import pytest
-from contextlib import asynccontextmanager, chdir
+from contextlib import chdir
 from pathlib import Path
-import time
 from brei.utility import stat
 from brei.lazy import Phony
 from brei.task import TaskDB, Task
+from brei.async_timer import timer
 
 
 class TaskDBTester(TaskDB):
@@ -16,19 +14,6 @@ class TaskDBTester(TaskDB):
 
     def phony(self, name, deps, **kwargs):
         self.add(Task([], deps, name=name, **kwargs))
-
-
-@dataclass
-class Elapsed:
-    time: Optional[float] = None
-
-
-@asynccontextmanager
-async def timer():
-    e = Elapsed()
-    t = time.perf_counter()
-    yield e
-    e.time = time.perf_counter() - t
 
 
 @pytest.mark.asyncio
@@ -76,8 +61,8 @@ async def test_runtime(tmp_path: Path):
         async with timer() as t:
             await db.run(Phony("all"), db=db)
 
-        assert t.time is not None
-        assert t.time > 0.1 and t.time < 0.4
+        assert t.elapsed is not None
+        assert t.elapsed > 0.1 and t.elapsed < 0.4
 
 
 @pytest.mark.asyncio

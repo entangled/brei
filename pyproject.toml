@@ -25,6 +25,7 @@ deadcode = "^2.2.2"
 pytest-timeout = "^2.2.0"
 coverage = "^7.3.2"
 pyright = "^1.1.333"
+pdoc = "^14.1.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -83,7 +84,7 @@ script = "coverage report --format=markdown"
 
 [[tool.brei.task]]
 name = "weave"
-requires = ["#html", "#static"]
+requires = ["#html", "#static", "#pdoc"]
 
 [[tool.brei.call]]
 template = "pandoc"
@@ -91,3 +92,9 @@ collect = "html"
   [tool.brei.call.args]
   basename = ["index", "implementation", "tasks", "lazy", "template_strings", "program"]
 
+[[tool.brei.task]]
+name = "pdoc"
+description = "Build API documentation"
+creates = ["site/api/brei.html"]
+requires = ["brei/__init__.py"]
+script = "pdoc brei -o ./site/api"

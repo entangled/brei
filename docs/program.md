@@ -55,6 +55,15 @@ class Join(Enum):
 
 @dataclass
 class TemplateCall:
+    """Calls a template with a set of arguments.
+
+    Members:
+
+      - template: name of the template.
+      - args: arguments to the call.
+      - collect: name of the phony target by which to collect all generated targets.
+      - join: `inner` or `outer` join.
+    """
     template: str
     args: dict[str, str | list[str]]
     collect: str | None = None
@@ -84,6 +93,17 @@ class TemplateCall:
 
 @dataclass
 class Program:
+    """A Brei program.
+
+    Members:
+
+      - task: list of tasks.
+      - environment: variables.
+      - template: set of templates.
+      - call: list of calls to templates.
+      - include: list of includes.
+      - runner: extra configured task runners.
+    """
     task: list[TaskProxy] = field(default_factory=list)
     environment: dict[str, str] = field(default_factory=dict)
     template: dict[str, Template] = field(default_factory=dict)
