@@ -1,5 +1,17 @@
 # Implementation
 
+``` {.bash .eval}
+brei --version
+```
+
+## Test coverage
+
+:::table
+!include docs/test_coverage.md
+:::
+
+## Python module
+
 ``` {.python file=brei/version.py}
 from importlib import metadata
 
@@ -10,34 +22,48 @@ __version__ = metadata.version("brei")
 ``` {.python file=brei/__init__.py}
 from .program import Program, resolve_tasks
 from .task import Task, TaskDB
+from .cli import brei
 
-__all__ = ["Program", "resolve_tasks", "Task", "TaskDB"]
+__all__ = ["Program", "resolve_tasks", "Task", "TaskDB", "brei"]
 ```
 
+:::details
+### Logging
+
+Logging is formatted by the `rich` module.
 
 ``` {.python file=brei/logging.py}
 import logging
+import sys
 from rich.highlighter import RegexHighlighter
 from rich.logging import RichHandler
 
 def logger():
     return logging.getLogger("brei")
 
-def configure_logger(debug: bool):
+def configure_logger(debug: bool, rich: bool = True):
     class BackTickHighlighter(RegexHighlighter):
         highlights = [r"`(?P<bold>[^`]*)`"]
 
-    FORMAT = "%(message)s"
-    logging.basicConfig(
-        level=logging.DEBUG if debug else logging.INFO,
-        format=FORMAT,
-        datefmt="[%X]",
-        handlers=[RichHandler(show_path=debug, highlighter=BackTickHighlighter())],
-    )
-
-# logging.basicConfig(level=logging.INFO)
-# logger().level = logging.INFO
+    if rich:
+        FORMAT = "%(message)s"
+        logging.basicConfig(
+            level=logging.DEBUG if debug else logging.INFO,
+            format=FORMAT,
+            datefmt="[%X]",
+            handlers=[RichHandler(show_path=debug, highlighter=BackTickHighlighter())],
+        )
+    else:
+        logging.basicConfig(
+            level=logging.DEBUG if debug else logging.INFO,
+            handlers=[logging.StreamHandler(sys.stdout)]
+        )
 ```
+
+:::
+
+:::details
+### Command-line interface
 
 ``` {.python file=brei/cli.py}
 from argparse import ArgumentParser
@@ -95,7 +121,7 @@ async def main(
 @argh.arg("-v", "--version", help="print version number and exit")
 @argh.arg("--list-runners", help="show default configured runners")
 @argh.arg("--debug", help="more verbose logging")
-def loom(
+def brei(
     targets: list[str],
     *,
     input_file: Optional[str] = None,
@@ -107,7 +133,8 @@ def loom(
 ):
     """Build one of the configured targets."""
     if version:
-        print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center. All Rights Reserved.")
+        print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center.")
+        print("Licensed under the Apache License, Version 2.0.")
         sys.exit(0)
 
     if list_runners:
@@ -163,10 +190,16 @@ def loom(
 
 def cli():
     parser = ArgumentParser(formatter_class=RichHelpFormatter)
-    argh.set_default_command(parser, loom)
+    argh.set_default_command(parser, brei)
     argh.dispatch(parser)
 
 
 if __name__ == "__main__":
     cli()
 ```
+
+:::
+
+!include docs/lazy.md
+
+!include docs/utility.md

@@ -1,10 +1,47 @@
 # Welcome to Brei
-Brei is a small workflow system in Python. The primary reason for creating Brei is to replace GNU Make, in order to be compatible on systems that are naturally deprived of this wonder of human ingenuity. Design goals are:
+Brei is a small workflow system in Python. The primary reason for creating Brei is to replace GNU Make, in order to be compatible on systems that are naturally deprived of this wonder of human ingenuity. In a nutshell:
 
-- Programmable workflows from TOML description
-- Ease of use
-- Ease of installation
-- Stay minimal: don't give in to feature bloat.
+```toml
+[[task]]
+description = "Greet the Globe"
+stdout = "hello.txt"
+script = "echo 'Hello, World!'"
+```
+
+- No new syntax: programmable workflows in TOML or JSON files.
+- Efficient: Runs tasks lazily and in parallel.
+- Feature complete: Supports templates, variables, includes and configurable runners.
+- Few dependencies: Only needs Python &ge;3.11.
+- Small codebase: Brei is around 1000 lines of Python.
+
+```bash
+pip install brei
+```
+
+## Why
+Why yet another workflow tool? This tool was developed as part of the [Entangled project](https://entangled.github.io), but can be used on its own. Brei is meant to perform small scale automisations for literate programming in Entangled, like generating figures, and performing computations locally. It requires no setup to work with and workflows are easy to understand by novice users. If you have any more serious needs than that, we'd recommend to use a more tried and proven system, of which there are too many to count.
+
+## When to use
+You're running a project, there's lots of odds and ends that need automisation. You'd use a `Makefile` but your friend is on Windows and doesn't have GNU Make installed. You try to ship a product that needs this, but don't want to confront people trying it for the first time with a tonne of stuff they've never heard of.
+
+# Running
+Brei is available on PyPI:
+
+```
+pip install brei
+```
+
+Although for Python we recommend using virtual environments, for example [Poetry](https://python-poetry.org/). Once you've setup a project in Poetry
+
+```
+poetry add brei
+```
+
+Then `brei` should be available as a command-line executable.
+
+``` {.bash .eval}
+brei --help
+```
 
 # How it works
 You give Brei a list of tasks that may depend on one another. Brei will run these when input files are newer than the target. Execution is lazy and in parallel.
@@ -199,7 +236,7 @@ tasks = [
      "script": f"echo '{i}'"} for i in range(10)
 ]
 tasks.append({"name": "write-outs", "requires": [
-    f"out{i}.dat" for i in range(10)
+    f"${dir}/out{i}.dat" for i in range(10)
 ]})
 print(json.dumps({"task": tasks}))
 """
@@ -265,23 +302,5 @@ brei --list-runners
 - TOML is nice but not ideal: it can be tricky to see the difference beteween single `[...]` and double `[[...]]` square brackets. Sometimes TOML syntax will lead to very verbose notation, however, current alternatives are all worse.
 - Many modern programming languages that we like (Python, Rust, Julia) have their project settings in a TOML file. This way your Brei workflow can piggy-back on project files that are already there.
 
-# Running
-
-Brei is available on PyPI:
-
-```
-pip install brei
-```
-
-Although for Python we recommend using virtual environments, for example [Poetry](https://python-poetry.org/). Once you've setup a project in Poetry
-
-```
-poetry add brei
-```
-
-Then `brei` should be available as a command-line executable.
-
-``` {.bash .eval}
-brei --help
-```
-
+# License
+Copyright 2023 Netherlands eScience Center, Licensed under the Apache License, Version 2.0, see [LICENSE](https://www.apache.org/licenses/LICENSE-2.0).

@@ -19,7 +19,7 @@ tasks = [
      "script": f"echo '{i}'"} for i in range(10)
 ]
 tasks.append({"name": "write-outs", "requires": [
-    f"out{i}.dat" for i in range(10)
+    f"${dir}/out{i}.dat" for i in range(10)
 ]})
 print(json.dumps({"task": tasks}))
 """

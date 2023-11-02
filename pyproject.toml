@@ -24,6 +24,7 @@ pytest-asyncio = "^0.21.1"
 deadcode = "^2.2.2"
 pytest-timeout = "^2.2.0"
 coverage = "^7.3.2"
+pyright = "^1.1.333"
 
 [build-system]
 requires = ["poetry-core"]
@@ -55,6 +56,7 @@ script = "coverage xml"
 
 [[tool.brei.task]]
 creates = [".coverage"]
+requires = ["brei"]
 description = "Run tests"
 script = "coverage run --source=brei -m pytest"
 
@@ -62,4 +64,30 @@ script = "coverage run --source=brei -m pytest"
 name = "mypy"
 description = "The MyPy static type checker"
 script = "mypy"
+
+[[tool.brei.task]]
+name = "serve"
+description = "Serve and watch for changes"
+runner = "bash"
+script = """
+while true; do
+	inotifywait -e close_write .entangled/template docs
+	brei weave
+done
+"""
+
+[[tool.brei.task]]
+requires = ["coverage.xml"]
+stdout = "docs/test_coverage.md"
+script = "coverage report --format=markdown"
+
+[[tool.brei.task]]
+name = "weave"
+requires = ["#html", "#static"]
+
+[[tool.brei.call]]
+template = "pandoc"
+collect = "html"
+  [tool.brei.call.args]
+  basename = ["index", "implementation", "tasks", "lazy", "template_strings", "program"]
 
