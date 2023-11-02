@@ -1,19 +1,5 @@
 # Laziness
-Loom executes workflows in Asyncio, through lazy evaluation and memoization. The `Lazy` class contains a `asyncio.lock` and a `Result` object. When multiple tasks ask for the result of the same dependent task, the lock makes sure a computation is perforemed only once. Once the lock is free, all future requests immediately return the memoized result.
-
-      .------.        .------. 
-     |  Lazy  | -->  |  Task  |
-      `------'        `------' 
-
-      .--------.        .--------. 
-     |  LazyDB  | -->  |  TaskDB  |
-      `--------'        `--------' 
-
-
-
-Module `loom.lazy` presents us with a `Lazy` tasks that have targets and a set of dependencies. A `Task` will have an abstract method `run`. Then the purpose is to run those tasks in correct order and possibly in parallel.
-
-This is achieved by memoizing results and keeping locks on the `Lazy` task when it is still evaluating.
+Brei executes workflows in Asyncio, through lazy evaluation and memoization. The `Lazy` class contains a `asyncio.lock` and a `Result` object. When multiple tasks ask for the result of the same dependent task, the lock makes sure a computation is perforemed only once. Once the lock is free, all future requests immediately return the memoized result.
 
 ## Results
 One common problem when using workflow systems in Python, is that errors are not tracable to their source. It is quite common to get a stack-trace that leads to the internals of the workflow system, but not to the cause of the error. The way around this, is not to use Python's exception system (at least not in the outer layer), but rather signify errors by returning `Failure` objects.
@@ -42,7 +28,7 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 
-class Failure:
+class Failure(Exception):
     def __bool__(self):
         return False
 
@@ -56,7 +42,7 @@ class MissingFailure(Failure, Generic[T]):
 
 
 @dataclass
-class TaskFailure(Failure, Exception):
+class TaskFailure(Failure):
     message: str
 
     def __post_init__(self):

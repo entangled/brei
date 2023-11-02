@@ -7,7 +7,7 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 
-class Failure:
+class Failure(Exception):
     def __bool__(self):
         return False
 
@@ -21,7 +21,7 @@ class MissingFailure(Failure, Generic[T]):
 
 
 @dataclass
-class TaskFailure(Failure, Exception):
+class TaskFailure(Failure):
     message: str
 
     def __post_init__(self):

@@ -59,12 +59,15 @@ window.addEventListener('DOMContentLoaded', () => {
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
 </head>
-<body>
+<body class="dark-mode">
 $for(include-before)$
 $include-before$
 $endfor$
 $if(title)$
 <header id="title-block-header">
+<div class="row">
+<div class="spacing col-3 col-s6">&nbsp;</div>
+<div class="col-6 col-s-9">
 <h1 class="title">$title$</h1>
 $if(subtitle)$
 <p class="subtitle">$subtitle$</p>
@@ -75,6 +78,9 @@ $endfor$
 $if(date)$
 <p class="date">$date$</p>
 $endif$
+</div>
+<div class="spacing col-3 col-s3">&nbsp;</div>
+</div>
 $if(abstract)$
 <div class="abstract">
 <div class="abstract-title">$abstract-title$</div>
@@ -85,11 +91,11 @@ $endif$
 $endif$
 
 <div class="row">
-<div class="col-3 col-s-6" id="contents">
+<div class="col-3 col-s-6" id="contents"><div class="sticky">
 $if(contents)$
 $contents$
 $endif$
-</div>
+</div></div>
 <div class="col-6 col-s-9" id="main">
 $body$
 </div>

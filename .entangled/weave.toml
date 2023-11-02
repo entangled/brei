@@ -4,22 +4,22 @@ subtitle = "a minimal workflow system"
 
 pandoc_args = """
 ${pandoc_format} ${pandoc_style} ${pandoc_template} ${pandoc_filters} \
--M title='${title}' -M subtitle='${subtitle}'"""
+-M title='${title}' -M subtitle='${subtitle}' \
+-M contents_file='docs/contents.md'"""
 
 pandoc_format = "-s -t html5 --section-divs --toc --toc-depth 2"
 pandoc_template = "--template .entangled/template/template.html"
-pandoc_style = "--css light.css"
+pandoc_style = "--css dark.css --highlight-style zenburn"
 pandoc_filters = """
 --lua-filter ${filter_dir}/annotate.lua \
 --lua-filter ${filter_dir}/details.lua \
 --lua-filter ${filter_dir}/eqnos.lua \
---lua-filter ${filter_dir}/eval.lua"""
+--lua-filter ${filter_dir}/eval.lua \
+--lua-filter ${filter_dir}/include.lua \
+--lua-filter ${filter_dir}/include-contents.lua \
+--lua-filter ${filter_dir}/links.lua"""
 
 filter_dir = ".entangled/filters"
-
-[[task]]
-name = "weave"
-requires = ["#html", "#static"]
 
 [[call]]
 template = "copy"
@@ -27,17 +27,11 @@ collect = "static"
   [call.args]
   srcdir = ".entangled/template"
   tgtdir = "site"
-  basename = ["dark.css", "light.css"]
-
-[[call]]
-template = "pandoc"
-collect = "html"
-  [call.args]
-  basename = ["index", "tasks", "template_strings", "program"]
+  basename = ["dark.css", "light.css", "github-mark.svg", "nlesc.svg"]
 
 [template.pandoc]
 description = "pandoc `${basename}`"
-requires = ["docs/${basename}.md"]
+requires = ["docs/${basename}.md", ".entangled/template/template.html", "docs/contents.md", "docs/test_coverage.md"]
 creates = ["site/${basename}.html"]
 script = "pandoc ${pandoc_args} -o 'site/${basename}.html' 'docs/${basename}.md'"
 

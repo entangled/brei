@@ -54,7 +54,7 @@ async def main(
 @argh.arg("-v", "--version", help="print version number and exit")
 @argh.arg("--list-runners", help="show default configured runners")
 @argh.arg("--debug", help="more verbose logging")
-def loom(
+def brei(
     targets: list[str],
     *,
     input_file: Optional[str] = None,
@@ -66,7 +66,8 @@ def loom(
 ):
     """Build one of the configured targets."""
     if version:
-        print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center. All Rights Reserved.")
+        print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center.")
+        print("Licensed under the Apache License, Version 2.0.")
         sys.exit(0)
 
     if list_runners:
@@ -122,7 +123,7 @@ def loom(
 
 def cli():
     parser = ArgumentParser(formatter_class=RichHelpFormatter)
-    argh.set_default_command(parser, loom)
+    argh.set_default_command(parser, brei)
     argh.dispatch(parser)
 
 
