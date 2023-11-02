@@ -289,34 +289,47 @@ file:brei/__init__.py
 </div>
 <div class="sourceCode" id="cb4"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">Welcome to Brei&#39;s API documentation. There are two ways to use Brei: from the command-line (in which case we refer to the homepage for documentation), or straight from Python. The easiest function to work with is `brei()`, which links to the command-line app one-to-one.</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">## Program</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">If you want to read the `Program` yourself, there are several ways to do so:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co">Welcome to Brei&#39;s API documentation. There are two ways to use Brei: from the</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">command-line (in which case we refer to the homepage for documentation), or</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">straight from Python. The easiest function to work with is `brei()`, which</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">links to the command-line app one-to-one.</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">1. Use `Program.read()`. You give it a `Path` to a TOML or JSON file and a section, this last bit giving a object path into the data. For instance: `Program.read(Path(&quot;pyproject.toml&quot;), &quot;tool.brei&quot;)`.</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">2. Read your own data format into JSON compatible data, then `construct(Program, data)`. The `construct` function uses the type annotations in dataclasses to validate the input data.</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">## Program</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">If you want to read the `Program` yourself, there are several ways to do so:</span></span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">After reading the data, you&#39;ll want to resolve all tasks, i.e. perform includes and run any necessary task to resolve the targets of all other tasks.</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">    program = Program.read(Path(&quot;brei.toml&quot;))</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">    db: TaskDB = await resolve_tasks(program)</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">    await db.run(Phony(&quot;all&quot;))</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co">There are three kinds of targets: `pathlib.Path`, `Phony` and `Variable`.</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">## API</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .program <span class="im">import</span> Program, resolve_tasks, TemplateCall</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .construct <span class="im">import</span> construct</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .lazy <span class="im">import</span> LazyDB</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .task <span class="im">import</span> Task, TaskDB, Phony, Variable, TaskProxy, Template</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .runner <span class="im">import</span> Runner</span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .cli <span class="im">import</span> brei</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>__all__ <span class="op">=</span> [<span class="st">&quot;brei&quot;</span>, <span class="st">&quot;Program&quot;</span>, <span class="st">&quot;resolve_tasks&quot;</span>, <span class="st">&quot;construct&quot;</span>, <span class="st">&quot;TaskDB&quot;</span>, <span class="st">&quot;LazyDB&quot;</span>, <span class="st">&quot;Phony&quot;</span>, <span class="st">&quot;Variable&quot;</span>,</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>           <span class="st">&quot;Runner&quot;</span>, <span class="st">&quot;TaskProxy&quot;</span>, <span class="st">&quot;Template&quot;</span>, <span class="st">&quot;TemplateCall&quot;</span>]</span></code></pre></div>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">1. Use `Program.read()`. You give it a `Path` to a TOML or JSON file and a</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">section, this last bit giving a object path into the data. For instance:</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">`Program.read(Path(&quot;pyproject.toml&quot;), &quot;tool.brei&quot;)`.</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">2. Read your own data format into JSON compatible data, then</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">`construct(Program, data)`. The `construct` function uses the type annotations</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co">in dataclasses to validate the input data.</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co">After reading the data, you&#39;ll want to resolve all tasks, i.e. perform includes</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="co">and run any necessary task to resolve the targets of all other tasks.</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co">    program = Program.read(Path(&quot;brei.toml&quot;))</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="co">    db: TaskDB = await resolve_tasks(program)</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co">    await db.run(Phony(&quot;all&quot;))</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">There are three kinds of targets: `pathlib.Path`, `Phony` and `Variable`.</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">## API</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .program <span class="im">import</span> Program, resolve_tasks, TemplateCall</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .construct <span class="im">import</span> construct</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .lazy <span class="im">import</span> Lazy, LazyDB</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .task <span class="im">import</span> Task, TaskDB, Phony, Variable, TaskProxy, Template</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .runner <span class="im">import</span> Runner</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> .cli <span class="im">import</span> brei</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>__all__ <span class="op">=</span> [</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;brei&quot;</span>,</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Lazy&quot;</span>, <span class="st">&quot;LazyDB&quot;</span>, <span class="st">&quot;Phony&quot;</span>, <span class="st">&quot;Program&quot;</span>, <span class="st">&quot;Runner&quot;</span>, <span class="st">&quot;Task&quot;</span>, <span class="st">&quot;TaskDB&quot;</span>,</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;TaskProxy&quot;</span>, <span class="st">&quot;Template&quot;</span>, <span class="st">&quot;TemplateCall&quot;</span>, <span class="st">&quot;Variable&quot;</span>, <span class="st">&quot;construct&quot;</span>,</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;resolve_tasks&quot;</span>,</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
 </div>
 <div>
 <details><summary>
@@ -520,7 +533,11 @@ stack-trace that leads to the internals of the workflow system, but not
 to the cause of the error. The way around this, is not to use Python’s
 exception system (at least not in the outer layer), but rather signify
 errors by returning <code>Failure</code> objects.</p>
-<div class="sourceCode" id="cb7" data-file="test/test_result.py"><pre
+<div class="named-code-block">
+<div class="code-block-title">
+file:test/test_result.py
+</div>
+<div class="sourceCode" id="cb7"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> brei.result <span class="im">import</span> Failure, TaskFailure, Ok</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hypothesis <span class="im">import</span> given</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> hypothesis.strategies <span class="im">import</span> builds, booleans, text, integers</span>
@@ -533,7 +550,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a hr
 <span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="at">@given</span>(results)</span>
 <span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> test_result(r):</span>
 <span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> (r <span class="kw">and</span> <span class="bu">hasattr</span>(r, <span class="st">&quot;value&quot;</span>)) <span class="kw">or</span> (<span class="kw">not</span> r <span class="kw">and</span> <span class="bu">isinstance</span>(r, Failure))</span></code></pre></div>
-<div class="sourceCode" id="cb8" data-file="brei/result.py"><pre
+</div>
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/result.py
+</div>
+<div class="sourceCode" id="cb8"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> TypeVar, Generic</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -579,10 +601,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a hr
 <span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a>Result <span class="op">=</span> Failure <span class="op">|</span> Ok[R]</span></code></pre></div>
+</div>
 </section>
 <section id="lazy-evaluation" class="level2">
 <h2>Lazy evaluation</h2>
-<div class="sourceCode" id="cb9" data-file="brei/lazy.py"><pre
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/lazy.py
+</div>
+<div class="sourceCode" id="cb9"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> copy <span class="im">import</span> copy</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass, field, fields</span>
@@ -739,6 +766,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a hr
 <span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> reset(<span class="va">self</span>):</span>
 <span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.tasks:</span>
 <span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>            t.reset()</span></code></pre></div>
+</div>
 </section>
 </section>
 <section id="template-strings" class="level1">
@@ -780,8 +808,11 @@ class="sourceCode toml"><code class="sourceCode toml"><span id="cb12-1"><a href=
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="kw">...</span> <span class="dt">etc</span> <span class="kw">...</span></span></code></pre></div>
 <p>We can trace these variable substitutions using the same lazy
 evaluation strategy as the workflow itself.</p>
-<div class="sourceCode" id="cb13"
-data-file="brei/template_strings.py"><pre
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/template_strings.py
+</div>
+<div class="sourceCode" id="cb13"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass, is_dataclass, fields</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> string <span class="im">import</span> Template</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Any, Generic, Mapping, TypeVar, cast</span>
@@ -850,8 +881,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a h
 <span id="cb13-66"><a href="#cb13-66" aria-hidden="true" tabindex="-1"></a><span class="at">@gather_args.register</span></span>
 <span id="cb13-67"><a href="#cb13-67" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _(_template: <span class="va">None</span>) <span class="op">-&gt;</span> <span class="bu">set</span>[<span class="bu">str</span>]:</span>
 <span id="cb13-68"><a href="#cb13-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">set</span>()</span></code></pre></div>
-<div class="sourceCode" id="cb14"
-data-file="test/test_template_strings.py"><pre
+</div>
+<div class="named-code-block">
+<div class="code-block-title">
+file:test/test_template_strings.py
+</div>
+<div class="sourceCode" id="cb14"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Iterable, Optional</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pytest</span>
@@ -907,10 +942,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a h
 <span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> subst.some_list <span class="op">==</span> [<span class="st">&quot;foo bar&quot;</span>, <span class="st">&quot;bar foo bar&quot;</span>]</span>
 <span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> subst.some_prop <span class="op">==</span> <span class="st">&quot;bar foo&quot;</span></span>
 <span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a>    <span class="cf">assert</span> subst.some_none <span class="kw">is</span> <span class="va">None</span></span></code></pre></div>
+</div>
 </section>
 <section id="tasks" class="level1">
 <h1>Tasks</h1>
-<div class="sourceCode" id="cb15" data-file="brei/runner.py"><pre
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/runner.py
+</div>
+<div class="sourceCode" id="cb15"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -924,7 +964,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a h
 <span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;python&quot;</span>: Runner(<span class="st">&quot;python&quot;</span>, [<span class="st">&quot;$</span><span class="sc">{script}</span><span class="st">&quot;</span>]),</span>
 <span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;bash&quot;</span>: Runner(<span class="st">&quot;bash&quot;</span>, [<span class="st">&quot;$</span><span class="sc">{script}</span><span class="st">&quot;</span>]),</span>
 <span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
-<div class="sourceCode" id="cb16" data-file="brei/task.py"><pre
+</div>
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/task.py
+</div>
+<div class="sourceCode" id="cb16"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> contextlib <span class="im">import</span> contextmanager, nullcontext</span>
@@ -1251,10 +1296,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a h
 <span id="cb16-324"><a href="#cb16-324" aria-hidden="true" tabindex="-1"></a><span class="co">    that any template variables in the Template can be substituted with a `TemplateCall`.&quot;&quot;&quot;</span></span>
 <span id="cb16-325"><a href="#cb16-325" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> call(<span class="va">self</span>, args: <span class="bu">dict</span>[<span class="bu">str</span>, Any]) <span class="op">-&gt;</span> TaskProxy:</span>
 <span id="cb16-326"><a href="#cb16-326" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> substitute(<span class="va">self</span>, args)</span></code></pre></div>
+</div>
 </section>
 <section id="programs" class="level1">
 <h1>Programs</h1>
-<div class="sourceCode" id="cb17" data-file="brei/program.py"><pre
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/program.py
+</div>
+<div class="sourceCode" id="cb17"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> copy <span class="im">import</span> copy</span>
@@ -1473,10 +1523,15 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a h
 <span id="cb17-216"><a href="#cb17-216" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> db</span>
 <span id="cb17-217"><a href="#cb17-217" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-218"><a href="#cb17-218" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="cf">await</span> go(program)</span></code></pre></div>
+</div>
 </section>
 <section id="utils" class="level1">
 <h1>Utils</h1>
-<div class="sourceCode" id="cb18" data-file="brei/utility.py"><pre
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/utility.py
+</div>
+<div class="sourceCode" id="cb18"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> __future__ <span class="im">import</span> annotations</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
@@ -1510,7 +1565,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a h
 <span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> stat(path: Path) <span class="op">-&gt;</span> FileStat:</span>
 <span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>    path <span class="op">=</span> normal_relative(path)</span>
 <span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> FileStat.from_path(path)</span></code></pre></div>
-<div class="sourceCode" id="cb19" data-file="brei/async_timer.py"><pre
+</div>
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/async_timer.py
+</div>
+<div class="sourceCode" id="cb19"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dataclasses <span class="im">import</span> dataclass</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> contextlib <span class="im">import</span> asynccontextmanager</span>
@@ -1525,7 +1585,12 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a h
 <span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>    t <span class="op">=</span> time.perf_counter()</span>
 <span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">yield</span> e</span>
 <span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>    e.elapsed <span class="op">=</span> time.perf_counter() <span class="op">-</span> t</span></code></pre></div>
-<div class="sourceCode" id="cb20" data-file="brei/construct.py"><pre
+</div>
+<div class="named-code-block">
+<div class="code-block-title">
+file:brei/construct.py
+</div>
+<div class="sourceCode" id="cb20"><pre
 class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> typing</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Any, Self, Union, TypeVar, TypeGuard, Type, Optional, cast</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> types</span>
@@ -1664,6 +1729,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a h
 <span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a>        ) <span class="im">from</span> e</span>
 <span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> construct(data_type, data)</span></code></pre></div>
+</div>
 </section>
 </div>
 

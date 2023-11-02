@@ -11,12 +11,12 @@ pandoc_format = "-s -t html5 --section-divs --toc --toc-depth 2"
 pandoc_template = "--template .entangled/template/template.html"
 pandoc_style = "--css dark.css --highlight-style zenburn"
 pandoc_filters = """
+--lua-filter ${filter_dir}/include-contents.lua \
+--lua-filter ${filter_dir}/include.lua \
 --lua-filter ${filter_dir}/annotate.lua \
 --lua-filter ${filter_dir}/details.lua \
 --lua-filter ${filter_dir}/eqnos.lua \
 --lua-filter ${filter_dir}/eval.lua \
---lua-filter ${filter_dir}/include.lua \
---lua-filter ${filter_dir}/include-contents.lua \
 --lua-filter ${filter_dir}/links.lua"""
 
 filter_dir = ".entangled/filters"

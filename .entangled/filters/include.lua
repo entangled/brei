@@ -9,7 +9,7 @@ function Para(elem)
         print("Don't know how to include: "..elem.content[3])
         return
     end
-    filename = elem.content[3].text
-    content = io.input(filename):read("a")
+    local filename = elem.content[3].text
+    local content = io.input(filename):read("a")
     return pandoc.read(content).blocks
 end
