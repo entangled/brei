@@ -1,4 +1,4 @@
-site/* linguist-generated
-docs/* linguist-documentation
-.entangled/* linguist-vendored
+site        linguist-generated=true
+docs        linguist-documentation=true
+.entangled  linguist-vendored=true
 
