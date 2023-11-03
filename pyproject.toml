@@ -95,6 +95,6 @@ collect = "html"
 [[tool.brei.task]]
 name = "pdoc"
 description = "Build API documentation"
-creates = ["site/api/brei.html"]
+creates = ["docs/site/api/brei.html"]
 requires = ["brei/__init__.py"]
-script = "pdoc brei -o ./site/api"
+script = "pdoc brei -o ./docs/site/api"

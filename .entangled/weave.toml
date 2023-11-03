@@ -26,14 +26,14 @@ template = "copy"
 collect = "static"
   [call.args]
   srcdir = ".entangled/template"
-  tgtdir = "site"
+  tgtdir = "docs/site"
   basename = ["dark.css", "light.css", "github-mark.svg", "nlesc.svg"]
 
 [template.pandoc]
 description = "pandoc `${basename}`"
 requires = ["docs/${basename}.md", ".entangled/template/template.html", "docs/contents.md", "docs/test_coverage.md"]
-creates = ["site/${basename}.html"]
-script = "pandoc ${pandoc_args} -o 'site/${basename}.html' 'docs/${basename}.md'"
+creates = ["docs/site/${basename}.html"]
+script = "pandoc ${pandoc_args} -o 'docs/site/${basename}.html' 'docs/${basename}.md'"
 
 [template.copy]
 description = "copy `${basename}`"
