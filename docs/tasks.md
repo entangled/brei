@@ -75,6 +75,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     stdin: Optional[Path | Variable] = None
     stdout: Optional[Path | Variable] = None
     description: Optional[str] = None
+    force: bool = False
 
     @property
     def target_paths(self):
@@ -107,7 +108,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             self.creates.append(self.stdout)
 
     def always_run(self) -> bool:
-        return len(self.real_requirements) == 0 or len(list(self.target_paths)) == 0
+        return self.force or len(list(self.target_paths)) == 0
 
     def needs_run(self) -> bool:
         if any(not p.exists() for p in self.target_paths):
@@ -238,6 +239,7 @@ class TaskProxy:
     stdin: Optional[str] = None
     stdout: Optional[str] = None
     description: Optional[str] = None
+    force: bool = False
 
     @property
     def all_targets(self):
@@ -294,6 +296,7 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
             stdin,
             stdout,
             proxy.description,
+            proxy.force
         )
         return task
 

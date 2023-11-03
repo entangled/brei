@@ -58,7 +58,8 @@ def substitute(template, env: Mapping[str, str]):
         }
         return dtype(**args)
 
-    raise TypeError(f"Can't perform string substitution on object of type: {dtype}")
+    return template
+    # raise TypeError(f"Can't perform string substitution on object of type: {dtype}")
 
 
 @substitute.register
@@ -69,7 +70,6 @@ def _(template: str, env: Mapping[str, str]) -> str:
 @substitute.register
 def _(template: list, env: Mapping[str, str]) -> list:
     return [substitute(x, env) for x in template]
-
 
 @substitute.register
 def _(_template: None, _) -> None:
@@ -87,7 +87,8 @@ def gather_args(template: Any) -> set[str]:
         )
         return set().union(*args)
 
-    raise TypeError(f"Can't perform string substitution on object of type: {dtype}")
+    return set()
+    # raise TypeError(f"Can't perform string substitution on object of type: {dtype}")
 
 
 @gather_args.register

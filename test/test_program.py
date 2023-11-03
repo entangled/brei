@@ -8,6 +8,7 @@ import pytest
 from brei.lazy import Phony
 from brei.program import Program, resolve_tasks
 from brei.task import Task
+from brei.utility import stat
 
 
 @dataclass
@@ -146,6 +147,7 @@ stdout = "${pre}-${a}-${b}"
 
 [[call]]
 template = "echo"
+collect = "inner"
   [call.args]
   pre = "zip"
   a = ["1", "2", "3"]
@@ -154,6 +156,7 @@ template = "echo"
 [[call]]
 template = "echo"
 join = "outer"
+collect = "outer"
   [call.args]
   pre = "prod"
   a = ["1", "2"]
@@ -161,16 +164,55 @@ join = "outer"
 
 [[task]]
 name = "all"
-requires = ["zip-1-a", "zip-2-b", "zip-3-c",
-                "prod-1-a", "prod-1-b", "prod-2-a", "prod-2-b"]
+requires = ["#inner", "#outer"]
 """, [("zip-1-a", "1a"), ("zip-2-b", "2b"), ("zip-3-c", "3c"),
       ("prod-1-a", "1a"), ("prod-1-b", "1b"), ("prod-2-a", "2a"), ("prod-2-b", "2b")])
+
+
+force_run = """
+[[task]]
+name = "forced"
+force = true
+creates = ["forced.txt"]
+script = "touch forced.txt"
+
+[[task]]
+name = "unforced"
+force = false
+creates = ["unforced.txt"]
+script = "touch unforced.txt"
+
+[[task]]
+name = "all"
+requires = ["#forced", "#unforced"]
+"""
+
+@pytest.mark.asyncio
+async def test_forcing(tmp_path):
+    with chdir(tmp_path):
+        src = Path("brei.toml")
+        src.write_text(force_run)
+        prg = Program.read(src)
+        db = await resolve_tasks(prg)
+        await db.run(Phony("all"), db=db)
+
+        p1, p2 = Path("forced.txt"), Path("unforced.txt")
+        assert p1.exists() and p2.exists()
+        s1 = stat(p1)
+        s2 = stat(p2)
+        
+        time.sleep(0.01)
+        db.reset()
+        await db.run(Phony("all"), db=db)
+        assert stat(p1) > s1
+        assert not stat(p2) > s2
+
 
 @pytest.mark.parametrize("test", [hello_world, include, template, rot_13, templated_task, variable_stdout, array_call])
 @pytest.mark.asyncio
 async def test_loom(tmp_path, test):
     with chdir(tmp_path):
-        src = Path("loom.toml")
+        src = Path("brei.toml")
         src.write_text(test.script)
         prg = Program.read(src)
         db = await resolve_tasks(prg)

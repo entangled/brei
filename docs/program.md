@@ -119,7 +119,7 @@ class Program:
 def tasks_from_call(template: Template, call: TemplateCall) -> list[TaskProxy]:
     tasks = [template.call(args) for args in call.all_args]
     if call.collect:
-        targets = list(chain.from_iterable(t.creates for t in tasks))
+        targets = list(chain.from_iterable(t.all_targets for t in tasks))
         collection = TaskProxy([], targets, name=call.collect)
         return tasks + [collection]
     else:

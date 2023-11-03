@@ -1,0 +1,17 @@
+# ~/~ begin <<docs/index.md#examples/force_run.toml>>[init]
+[[task]]
+name = "test"
+requires = ["#coverage-report"]
+
+[[task]]
+description = "Print coverage info"
+name = "coverage-report"
+requires = [".coverage"]
+script = "coverage report"
+
+[[task]]
+creates = [".coverage"]
+force = true
+description = "Run tests"
+script = "coverage run --source=brei -m pytest"
+# ~/~ end

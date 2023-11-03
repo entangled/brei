@@ -295,6 +295,31 @@ There are a number of runners configured by default.
 brei --list-runners
 ```
 
+## Forcing a rerun
+Sometimes you want to always rerun a task no matter what.
+
+``` {.toml file=examples/force_run.toml}
+[[task]]
+name = "test"
+requires = ["#coverage-report"]
+
+[[task]]
+description = "Print coverage info"
+name = "coverage-report"
+requires = [".coverage"]
+script = "coverage report"
+
+[[task]]
+creates = [".coverage"]
+force = true
+description = "Run tests"
+script = "coverage run --source=brei -m pytest"
+```
+
+``` {.bash .eval}
+brei -i examples/force_run.toml test
+```
+
 ## Remarks
 
 - If you need your workflows also execute on a Windows machine, it is advised to write scripts for the default runner (lists of commands) or in Python.

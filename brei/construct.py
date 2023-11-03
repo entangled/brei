@@ -55,6 +55,9 @@ def _construct(annot: Type[T], json: Any) -> T:
     or a dataclass, and the JSON data should match exactly the given
     definitions in the dataclass hierarchy.
     """
+    if annot is bool:
+        assert isinstance(json, bool)
+        return cast(T, json)
     if annot is str:
         assert isinstance(json, str)
         return cast(T, json)

@@ -290,7 +290,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a hr
 <span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tasks_from_call(template: Template, call: TemplateCall) <span class="op">-&gt;</span> <span class="bu">list</span>[TaskProxy]:</span>
 <span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>    tasks <span class="op">=</span> [template.call(args) <span class="cf">for</span> args <span class="kw">in</span> call.all_args]</span>
 <span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> call.collect:</span>
-<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>        targets <span class="op">=</span> <span class="bu">list</span>(chain.from_iterable(t.creates <span class="cf">for</span> t <span class="kw">in</span> tasks))</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>        targets <span class="op">=</span> <span class="bu">list</span>(chain.from_iterable(t.all_targets <span class="cf">for</span> t <span class="kw">in</span> tasks))</span>
 <span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>        collection <span class="op">=</span> TaskProxy([], targets, name<span class="op">=</span>call.collect)</span>
 <span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> tasks <span class="op">+</span> [collection]</span>
 <span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>

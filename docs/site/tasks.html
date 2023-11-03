@@ -249,274 +249,277 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a hr
 <span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    stdin: Optional[Path <span class="op">|</span> Variable] <span class="op">=</span> <span class="va">None</span></span>
 <span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    stdout: Optional[Path <span class="op">|</span> Variable] <span class="op">=</span> <span class="va">None</span></span>
 <span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    description: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> target_paths(<span class="va">self</span>):</span>
-<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (p <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.creates <span class="cf">if</span> <span class="bu">isinstance</span>(p, Path))</span>
-<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> dependency_paths(<span class="va">self</span>):</span>
-<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (p <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.requires <span class="cf">if</span> <span class="bu">isinstance</span>(p, Path))</span>
-<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__str__</span>(<span class="va">self</span>):</span>
-<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        tgts <span class="op">=</span> <span class="st">&quot;, &quot;</span>.join(<span class="bu">str</span>(t) <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.creates)</span>
-<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>        deps <span class="op">=</span> <span class="st">&quot;, &quot;</span>.join(<span class="bu">str</span>(t) <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.requires)</span>
-<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> indent(<span class="va">self</span>.script, prefix<span class="op">=</span><span class="st">&quot; ▎ &quot;</span>, predicate<span class="op">=</span><span class="kw">lambda</span> _: <span class="va">True</span>)</span>
-<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.path <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> <span class="bu">str</span>(<span class="va">self</span>.path)</span>
-<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> <span class="st">&quot; - &quot;</span></span>
-<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>        name <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="sc">}</span><span class="ss">: &quot;</span> <span class="cf">if</span> <span class="va">self</span>.name <span class="cf">else</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> name <span class="op">+</span> <span class="ss">f&quot;[</span><span class="sc">{</span>tgts<span class="sc">}</span><span class="ss">] &lt;- [</span><span class="sc">{</span>deps<span class="sc">}</span><span class="ss">]</span><span class="ch">\n</span><span class="ss">&quot;</span> <span class="op">+</span> src</span>
-<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __post_init__(<span class="va">self</span>):</span>
-<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.name <span class="kw">and</span> Phony(<span class="va">self</span>.name) <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.creates:</span>
-<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.creates.append(Phony(<span class="va">self</span>.name))</span>
-<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.stdin <span class="kw">and</span> <span class="va">self</span>.stdin <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.requires:</span>
-<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.requires.append(<span class="va">self</span>.stdin)</span>
-<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.path <span class="kw">and</span> <span class="va">self</span>.path <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.requires:</span>
-<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.requires.append(<span class="va">self</span>.path)</span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.stdout <span class="kw">and</span> <span class="va">self</span>.stdout <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.creates:</span>
-<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.creates.append(<span class="va">self</span>.stdout)</span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> always_run(<span class="va">self</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">len</span>(<span class="va">self</span>.real_requirements) <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> <span class="bu">len</span>(<span class="bu">list</span>(<span class="va">self</span>.target_paths)) <span class="op">==</span> <span class="dv">0</span></span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> needs_run(<span class="va">self</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">any</span>(<span class="kw">not</span> p.exists() <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.target_paths):</span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>        target_stats <span class="op">=</span> [stat(p) <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.target_paths]</span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>        dep_stats <span class="op">=</span> [stat(p) <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.dependency_paths]</span>
-<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">any</span>(t <span class="op">&lt;</span> d <span class="cf">for</span> t <span class="kw">in</span> target_stats <span class="cf">for</span> d <span class="kw">in</span> dep_stats):</span>
-<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
-<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
-<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>    <span class="at">@contextmanager</span></span>
-<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_script_path(<span class="va">self</span>):</span>
-<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.path <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>            tmpfile <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>            path <span class="op">=</span> <span class="va">self</span>.path</span>
-<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>            tmpfile <span class="op">=</span> NamedTemporaryFile(<span class="st">&quot;w&quot;</span>)</span>
-<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>            tmpfile.write(<span class="va">self</span>.script)</span>
-<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>            tmpfile.flush()</span>
-<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>            path <span class="op">=</span> Path(tmpfile.name)</span>
-<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;A `Rule` can have either `path` or `script` defined.&quot;</span>)</span>
-<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> path</span>
-<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> tmpfile <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>            tmpfile.close()</span>
-<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>    <span class="at">@contextmanager</span></span>
-<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_stdout(<span class="va">self</span>):</span>
-<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>        <span class="cf">match</span> <span class="va">self</span>.stdout:</span>
-<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> Variable(x):</span>
-<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>                <span class="cf">yield</span> asyncio.subprocess.PIPE</span>
-<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> x <span class="cf">if</span> <span class="bu">isinstance</span>(x, Path):</span>
-<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>                stdout <span class="op">=</span> <span class="bu">open</span>(x, <span class="st">&quot;w&quot;</span>)</span>
-<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>                <span class="cf">yield</span> stdout</span>
-<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>                stdout.close()</span>
-<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> _:</span>
-<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>                <span class="cf">yield</span> <span class="va">None</span></span>
-<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> run(<span class="va">self</span>, <span class="op">*</span>, db: TaskDB):</span>
-<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.always_run() <span class="kw">and</span> <span class="kw">not</span> <span class="va">self</span>.needs_run() <span class="kw">and</span> <span class="kw">not</span> db.force_run:</span>
-<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>            tgts <span class="op">=</span> <span class="st">&quot; &quot;</span>.join(<span class="ss">f&quot;`</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">`&quot;</span> <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.target_paths)</span>
-<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>            log.info(<span class="ss">f&quot;Targets </span><span class="sc">{</span>tgts<span class="sc">}</span><span class="ss"> already up-to-date.&quot;</span>)</span>
-<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>        log.debug(<span class="ss">f&quot;</span><span class="sc">{</span><span class="va">self</span><span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="va">self</span>.path <span class="kw">is</span> <span class="va">None</span> <span class="kw">and</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="va">None</span>):</span>
-<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>        targets <span class="op">=</span> <span class="st">&quot; &quot;</span>.join(<span class="ss">f&quot;`</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">`&quot;</span> <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.creates)</span>
-<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>        short_note <span class="op">=</span> <span class="va">self</span>.description <span class="kw">or</span> (<span class="ss">f&quot;#</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="sc">}</span><span class="ss">&quot;</span> <span class="cf">if</span> <span class="va">self</span>.name <span class="cf">else</span> <span class="va">None</span>) <span class="op">\</span></span>
-<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>            <span class="kw">or</span> <span class="ss">f&quot;creating </span><span class="sc">{</span>targets<span class="sc">}</span><span class="ss">&quot;</span></span>
-<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>        log.info(<span class="ss">f&quot;[green]</span><span class="sc">{</span>short_note<span class="sc">}</span><span class="ss">[/]&quot;</span>, extra<span class="op">=</span>{<span class="st">&#39;markup&#39;</span>: <span class="va">True</span>})</span>
-<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>        stdin: TextIO <span class="op">|</span> <span class="bu">int</span> <span class="op">|</span> <span class="va">None</span> <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>        <span class="cf">match</span> <span class="va">self</span>.stdin:</span>
-<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> Variable(x):</span>
-<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>                stdin <span class="op">=</span> asyncio.subprocess.PIPE</span>
-<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>                input_data <span class="op">=</span> db.environment[x].encode()</span>
-<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> x <span class="cf">if</span> <span class="bu">isinstance</span>(x, Path):</span>
-<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>                stdin <span class="op">=</span> <span class="bu">open</span>(x, <span class="st">&quot;r&quot;</span>)</span>
-<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>                input_data <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> _:</span>
-<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>                stdin <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>                input_data <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.runner <span class="kw">is</span> <span class="va">None</span> <span class="kw">and</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> is_oneliner(<span class="va">self</span>.script):</span>
-<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>                <span class="cf">assert</span> <span class="va">self</span>.stdin <span class="kw">is</span> <span class="va">None</span></span>
-<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="va">self</span>.get_stdout() <span class="im">as</span> stdout:</span>
-<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>                stdout_data <span class="op">=</span> <span class="st">b&quot;&quot;</span></span>
-<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> line <span class="kw">in</span> <span class="va">self</span>.script.splitlines():</span>
-<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">async</span> <span class="cf">with</span> db.throttle <span class="kw">or</span> nullcontext():</span>
-<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>                        proc <span class="op">=</span> <span class="cf">await</span> create_subprocess_exec(</span>
-<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>                            <span class="op">*</span>shlex.split(line),</span>
-<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>                            stdin<span class="op">=</span>stdin,</span>
-<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>                            stdout<span class="op">=</span>stdout,</span>
-<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>                            stderr<span class="op">=</span>asyncio.subprocess.PIPE,</span>
-<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>                        )</span>
-<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>                        stdout_data_part, stderr_data <span class="op">=</span> <span class="cf">await</span> proc.communicate(input_data)</span>
-<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>                        log.debug(<span class="ss">f&quot;return-code </span><span class="sc">{</span>proc<span class="sc">.</span>returncode<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> stdout_data_part:</span>
-<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>                        stdout_data <span class="op">+=</span> stdout_data_part</span>
-<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> stderr_data:</span>
-<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>                        log.info(<span class="ss">f&quot;[gold1]</span><span class="sc">{</span>short_note<span class="sc">}</span><span class="ss">[/] %s&quot;</span>, stderr_data.decode().rstrip(), extra<span class="op">=</span>{<span class="st">&quot;markup&quot;</span>: <span class="va">True</span>})</span>
-<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.runner <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="va">self</span>.get_script_path() <span class="im">as</span> path, <span class="va">self</span>.get_stdout() <span class="im">as</span> stdout:</span>
-<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>                runner <span class="op">=</span> db.runners[<span class="va">self</span>.runner]</span>
-<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>                args <span class="op">=</span> [string.Template(arg).substitute(script<span class="op">=</span>path) <span class="cf">for</span> arg <span class="kw">in</span> runner.args]</span>
-<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>                <span class="cf">async</span> <span class="cf">with</span> db.throttle <span class="kw">or</span> nullcontext():</span>
-<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>                    proc <span class="op">=</span> <span class="cf">await</span> create_subprocess_exec(</span>
-<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>                        runner.command,</span>
-<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>                        <span class="op">*</span>args,</span>
-<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>                        stdin<span class="op">=</span>stdin,</span>
-<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>                        stdout<span class="op">=</span>stdout,</span>
-<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>                        stderr<span class="op">=</span>asyncio.subprocess.PIPE,</span>
-<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>                    )</span>
-<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>                    stdout_data, stderr_data <span class="op">=</span> <span class="cf">await</span> proc.communicate(input_data)</span>
-<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>                    log.debug(<span class="ss">f&quot;return-code </span><span class="sc">{</span>proc<span class="sc">.</span>returncode<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> stderr_data:</span>
-<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>                log.info(<span class="ss">f&quot;[gold1]</span><span class="sc">{</span>short_note<span class="sc">}</span><span class="ss">[/] %s&quot;</span>, stderr_data.decode().rstrip(), extra<span class="op">=</span>{<span class="st">&quot;markup&quot;</span>: <span class="va">True</span>})</span>
-<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
-<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
-<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.needs_run():</span>
-<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> TaskFailure(<span class="st">&quot;Task didn&#39;t achieve goals.&quot;</span>)</span>
-<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> stdout_data.decode().strip() <span class="cf">if</span> stdout_data <span class="cf">else</span> <span class="va">None</span></span>
-<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    force: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> target_paths(<span class="va">self</span>):</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (p <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.creates <span class="cf">if</span> <span class="bu">isinstance</span>(p, Path))</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> dependency_paths(<span class="va">self</span>):</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (p <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.requires <span class="cf">if</span> <span class="bu">isinstance</span>(p, Path))</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__str__</span>(<span class="va">self</span>):</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>        tgts <span class="op">=</span> <span class="st">&quot;, &quot;</span>.join(<span class="bu">str</span>(t) <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.creates)</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        deps <span class="op">=</span> <span class="st">&quot;, &quot;</span>.join(<span class="bu">str</span>(t) <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.requires)</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> indent(<span class="va">self</span>.script, prefix<span class="op">=</span><span class="st">&quot; ▎ &quot;</span>, predicate<span class="op">=</span><span class="kw">lambda</span> _: <span class="va">True</span>)</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.path <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> <span class="bu">str</span>(<span class="va">self</span>.path)</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>            src <span class="op">=</span> <span class="st">&quot; - &quot;</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        name <span class="op">=</span> <span class="ss">f&quot;</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="sc">}</span><span class="ss">: &quot;</span> <span class="cf">if</span> <span class="va">self</span>.name <span class="cf">else</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> name <span class="op">+</span> <span class="ss">f&quot;[</span><span class="sc">{</span>tgts<span class="sc">}</span><span class="ss">] &lt;- [</span><span class="sc">{</span>deps<span class="sc">}</span><span class="ss">]</span><span class="ch">\n</span><span class="ss">&quot;</span> <span class="op">+</span> src</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __post_init__(<span class="va">self</span>):</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.name <span class="kw">and</span> Phony(<span class="va">self</span>.name) <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.creates:</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.creates.append(Phony(<span class="va">self</span>.name))</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.stdin <span class="kw">and</span> <span class="va">self</span>.stdin <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.requires:</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.requires.append(<span class="va">self</span>.stdin)</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.path <span class="kw">and</span> <span class="va">self</span>.path <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.requires:</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.requires.append(<span class="va">self</span>.path)</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.stdout <span class="kw">and</span> <span class="va">self</span>.stdout <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.creates:</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.creates.append(<span class="va">self</span>.stdout)</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> always_run(<span class="va">self</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.force <span class="kw">or</span> <span class="bu">len</span>(<span class="bu">list</span>(<span class="va">self</span>.target_paths)) <span class="op">==</span> <span class="dv">0</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> needs_run(<span class="va">self</span>) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">any</span>(<span class="kw">not</span> p.exists() <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.target_paths):</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>        target_stats <span class="op">=</span> [stat(p) <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.target_paths]</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        dep_stats <span class="op">=</span> [stat(p) <span class="cf">for</span> p <span class="kw">in</span> <span class="va">self</span>.dependency_paths]</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">any</span>(t <span class="op">&lt;</span> d <span class="cf">for</span> t <span class="kw">in</span> target_stats <span class="cf">for</span> d <span class="kw">in</span> dep_stats):</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>    <span class="at">@contextmanager</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_script_path(<span class="va">self</span>):</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.path <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>            tmpfile <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>            path <span class="op">=</span> <span class="va">self</span>.path</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>            tmpfile <span class="op">=</span> NamedTemporaryFile(<span class="st">&quot;w&quot;</span>)</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>            tmpfile.write(<span class="va">self</span>.script)</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>            tmpfile.flush()</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>            path <span class="op">=</span> Path(tmpfile.name)</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">&quot;A `Rule` can have either `path` or `script` defined.&quot;</span>)</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>        <span class="cf">yield</span> path</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> tmpfile <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>            tmpfile.close()</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>    <span class="at">@contextmanager</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_stdout(<span class="va">self</span>):</span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>        <span class="cf">match</span> <span class="va">self</span>.stdout:</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> Variable(x):</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>                <span class="cf">yield</span> asyncio.subprocess.PIPE</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> x <span class="cf">if</span> <span class="bu">isinstance</span>(x, Path):</span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>                stdout <span class="op">=</span> <span class="bu">open</span>(x, <span class="st">&quot;w&quot;</span>)</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>                <span class="cf">yield</span> stdout</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>                stdout.close()</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> _:</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>                <span class="cf">yield</span> <span class="va">None</span></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> run(<span class="va">self</span>, <span class="op">*</span>, db: TaskDB):</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.always_run() <span class="kw">and</span> <span class="kw">not</span> <span class="va">self</span>.needs_run() <span class="kw">and</span> <span class="kw">not</span> db.force_run:</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>            tgts <span class="op">=</span> <span class="st">&quot; &quot;</span>.join(<span class="ss">f&quot;`</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">`&quot;</span> <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.target_paths)</span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>            log.info(<span class="ss">f&quot;Targets </span><span class="sc">{</span>tgts<span class="sc">}</span><span class="ss"> already up-to-date.&quot;</span>)</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>        log.debug(<span class="ss">f&quot;</span><span class="sc">{</span><span class="va">self</span><span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> (<span class="va">self</span>.path <span class="kw">is</span> <span class="va">None</span> <span class="kw">and</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="va">None</span>):</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>        targets <span class="op">=</span> <span class="st">&quot; &quot;</span>.join(<span class="ss">f&quot;`</span><span class="sc">{</span>t<span class="sc">}</span><span class="ss">`&quot;</span> <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.creates)</span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>        short_note <span class="op">=</span> <span class="va">self</span>.description <span class="kw">or</span> (<span class="ss">f&quot;#</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="sc">}</span><span class="ss">&quot;</span> <span class="cf">if</span> <span class="va">self</span>.name <span class="cf">else</span> <span class="va">None</span>) <span class="op">\</span></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>            <span class="kw">or</span> <span class="ss">f&quot;creating </span><span class="sc">{</span>targets<span class="sc">}</span><span class="ss">&quot;</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>        log.info(<span class="ss">f&quot;[green]</span><span class="sc">{</span>short_note<span class="sc">}</span><span class="ss">[/]&quot;</span>, extra<span class="op">=</span>{<span class="st">&#39;markup&#39;</span>: <span class="va">True</span>})</span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>        stdin: TextIO <span class="op">|</span> <span class="bu">int</span> <span class="op">|</span> <span class="va">None</span> <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>        <span class="cf">match</span> <span class="va">self</span>.stdin:</span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> Variable(x):</span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>                stdin <span class="op">=</span> asyncio.subprocess.PIPE</span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>                input_data <span class="op">=</span> db.environment[x].encode()</span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> x <span class="cf">if</span> <span class="bu">isinstance</span>(x, Path):</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>                stdin <span class="op">=</span> <span class="bu">open</span>(x, <span class="st">&quot;r&quot;</span>)</span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>                input_data <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>            <span class="cf">case</span> _:</span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>                stdin <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>                input_data <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.runner <span class="kw">is</span> <span class="va">None</span> <span class="kw">and</span> <span class="va">self</span>.script <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="kw">not</span> is_oneliner(<span class="va">self</span>.script):</span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>                <span class="cf">assert</span> <span class="va">self</span>.stdin <span class="kw">is</span> <span class="va">None</span></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="va">self</span>.get_stdout() <span class="im">as</span> stdout:</span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>                stdout_data <span class="op">=</span> <span class="st">b&quot;&quot;</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>                <span class="cf">for</span> line <span class="kw">in</span> <span class="va">self</span>.script.splitlines():</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">async</span> <span class="cf">with</span> db.throttle <span class="kw">or</span> nullcontext():</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>                        proc <span class="op">=</span> <span class="cf">await</span> create_subprocess_exec(</span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>                            <span class="op">*</span>shlex.split(line),</span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>                            stdin<span class="op">=</span>stdin,</span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>                            stdout<span class="op">=</span>stdout,</span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>                            stderr<span class="op">=</span>asyncio.subprocess.PIPE,</span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>                        )</span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>                        stdout_data_part, stderr_data <span class="op">=</span> <span class="cf">await</span> proc.communicate(input_data)</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>                        log.debug(<span class="ss">f&quot;return-code </span><span class="sc">{</span>proc<span class="sc">.</span>returncode<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> stdout_data_part:</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>                        stdout_data <span class="op">+=</span> stdout_data_part</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> stderr_data:</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>                        log.info(<span class="ss">f&quot;[gold1]</span><span class="sc">{</span>short_note<span class="sc">}</span><span class="ss">[/] %s&quot;</span>, stderr_data.decode().rstrip(), extra<span class="op">=</span>{<span class="st">&quot;markup&quot;</span>: <span class="va">True</span>})</span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">self</span>.runner <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>            <span class="cf">with</span> <span class="va">self</span>.get_script_path() <span class="im">as</span> path, <span class="va">self</span>.get_stdout() <span class="im">as</span> stdout:</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>                runner <span class="op">=</span> db.runners[<span class="va">self</span>.runner]</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>                args <span class="op">=</span> [string.Template(arg).substitute(script<span class="op">=</span>path) <span class="cf">for</span> arg <span class="kw">in</span> runner.args]</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>                <span class="cf">async</span> <span class="cf">with</span> db.throttle <span class="kw">or</span> nullcontext():</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>                    proc <span class="op">=</span> <span class="cf">await</span> create_subprocess_exec(</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>                        runner.command,</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>                        <span class="op">*</span>args,</span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>                        stdin<span class="op">=</span>stdin,</span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>                        stdout<span class="op">=</span>stdout,</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>                        stderr<span class="op">=</span>asyncio.subprocess.PIPE,</span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>                    stdout_data, stderr_data <span class="op">=</span> <span class="cf">await</span> proc.communicate(input_data)</span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>                    log.debug(<span class="ss">f&quot;return-code </span><span class="sc">{</span>proc<span class="sc">.</span>returncode<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> stderr_data:</span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>                log.info(<span class="ss">f&quot;[gold1]</span><span class="sc">{</span>short_note<span class="sc">}</span><span class="ss">[/] %s&quot;</span>, stderr_data.decode().rstrip(), extra<span class="op">=</span>{<span class="st">&quot;markup&quot;</span>: <span class="va">True</span>})</span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.needs_run():</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> TaskFailure(<span class="st">&quot;Task didn&#39;t achieve goals.&quot;</span>)</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> stdout_data.decode().strip() <span class="cf">if</span> stdout_data <span class="cf">else</span> <span class="va">None</span></span>
 <span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
-<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TaskProxy:</span>
-<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Input to create an actual Task.</span></span>
-<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a><span class="co">    An actual `Task` has no template variables remaining and untyped strings</span></span>
-<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a><span class="co">    are replaced with `Path` `Variable` or `Phony` objects.</span></span>
-<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
-<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>    creates: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="bu">list</span>)</span>
-<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>    requires: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="bu">list</span>)</span>
-<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>    name: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>    runner: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    path: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    script: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>    stdin: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>    stdout: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>    description: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> all_targets(<span class="va">self</span>):</span>
-<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (</span>
-<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.creates</span>
-<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="va">self</span>.stdout] <span class="cf">if</span> <span class="va">self</span>.stdout <span class="cf">else</span> [])</span>
-<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="ss">f&quot;#</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="sc">}</span><span class="ss">&quot;</span>] <span class="cf">if</span> <span class="va">self</span>.name <span class="cf">else</span> [])</span>
-<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> all_dependencies(<span class="va">self</span>):</span>
-<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (</span>
-<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.requires</span>
-<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="va">self</span>.stdin] <span class="cf">if</span> <span class="va">self</span>.stdin <span class="cf">else</span> [])</span>
-<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="va">self</span>.path] <span class="cf">if</span> <span class="va">self</span>.path <span class="cf">else</span> [])</span>
-<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
-<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TemplateVariable(Lazy[Variable, <span class="bu">str</span>]):</span>
-<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>    template: <span class="bu">str</span></span>
-<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __post_init__(<span class="va">self</span>):</span>
-<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.requires <span class="op">+=</span> [Variable(arg) <span class="cf">for</span> arg <span class="kw">in</span> gather_args(<span class="va">self</span>.template)]</span>
-<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> run(<span class="va">self</span>, <span class="op">*</span>, db) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> substitute(<span class="va">self</span>.template, db.environment)</span>
-<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
-<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TemplateTask(Lazy[Path <span class="op">|</span> Phony <span class="op">|</span> Variable, Task]):</span>
-<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>    template: TaskProxy</span>
-<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __post_init__(<span class="va">self</span>):</span>
-<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="kw">not</span> gather_args(<span class="va">self</span>.template.creates)</span>
-<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.creates <span class="op">+=</span> [str_to_target(t) <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.template.all_targets]</span>
-<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.requires <span class="op">+=</span> [Variable(arg) <span class="cf">for</span> arg <span class="kw">in</span> gather_args(<span class="va">self</span>.template)]</span>
-<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> run(<span class="va">self</span>, <span class="op">*</span>, db):</span>
-<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a>        proxy <span class="op">=</span> substitute(<span class="va">self</span>.template, db.environment)</span>
-<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>        tgts <span class="op">=</span> [str_to_target(t) <span class="cf">for</span> t <span class="kw">in</span> proxy.all_targets]</span>
-<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>        deps <span class="op">=</span> [str_to_target(t) <span class="cf">for</span> t <span class="kw">in</span> proxy.all_dependencies]</span>
-<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>        path <span class="op">=</span> Path(proxy.path) <span class="cf">if</span> proxy.path <span class="cf">else</span> <span class="va">None</span></span>
-<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>        stdin <span class="op">=</span> str_to_target(proxy.stdin) <span class="cf">if</span> proxy.stdin <span class="cf">else</span> <span class="va">None</span></span>
-<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>        stdout <span class="op">=</span> str_to_target(proxy.stdout) <span class="cf">if</span> proxy.stdout <span class="cf">else</span> <span class="va">None</span></span>
-<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="kw">not</span> <span class="bu">isinstance</span>(stdin, Phony) <span class="kw">and</span> <span class="kw">not</span> <span class="bu">isinstance</span>(stdout, Phony)</span>
-<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>        task <span class="op">=</span> Task(</span>
-<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a>            tgts,</span>
-<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a>            deps,</span>
-<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a>            proxy.name,</span>
-<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>            proxy.runner,</span>
-<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>            path,</span>
-<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>            proxy.script,</span>
-<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>            stdin,</span>
-<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>            stdout,</span>
-<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>            proxy.description,</span>
-<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> task</span>
-<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
-<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TaskDB(LazyDB[Path <span class="op">|</span> Variable <span class="op">|</span> Phony, Task <span class="op">|</span> TemplateTask <span class="op">|</span> TemplateVariable]):</span>
-<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a>    runners: <span class="bu">dict</span>[<span class="bu">str</span>, Runner] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="kw">lambda</span>: copy(DEFAULT_RUNNERS))</span>
-<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>    throttle: Optional[asyncio.Semaphore] <span class="op">=</span> <span class="va">None</span></span>
-<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>    force_run: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span></span>
-<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_missing(<span class="va">self</span>, t: Path <span class="op">|</span> Phony <span class="op">|</span> Variable):</span>
-<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(t, Path) <span class="kw">and</span> t.exists():</span>
-<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> Task([t], [])</span>
-<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> MissingDependency()</span>
-<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> is_resolvable(<span class="va">self</span>, s: Any) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
-<span id="cb2-294"><a href="#cb2-294" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">all</span>(v <span class="kw">in</span> <span class="va">self</span>.index <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">map</span>(Variable, gather_args(s)))</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TaskProxy:</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Input to create an actual Task.</span></span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a><span class="co">    An actual `Task` has no template variables remaining and untyped strings</span></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a><span class="co">    are replaced with `Path` `Variable` or `Phony` objects.</span></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>    creates: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="bu">list</span>)</span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>    requires: <span class="bu">list</span>[<span class="bu">str</span>] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="bu">list</span>)</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>    name: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    runner: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    path: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>    script: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>    stdin: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>    stdout: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>    description: Optional[<span class="bu">str</span>] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>    force: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> all_targets(<span class="va">self</span>):</span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.creates</span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="va">self</span>.stdout] <span class="cf">if</span> <span class="va">self</span>.stdout <span class="cf">else</span> [])</span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="ss">f&quot;#</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>name<span class="sc">}</span><span class="ss">&quot;</span>] <span class="cf">if</span> <span class="va">self</span>.name <span class="cf">else</span> [])</span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> all_dependencies(<span class="va">self</span>):</span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (</span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.requires</span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="va">self</span>.stdin] <span class="cf">if</span> <span class="va">self</span>.stdin <span class="cf">else</span> [])</span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> ([<span class="va">self</span>.path] <span class="cf">if</span> <span class="va">self</span>.path <span class="cf">else</span> [])</span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TemplateVariable(Lazy[Variable, <span class="bu">str</span>]):</span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>    template: <span class="bu">str</span></span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __post_init__(<span class="va">self</span>):</span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.requires <span class="op">+=</span> [Variable(arg) <span class="cf">for</span> arg <span class="kw">in</span> gather_args(<span class="va">self</span>.template)]</span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> run(<span class="va">self</span>, <span class="op">*</span>, db) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> substitute(<span class="va">self</span>.template, db.environment)</span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TemplateTask(Lazy[Path <span class="op">|</span> Phony <span class="op">|</span> Variable, Task]):</span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>    template: TaskProxy</span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> __post_init__(<span class="va">self</span>):</span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="kw">not</span> gather_args(<span class="va">self</span>.template.creates)</span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.creates <span class="op">+=</span> [str_to_target(t) <span class="cf">for</span> t <span class="kw">in</span> <span class="va">self</span>.template.all_targets]</span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.requires <span class="op">+=</span> [Variable(arg) <span class="cf">for</span> arg <span class="kw">in</span> gather_args(<span class="va">self</span>.template)]</span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> run(<span class="va">self</span>, <span class="op">*</span>, db):</span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>        proxy <span class="op">=</span> substitute(<span class="va">self</span>.template, db.environment)</span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>        tgts <span class="op">=</span> [str_to_target(t) <span class="cf">for</span> t <span class="kw">in</span> proxy.all_targets]</span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>        deps <span class="op">=</span> [str_to_target(t) <span class="cf">for</span> t <span class="kw">in</span> proxy.all_dependencies]</span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>        path <span class="op">=</span> Path(proxy.path) <span class="cf">if</span> proxy.path <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>        stdin <span class="op">=</span> str_to_target(proxy.stdin) <span class="cf">if</span> proxy.stdin <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>        stdout <span class="op">=</span> str_to_target(proxy.stdout) <span class="cf">if</span> proxy.stdout <span class="cf">else</span> <span class="va">None</span></span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="kw">not</span> <span class="bu">isinstance</span>(stdin, Phony) <span class="kw">and</span> <span class="kw">not</span> <span class="bu">isinstance</span>(stdout, Phony)</span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a>        task <span class="op">=</span> Task(</span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a>            tgts,</span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>            deps,</span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>            proxy.name,</span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>            proxy.runner,</span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>            path,</span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>            proxy.script,</span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>            stdin,</span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a>            stdout,</span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>            proxy.description,</span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a>            proxy.force</span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> task</span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a><span class="at">@dataclass</span></span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TaskDB(LazyDB[Path <span class="op">|</span> Variable <span class="op">|</span> Phony, Task <span class="op">|</span> TemplateTask <span class="op">|</span> TemplateVariable]):</span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>    runners: <span class="bu">dict</span>[<span class="bu">str</span>, Runner] <span class="op">=</span> field(default_factory<span class="op">=</span><span class="kw">lambda</span>: copy(DEFAULT_RUNNERS))</span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>    throttle: Optional[asyncio.Semaphore] <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>    force_run: <span class="bu">bool</span> <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_missing(<span class="va">self</span>, t: Path <span class="op">|</span> Phony <span class="op">|</span> Variable):</span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">isinstance</span>(t, Path) <span class="kw">and</span> t.exists():</span>
+<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> Task([t], [])</span>
+<span id="cb2-294"><a href="#cb2-294" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> MissingDependency()</span>
 <span id="cb2-295"><a href="#cb2-295" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-296"><a href="#cb2-296" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> resolve_object(<span class="va">self</span>, s: Any) <span class="op">-&gt;</span> Any:</span>
-<span id="cb2-297"><a href="#cb2-297" aria-hidden="true" tabindex="-1"></a>        <span class="bu">vars</span> <span class="op">=</span> gather_args(s)</span>
-<span id="cb2-298"><a href="#cb2-298" aria-hidden="true" tabindex="-1"></a>        <span class="cf">await</span> asyncio.gather(<span class="op">*</span>(<span class="va">self</span>.run(Variable(v), db<span class="op">=</span><span class="va">self</span>) <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">vars</span>))</span>
-<span id="cb2-299"><a href="#cb2-299" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> substitute(s, <span class="va">self</span>.environment)</span>
-<span id="cb2-300"><a href="#cb2-300" aria-hidden="true" tabindex="-1"></a>        log.debug(<span class="ss">f&quot;substituting </span><span class="sc">{</span>s<span class="sc">}</span><span class="ss"> =&gt; </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">&quot;</span>)</span>
-<span id="cb2-301"><a href="#cb2-301" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result</span>
-<span id="cb2-302"><a href="#cb2-302" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-303"><a href="#cb2-303" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb2-304"><a href="#cb2-304" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> environment(<span class="va">self</span>):</span>
-<span id="cb2-305"><a href="#cb2-305" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Environment(<span class="va">self</span>)</span>
-<span id="cb2-306"><a href="#cb2-306" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-307"><a href="#cb2-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-308"><a href="#cb2-308" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Environment:</span>
-<span id="cb2-309"><a href="#cb2-309" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, db):</span>
-<span id="cb2-310"><a href="#cb2-310" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.db <span class="op">=</span> db</span>
-<span id="cb2-311"><a href="#cb2-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-312"><a href="#cb2-312" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__contains__</span>(<span class="va">self</span>, k: <span class="bu">str</span>):</span>
-<span id="cb2-313"><a href="#cb2-313" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Variable(k) <span class="kw">in</span> <span class="va">self</span>.db.index</span>
+<span id="cb2-296"><a href="#cb2-296" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> is_resolvable(<span class="va">self</span>, s: Any) <span class="op">-&gt;</span> <span class="bu">bool</span>:</span>
+<span id="cb2-297"><a href="#cb2-297" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="bu">all</span>(v <span class="kw">in</span> <span class="va">self</span>.index <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">map</span>(Variable, gather_args(s)))</span>
+<span id="cb2-298"><a href="#cb2-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-299"><a href="#cb2-299" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> resolve_object(<span class="va">self</span>, s: Any) <span class="op">-&gt;</span> Any:</span>
+<span id="cb2-300"><a href="#cb2-300" aria-hidden="true" tabindex="-1"></a>        <span class="bu">vars</span> <span class="op">=</span> gather_args(s)</span>
+<span id="cb2-301"><a href="#cb2-301" aria-hidden="true" tabindex="-1"></a>        <span class="cf">await</span> asyncio.gather(<span class="op">*</span>(<span class="va">self</span>.run(Variable(v), db<span class="op">=</span><span class="va">self</span>) <span class="cf">for</span> v <span class="kw">in</span> <span class="bu">vars</span>))</span>
+<span id="cb2-302"><a href="#cb2-302" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> substitute(s, <span class="va">self</span>.environment)</span>
+<span id="cb2-303"><a href="#cb2-303" aria-hidden="true" tabindex="-1"></a>        log.debug(<span class="ss">f&quot;substituting </span><span class="sc">{</span>s<span class="sc">}</span><span class="ss"> =&gt; </span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-304"><a href="#cb2-304" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result</span>
+<span id="cb2-305"><a href="#cb2-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-306"><a href="#cb2-306" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb2-307"><a href="#cb2-307" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> environment(<span class="va">self</span>):</span>
+<span id="cb2-308"><a href="#cb2-308" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Environment(<span class="va">self</span>)</span>
+<span id="cb2-309"><a href="#cb2-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-310"><a href="#cb2-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-311"><a href="#cb2-311" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Environment:</span>
+<span id="cb2-312"><a href="#cb2-312" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, db):</span>
+<span id="cb2-313"><a href="#cb2-313" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.db <span class="op">=</span> db</span>
 <span id="cb2-314"><a href="#cb2-314" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-315"><a href="#cb2-315" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> items(<span class="va">self</span>):</span>
-<span id="cb2-316"><a href="#cb2-316" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (k.name <span class="cf">for</span> k <span class="kw">in</span> <span class="va">self</span>.db.index <span class="cf">if</span> <span class="bu">isinstance</span>(k, Variable))</span>
+<span id="cb2-315"><a href="#cb2-315" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__contains__</span>(<span class="va">self</span>, k: <span class="bu">str</span>):</span>
+<span id="cb2-316"><a href="#cb2-316" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> Variable(k) <span class="kw">in</span> <span class="va">self</span>.db.index</span>
 <span id="cb2-317"><a href="#cb2-317" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-318"><a href="#cb2-318" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, k: <span class="bu">str</span>):</span>
-<span id="cb2-319"><a href="#cb2-319" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.db.index[Variable(k)].result</span>
+<span id="cb2-318"><a href="#cb2-318" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> items(<span class="va">self</span>):</span>
+<span id="cb2-319"><a href="#cb2-319" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (k.name <span class="cf">for</span> k <span class="kw">in</span> <span class="va">self</span>.db.index <span class="cf">if</span> <span class="bu">isinstance</span>(k, Variable))</span>
 <span id="cb2-320"><a href="#cb2-320" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-321"><a href="#cb2-321" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-322"><a href="#cb2-322" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Template(TaskProxy):</span>
-<span id="cb2-323"><a href="#cb2-323" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;A `Template` can receive the same arguments as a TaskProxy. The difference is </span></span>
-<span id="cb2-324"><a href="#cb2-324" aria-hidden="true" tabindex="-1"></a><span class="co">    that any template variables in the Template can be substituted with a `TemplateCall`.&quot;&quot;&quot;</span></span>
-<span id="cb2-325"><a href="#cb2-325" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> call(<span class="va">self</span>, args: <span class="bu">dict</span>[<span class="bu">str</span>, Any]) <span class="op">-&gt;</span> TaskProxy:</span>
-<span id="cb2-326"><a href="#cb2-326" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> substitute(<span class="va">self</span>, args)</span></code></pre></div>
+<span id="cb2-321"><a href="#cb2-321" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__getitem__</span>(<span class="va">self</span>, k: <span class="bu">str</span>):</span>
+<span id="cb2-322"><a href="#cb2-322" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.db.index[Variable(k)].result</span>
+<span id="cb2-323"><a href="#cb2-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-324"><a href="#cb2-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-325"><a href="#cb2-325" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Template(TaskProxy):</span>
+<span id="cb2-326"><a href="#cb2-326" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;A `Template` can receive the same arguments as a TaskProxy. The difference is </span></span>
+<span id="cb2-327"><a href="#cb2-327" aria-hidden="true" tabindex="-1"></a><span class="co">    that any template variables in the Template can be substituted with a `TemplateCall`.&quot;&quot;&quot;</span></span>
+<span id="cb2-328"><a href="#cb2-328" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> call(<span class="va">self</span>, args: <span class="bu">dict</span>[<span class="bu">str</span>, Any]) <span class="op">-&gt;</span> TaskProxy:</span>
+<span id="cb2-329"><a href="#cb2-329" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> substitute(<span class="va">self</span>, args)</span></code></pre></div>
 </div>
 </section>
 </div>

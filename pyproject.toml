@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "brei"
-version = "0.2.0"
+version = "0.2.1"
 description = "A minimal build system."
 authors = ["Johan Hidding <j.hidding@esciencecenter.nl>"]
 license = "Apache 2"
@@ -70,7 +70,7 @@ description = "Serve and watch for changes"
 runner = "bash"
 script = """
 while true; do
-	inotifywait -e close_write .entangled/template docs
+	inotifywait -e close_write docs/*.md docs/template
 	brei weave
 done
 """
