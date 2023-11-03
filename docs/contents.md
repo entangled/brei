@@ -4,10 +4,15 @@
 - [Implementation](implementation.md)
 :::
 
+:::buttons
+- [![GitHub Org's stars](https://img.shields.io/github/stars/entangled)](https://github.com/entangled/brei)
+- [![Python package](https://github.com/entangled/brei/actions/workflows/python-package.yml/badge.svg)](https://github.com/entangled/brei/actions/workflows/python-package.yml)
+- [![PyPI - Version](https://img.shields.io/pypi/v/brei)](https://pypi.org/project/brei)
+- [![Entangled badge](https://img.shields.io/badge/entangled-Use%20the%20source!-%2300aeff)](https://entangled.github.io/)
+:::
+
 :::links
-- [Entangled](https://entangled.github.io/)
-- [![](github-mark.svg) Github](https://github.com/entangled/brei)
-- [![](nlesc.svg)](https://esciencecenter.nl)
+- [![](nlesc.svg){#nlesc-logo}](https://esciencecenter.nl)
 - <button onclick="toggleDarkMode()">Toggle dark mode</button>
 :::
 

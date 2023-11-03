@@ -80,7 +80,7 @@ a {
 /* === Fonts ======================================= */
 body {
   font-weight: 240;
-  font-size: 16pt;
+  font-size: 12pt;
   font-family: "Noto Sans Display", sans-serif;
 }
 
@@ -103,7 +103,7 @@ body {
   line-height: 250%;
   text-align: right;
   padding-right: 20pt;
-  margin-top: 40pt;
+  margin-top: 10pt;
 }
 
 #contents ul {
@@ -113,16 +113,39 @@ body {
     font-weight: 300;
 }
 
-.dark-mode #contents img {
-    filter: invert() grayscale() sepia() saturate(150%) brightness(50%);
+#nlesc-logo {
+    height: 30pt;
+}
+
+.dark-mode #nlesc-logo {
+    filter: invert() hue-rotate(180deg);
 }
 
 #contents img {
-    height: 30pt;
     vertical-align: middle;
     margin-right: 10pt;
 }
 
+#contents #nlesc-logo {
+    display: none;
+}
+
+    #contents .buttons ul {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: right;
+    }
+
+    #contents .buttons li {
+        margin: 0;
+        padding: 0;
+    }
+
+    #contents .sticky .links {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
 #menu nav {
     padding-left: 20pt;
 }
@@ -131,30 +154,32 @@ body {
     padding-left: 10pt;
     list-style-type: none;
     font-weight: 400;
+    border-left: solid thick #00000030;
 }
 
 #menu ul ul {
     padding-left: 20pt;
     list-style-type: "…  ";
     font-weight: 240;
+    border: none;
 }
 
 #main {
     line-height: 180%;
     max-width: 100%;
     margin: 0pt 0pt 0pt 0pt;
-    padding: 10pt 10pt 10pt 10pt;
+    padding: 0pt 10pt 10pt 10pt;
     box-sizing: border-box;
 }
 
 #menu {
     line-height: 180%;
     /* font-size: smaller; */
-    padding: 40pt 10pt 10pt 0pt;
+    padding: 10pt 10pt 10pt 0pt;
 }
 
 #main h1 {
-    margin-top: 50pt;
+    margin-top: 10pt;
     border-bottom: solid thick #00000030;
     line-height: normal;
 }
@@ -166,7 +191,20 @@ body {
 
 header {
     margin: 0;
-    padding: 20pt;
+    padding: 5pt 20pt 10pt 20pt;
+}
+
+header h1 {
+    margin: 0;
+    padding: 0;
+}
+
+header .subtitle {
+    margin: 0;
+}
+
+header div.spacing {
+    display: none;
 }
 
 details {
@@ -353,6 +391,17 @@ html {
 
 /* === Tablet layout =============================== */
 @media only screen and (min-width: 600px) and (max-width: 1600px) {
+    header {
+        padding: 20pt 20pt;
+    }
+
+    #contents .links #nlesc-logo {
+        display: inline;
+    }
+
+    #main h1 {
+        margin-top: 30pt;
+    }
     nav {
         position: sticky;
         top: 10pt;
@@ -390,17 +439,37 @@ html {
     }
     #contents .sticky {
         display: flex;
-        flex-flow: row;
-        justify-content: space-between;
+        flex-flow: column;
         width: 100%;
+    }
+    #contents .sticky .site-menu {
+        text-align: left;
+    }
+    #contents .sticky .links {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+    #contents .links li {
+        display: block;
     }
     #contents ul {
         margin: 5pt 0pt;
         border-right: none;
+        display: block;
     }
     #contents li {
         display: inline;
         margin: 5pt 10pt;
+    }
+
+    #contents .buttons li {
+        margin: 0pt;
+        padding: 0pt;
+    }
+
+    #contents .buttons img {
+        margin: 0pt;
     }
       
   /* For tablets: */
@@ -420,6 +489,25 @@ html {
 
 /* === Desktop layout ============================== */
 @media only screen and (min-width: 1600px) {
+    body {
+        font-size: 14pt;
+    }
+
+    header {
+        padding: 20pt 20pt;
+    }
+
+    header div.spacing {
+        display: block;
+    }
+
+    header h1 {
+        padding: 20pt 0;
+    }
+
+    #main h1 {
+        margin-top: 30pt;
+    }
     .row {
         display: flex;
         flex-flow: row;
@@ -438,8 +526,27 @@ html {
         top: 10pt;
     }
 
-    #contents .links {
-        margin-top: 50pt;
+    #contents .sticky > div {
+        margin-bottom: 30pt;
+    }
+
+    #contents .buttons ul {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: right;
+    }
+
+    #contents .buttons li {
+        margin: 0;
+        padding: 0;
+    }
+
+    #contents .sticky .links {
+        position: static;
+    }
+
+    #contents .links #nlesc-logo {
+        display: inline;
     }
 
     nav {

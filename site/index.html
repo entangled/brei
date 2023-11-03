@@ -131,12 +131,27 @@ window.addEventListener('DOMContentLoaded', () => {
 <li><a href="implementation.html">Implementation</a></li>
 </ul>
 </div>
+<div class="buttons">
+<ul>
+<li><a href="https://github.com/entangled/brei"><img
+src="https://img.shields.io/github/stars/entangled"
+alt="GitHub Org’s stars" /></a></li>
+<li><a
+href="https://github.com/entangled/brei/actions/workflows/python-package.yml"><img
+src="https://github.com/entangled/brei/actions/workflows/python-package.yml/badge.svg"
+alt="Python package" /></a></li>
+<li><a href="https://pypi.org/project/brei"><img
+src="https://img.shields.io/pypi/v/brei"
+alt="PyPI - Version" /></a></li>
+<li><a href="https://entangled.github.io/"><img
+src="https://img.shields.io/badge/entangled-Use%20the%20source!-%2300aeff"
+alt="Entangled badge" /></a></li>
+</ul>
+</div>
 <div class="links">
 <ul>
-<li><a href="https://entangled.github.io/">Entangled</a></li>
-<li><a href="https://github.com/entangled/brei"><img
-src="github-mark.svg" /> Github</a></li>
-<li><a href="https://esciencecenter.nl"><img src="nlesc.svg" /></a></li>
+<li><a href="https://esciencecenter.nl"><img src="nlesc.svg"
+id="nlesc-logo" /></a></li>
 <li><button onclick="toggleDarkMode()">
 Toggle dark mode
 </button></li>
@@ -311,10 +326,10 @@ class="sourceCode bash eval"><code class="sourceCode bash"><span id="cb9-1"><a h
 </div>
 <div class="doctestResult">
 <div class="sourceCode" id="cb10"><pre
-class="sourceCode txt"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>[17:06:57] INFO     Creating temporary directory                                                                                                                                                                                                  </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.ZTAWYafgbK/secret.txt`                                                                                                                                                                                     </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.ZTAWYafgbK/msg.txt`                                                                                                                                                                                        </span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>           INFO     #all                                                                                                                                                                                                                          </span>
+class="sourceCode txt"><code class="sourceCode default"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>[12:43:42] INFO     Creating temporary directory                                                                         </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.KnVhXMvHbj/secret.txt`                                                            </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.KnVhXMvHbj/msg.txt`                                                               </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>           INFO     #all                                                                                                 </span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>Hello, World!</span></code></pre></div>
 </div>
 </div>
@@ -371,14 +386,14 @@ class="sourceCode bash eval"><code class="sourceCode bash"><span id="cb12-1"><a 
 </div>
 <div class="doctestResult">
 <div class="sourceCode" id="cb13"><pre
-class="sourceCode txt"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>[17:06:58] INFO     Creating temporary directory                                                                                                                                                                                                  </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>           INFO     inner x 1                                                                                                                                                                                                                     </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>           INFO     inner y 2                                                                                                                                                                                                                     </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>           INFO     inner z 3                                                                                                                                                                                                                     </span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>           INFO     outer x 1                                                                                                                                                                                                                     </span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>           INFO     outer x 2                                                                                                                                                                                                                     </span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>           INFO     outer y 1                                                                                                                                                                                                                     </span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>           INFO     outer y 2                                                                                                                                                                                                                     </span></code></pre></div>
+class="sourceCode txt"><code class="sourceCode default"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>[12:43:43] INFO     Creating temporary directory                                                                         </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>           INFO     inner x 1                                                                                            </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>           INFO     inner y 2                                                                                            </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>           INFO     inner z 3                                                                                            </span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>           INFO     outer x 1                                                                                            </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>           INFO     outer x 2                                                                                            </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>           INFO     outer y 1                                                                                            </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>           INFO     outer y 2                                                                                            </span></code></pre></div>
 </div>
 </div>
 </section>
@@ -506,18 +521,18 @@ class="sourceCode bash eval"><code class="sourceCode bash"><span id="cb18-1"><a 
 </div>
 <div class="doctestResult">
 <div class="sourceCode" id="cb19"><pre
-class="sourceCode txt"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[17:06:58] INFO     Creating temporary directory                                                                                                                                                                                                  </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>           INFO     Generating workflow                                                                                                                                                                                                           </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out0.dat`                                                                                                                                                                                       </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out1.dat`                                                                                                                                                                                       </span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out2.dat`                                                                                                                                                                                       </span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out3.dat`                                                                                                                                                                                       </span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>[17:06:59] INFO     creating `/tmp/tmp.QqYLDRhGEm/out4.dat`                                                                                                                                                                                       </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out5.dat`                                                                                                                                                                                       </span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out6.dat`                                                                                                                                                                                       </span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out7.dat`                                                                                                                                                                                       </span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out8.dat`                                                                                                                                                                                       </span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.QqYLDRhGEm/out9.dat`                                                                                                                                                                                       </span></code></pre></div>
+class="sourceCode txt"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>[12:43:43] INFO     Creating temporary directory                                                                         </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>           INFO     Generating workflow                                                                                  </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out0.dat`                                                              </span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out1.dat`                                                              </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out2.dat`                                                              </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out3.dat`                                                              </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out4.dat`                                                              </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out5.dat`                                                              </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out6.dat`                                                              </span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out7.dat`                                                              </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out8.dat`                                                              </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.8FdR7rOLem/out9.dat`                                                              </span></code></pre></div>
 </div>
 </div>
 </section>
@@ -572,9 +587,9 @@ class="sourceCode bash eval"><code class="sourceCode bash"><span id="cb21-1"><a 
 </div>
 <div class="doctestResult">
 <div class="sourceCode" id="cb22"><pre
-class="sourceCode txt"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>[17:06:59] INFO     Creating temporary directory                                                                                                                                                                                                  </span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.emJCbpI2Gg/hello.txt`                                                                                                                                                                                      </span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>           INFO     #all                                                                                                                                                                                                                          </span>
+class="sourceCode txt"><code class="sourceCode default"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>[12:43:44] INFO     Creating temporary directory                                                                         </span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>           INFO     creating `/tmp/tmp.wqOEgprZqg/hello.txt`                                                             </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>           INFO     #all                                                                                                 </span>
 <span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>10! = 	3628800</span></code></pre></div>
 </div>
 </div>

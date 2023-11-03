@@ -9,8 +9,6 @@ function Div (elem)
             return {}
         end
     }
-    print(summary)
-    print(elem.content)
     return pandoc.Div({
         pandoc.RawInline("html", "<details><summary>"),
         pandoc.Span(summary),
