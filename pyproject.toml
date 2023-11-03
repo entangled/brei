@@ -35,9 +35,7 @@ build-backend = "poetry.core.masonry.api"
 packages = ["brei"]
 
 [tool.brei]
-include = [
-  ".entangled/weave.toml"
-]
+include = ["docs/weave.toml"]
 
 [[tool.brei.task]]
 name = "test"
@@ -89,8 +87,15 @@ requires = ["#html", "#static", "#pdoc"]
 [[tool.brei.call]]
 template = "pandoc"
 collect = "html"
-  [tool.brei.call.args]
-  basename = ["index", "implementation", "tasks", "lazy", "template_strings", "program"]
+[tool.brei.call.args]
+basename = [
+  "index",
+  "implementation",
+  "tasks",
+  "lazy",
+  "template_strings",
+  "program",
+]
 
 [[tool.brei.task]]
 name = "pdoc"

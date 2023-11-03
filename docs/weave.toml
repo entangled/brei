@@ -8,7 +8,7 @@ ${pandoc_format} ${pandoc_style} ${pandoc_template} ${pandoc_filters} \
 -M contents_file='docs/contents.md'"""
 
 pandoc_format = "-s -t html5 --section-divs --toc --toc-depth 2"
-pandoc_template = "--template .entangled/template/template.html"
+pandoc_template = "--template docs/template/template.html"
 pandoc_style = "--css dark.css --highlight-style zenburn"
 pandoc_filters = """
 --lua-filter ${filter_dir}/include-contents.lua \
@@ -19,19 +19,19 @@ pandoc_filters = """
 --lua-filter ${filter_dir}/eval.lua \
 --lua-filter ${filter_dir}/links.lua"""
 
-filter_dir = ".entangled/filters"
+filter_dir = "docs/filters"
 
 [[call]]
 template = "copy"
 collect = "static"
   [call.args]
-  srcdir = ".entangled/template"
+  srcdir = "docs/template"
   tgtdir = "docs/site"
   basename = ["dark.css", "light.css", "github-mark.svg", "nlesc.svg"]
 
 [template.pandoc]
 description = "pandoc `${basename}`"
-requires = ["docs/${basename}.md", ".entangled/template/template.html", "docs/contents.md", "docs/test_coverage.md"]
+requires = ["docs/${basename}.md", "docs/template/template.html", "docs/contents.md", "docs/test_coverage.md"]
 creates = ["docs/site/${basename}.html"]
 script = "pandoc ${pandoc_args} -o 'docs/site/${basename}.html' 'docs/${basename}.md'"
 
