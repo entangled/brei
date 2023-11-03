@@ -1,4 +1,9 @@
 # Brei
+[![GitHub Org's stars](https://img.shields.io/github/stars/entangled)](https://github.com/entangled/brei)
+[![Python package](https://github.com/entangled/brei/actions/workflows/python-package.yml/badge.svg)](https://github.com/entangled/brei/actions/workflows/python-package.yml)
+[![PyPI - Version](https://img.shields.io/pypi/v/brei)](https://pypi.org/project/brei)
+[![Entangled badge](https://img.shields.io/badge/entangled-Use%20the%20source!-%2300aeff)](https://entangled.github.io/)
+
 Minimal workflow system and alternative to Make.
 
 - Read from TOML or JSON (also `pyproject.toml` in `[tool.brei]` section)
@@ -6,7 +11,7 @@ Minimal workflow system and alternative to Make.
 - Runs task lazily and in parallel
 - Supports variables, templates, includes and custom runners
 
-Read more: [documentation](docs/index.md)
+Read more: [documentation](https://entangled.github.io/brei)
 
 ## Why (yet another workflow tool)
 This tool was developed as part of the Entangled project, but can be used on its own. Brei is meant to perform small scale automisations for literate programming in Entangled, like generating figures, and performing computations locally. It requires no setup to work with and workflows are easy to understand by novice users. If you have any more serious needs than that, we'd recommend to use a more tried and proven system, of which there are too many to count.
