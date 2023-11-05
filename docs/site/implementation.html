@@ -175,7 +175,7 @@ class="sourceCode bash eval"><code class="sourceCode bash"><span id="cb1-1"><a h
 </div>
 <div class="doctestResult">
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Brei 0.2.1, Copyright (c) 2023 Netherlands eScience Center.</span>
+class="sourceCode txt"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>Brei 0.1.0, Copyright (c) 2023 Netherlands eScience Center.</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>Licensed under the Apache License, Version 2.0.</span></code></pre></div>
 </div>
 </div>
@@ -479,7 +479,7 @@ class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a hr
 <span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>        sys.exit(<span class="dv">0</span>)</span>
 <span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> input_file <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span>:</span>
-<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> m <span class="op">:=</span> re.match(input_file, <span class="vs">r&quot;([^\[\]]+)\[([^\[\]\s]+)\]&quot;</span>):</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> m <span class="op">:=</span> re.match(<span class="vs">r&quot;([^\[\]]+)\[([^\[\]\s]+)\]&quot;</span>, input_file):</span>
 <span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>            input_path <span class="op">=</span> Path(m.group(<span class="dv">1</span>))</span>
 <span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>            section <span class="op">=</span> m.group(<span class="dv">2</span>)</span>
 <span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>

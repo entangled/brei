@@ -187,7 +187,7 @@ def brei(
         sys.exit(0)
 
     if input_file is not None:
-        if m := re.match(input_file, r"([^\[\]]+)\[([^\[\]\s]+)\]"):
+        if m := re.match(r"([^\[\]]+)\[([^\[\]\s]+)\]", input_file):
             input_path = Path(m.group(1))
             section = m.group(2)
         else:
