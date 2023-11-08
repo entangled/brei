@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0b6",
+  "version": "2.0.0",
   "files": [
     {
       "path": "test/test_result.py",
@@ -134,7 +134,7 @@
       "deps": [
         "docs/program.md"
       ],
-      "modified": "2023-10-30T13:55:07.681105",
+      "modified": "2023-11-07T10:26:47.011033",
       "hexdigest": "6f6b42c09828d36dafa62160057be5d3147db7c7ed980dba582279d645fd6b8c",
       "size": 6145
     },
@@ -179,7 +179,7 @@
       "deps": [
         "docs/tasks.md"
       ],
-      "modified": "2023-10-30T10:34:54.594448",
+      "modified": "2023-11-07T10:26:47.012033",
       "hexdigest": "5b757d1bf7b4152d79bd2e589534261dfcb40c408868300adcef2018525f9036",
       "size": 10557
     },
@@ -188,7 +188,7 @@
       "deps": [
         "docs/template_strings.md"
       ],
-      "modified": "2023-10-29T00:55:24.401604",
+      "modified": "2023-11-07T10:26:47.012033",
       "hexdigest": "593ae0323e34d4bf1cc8099bf1be43018c9329883c46732e74257b9b113ddb76",
       "size": 1707
     },
@@ -240,25 +240,25 @@
       "deps": [
         "docs/implementation.md"
       ],
-      "modified": "2023-10-31T12:18:17.790390",
-      "hexdigest": "24d27f9429fb1004aa992ca207be0bb4717c2be867b0d5a842404dff94cdf1cf",
-      "size": 234
+      "modified": "2023-11-08T11:53:22.891749",
+      "hexdigest": "a72d90be5e06c1df501f2cbf68779452ae7cd09943cf8cb975e9cbc0510f4d5f",
+      "size": 251
     },
     {
       "path": "brei/cli.py",
       "deps": [
         "docs/implementation.md"
       ],
-      "modified": "2023-10-31T12:23:57.278205",
+      "modified": "2023-11-07T10:26:47.010033",
       "hexdigest": "801c4aac349c82f4f702d05ae0303da18aa220af60a34ae3df3a6223e06e61a2",
       "size": 4133
     },
     {
       "path": "docs/implementation.md",
-      "deps": null,
-      "modified": "2023-11-02T15:20:43.933643",
-      "hexdigest": "cd5270fd8880d3559d99f67c4a2099b9e4132f6cf0f74330bf86141c2b56f1da",
-      "size": 5522
+      "deps": [],
+      "modified": "2023-11-08T11:56:43.423742",
+      "hexdigest": "66eb3c4cb1e035d411b4582fe31646211a64bcffc7a7cef02bfb37c5829506dd",
+      "size": 5538
     },
     {
       "path": "examples/template_multiplexing.toml",
@@ -288,7 +288,7 @@
       "deps": [
         "docs/utility.md"
       ],
-      "modified": "2023-11-01T11:11:53.910619",
+      "modified": "2023-11-07T10:26:47.010033",
       "hexdigest": "e495708e7476f9dc398f41121be2e2f5d65d582b83f73b07bfe70e144af96850",
       "size": 4697
     },
@@ -313,7 +313,7 @@
       "deps": [
         "docs/experimental.md"
       ],
-      "modified": "2023-11-02T15:20:52.260695",
+      "modified": "2023-11-07T10:26:47.011033",
       "hexdigest": "0f5d492fb593717c3eb0c5fa95d0d32103dcae3100d47ae3cd6b8a78be21b0fd",
       "size": 7674
     },
@@ -322,7 +322,7 @@
       "deps": [
         "docs/experimental.md"
       ],
-      "modified": "2023-11-02T15:20:52.268695",
+      "modified": "2023-11-07T10:26:47.011033",
       "hexdigest": "0b3bc872b74f42bb6b70d834bac21ca5dfd5bc7d7023697de8c56facc95455f0",
       "size": 2693
     },
@@ -331,39 +331,39 @@
       "deps": [
         "docs/experimental.md"
       ],
-      "modified": "2023-11-02T15:20:52.271695",
+      "modified": "2023-11-07T10:26:47.019033",
       "hexdigest": "8c6ca14f148634cfcf3d0f848dc7c34e61891a48b6be5b393e72b729f39c0f1f",
       "size": 1599
     }
   ],
   "source": [],
   "target": [
-    "brei/version.py",
-    "brei/utility.py",
-    "brei/construct.py",
-    "brei/cli.py",
-    "brei/task.py",
-    "brei/program.py",
-    "brei/experimental/task_database.py",
-    "examples/template_multiplexing.toml",
-    "test/test_template_strings.py",
-    "examples/tasks.toml",
-    "brei/template_strings.py",
-    "test/test_result.py",
-    "brei/result.py",
-    "brei/runner.py",
-    "examples/custom-runner.toml",
     "brei/errors.py",
-    "brei/lazy.py",
+    "brei/experimental/task_database.py",
     "examples/versioned_output.toml",
-    "examples/rot13.toml",
-    "brei/__init__.py",
-    "examples/hello-includes.toml",
-    "brei/async_timer.py",
+    "examples/tasks.toml",
+    "brei/cli.py",
     "examples/echo.toml",
-    "brei/experimental/lazy.py",
-    "brei/logging.py",
+    "test/test_template_strings.py",
     "test/experimental/test_func_lazy.py",
-    "examples/include-gen.toml"
+    "test/test_result.py",
+    "examples/template_multiplexing.toml",
+    "brei/task.py",
+    "brei/construct.py",
+    "brei/__init__.py",
+    "brei/template_strings.py",
+    "brei/result.py",
+    "brei/async_timer.py",
+    "brei/lazy.py",
+    "brei/runner.py",
+    "examples/hello-includes.toml",
+    "examples/include-gen.toml",
+    "brei/program.py",
+    "brei/utility.py",
+    "brei/version.py",
+    "brei/logging.py",
+    "examples/custom-runner.toml",
+    "examples/rot13.toml",
+    "brei/experimental/lazy.py"
   ]
 }
