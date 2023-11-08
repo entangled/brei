@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "brei"
-version = "0.2.2"
+version = "0.2.3"
 description = "A minimal build system."
 authors = ["Johan Hidding <j.hidding@esciencecenter.nl>"]
 license = "Apache 2"
