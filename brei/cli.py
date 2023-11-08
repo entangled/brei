@@ -28,13 +28,14 @@ log = logger()
 async def main(
     program: Program, target_strs: list[str], force_run: bool, throttle: Optional[int]
 ):
-    db = await resolve_tasks(program)
-    for t in db.tasks:
-        log.debug(str(t))
+    db = await resolve_tasks(program, history_path=Path(".brei_history"))
     if throttle:
         db.throttle = asyncio.Semaphore(throttle)
     db.force_run = force_run
-    results = await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
+
+    with db.persistent_history():
+        results = await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
+
     if not all(results):
         log.error("Some jobs have failed:")
         for r in results:

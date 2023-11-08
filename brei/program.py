@@ -139,7 +139,7 @@ async def resolve_delayed(db: TaskDB, tasks: list[TaskProxy]) -> list[TaskProxy]
     return [t for t in await asyncio.gather(*map(resolve, tasks)) if t]
 
 
-async def resolve_tasks(program: Program) -> TaskDB:
+async def resolve_tasks(program: Program, history_path: Path | None = None) -> TaskDB:
     """Resolve a program. A resolved program has all of its includes and
     template calls done, so that only tasks remains. In order to resolve
     a program, some tasks may need to be run. Variables that appear in
@@ -147,7 +147,7 @@ async def resolve_tasks(program: Program) -> TaskDB:
 
     Returns: TaskDB instance.
     """
-    db = TaskDB()
+    db = TaskDB(history_path = history_path)
     template_index = dict()
 
     async def go(program: Program):
@@ -216,5 +216,8 @@ async def resolve_tasks(program: Program) -> TaskDB:
 
         return db
 
-    return await go(program)
+    with db.persistent_history():
+        await go(program)
+
+    return db
 # ~/~ end

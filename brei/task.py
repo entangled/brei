@@ -1,17 +1,20 @@
 # ~/~ begin <<docs/tasks.md#brei/task.py>>[init]
 from __future__ import annotations
 import asyncio
+from collections import defaultdict
 from contextlib import contextmanager, nullcontext
 from copy import copy
 from dataclasses import dataclass, field
 from pathlib import Path
 import re
 import string
+import json
 from tempfile import NamedTemporaryFile
-from typing import Any, Optional, TextIO
+from typing import Any, DefaultDict, Optional, TextIO
 from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
+import hashlib
 
 from .result import TaskFailure
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
@@ -67,6 +70,12 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     def dependency_paths(self):
         return (p for p in self.requires if isinstance(p, Path))
 
+    @property
+    def digest(self) -> str | None:
+        if self.script is None:
+            return None
+        return hashlib.md5(self.script.encode()).hexdigest()
+
     def __str__(self):
         tgts = ", ".join(str(t) for t in self.creates)
         deps = ", ".join(str(t) for t in self.requires)
@@ -92,12 +101,14 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     def always_run(self) -> bool:
         return self.force or len(list(self.target_paths)) == 0
 
-    def needs_run(self) -> bool:
+    def needs_run(self, db: TaskDB) -> bool:
         if any(not p.exists() for p in self.target_paths):
             return True
         target_stats = [stat(p) for p in self.target_paths]
         dep_stats = [stat(p) for p in self.dependency_paths]
         if any(t < d for t in target_stats for d in dep_stats):
+            return True
+        if any(self.digest != db.history.get(p, None) for p in self.target_paths):
             return True
         return False
 
@@ -132,7 +143,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
                 yield None
 
     async def run(self, *, db: TaskDB):
-        if not self.always_run() and not self.needs_run() and not db.force_run:
+        if not self.always_run() and not self.needs_run(db) and not db.force_run:
             tgts = " ".join(f"`{t}`" for t in self.target_paths)
             log.info(f"Targets {tgts} already up-to-date.")
             return
@@ -161,6 +172,8 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
         if self.runner is None and self.script is not None:
             if not is_oneliner(self.script):
                 assert self.stdin is None
+
+            
             with self.get_stdout() as stdout:
                 stdout_data = b""
                 for line in self.script.splitlines():
@@ -199,7 +212,10 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
         else:
             return
 
-        if self.needs_run():
+        for p in self.target_paths:
+            db.history[p] = self.digest
+
+        if self.needs_run(db):
             raise TaskFailure("Task didn't achieve goals.")
 
         return stdout_data.decode().strip() if stdout_data else None
@@ -288,6 +304,30 @@ class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVaria
     runners: dict[str, Runner] = field(default_factory=lambda: copy(DEFAULT_RUNNERS))
     throttle: Optional[asyncio.Semaphore] = None
     force_run: bool = False
+    history_path: Path | None = None
+    history: dict[Path, str | None] = field(default_factory=dict)
+
+    @contextmanager
+    def persistent_history(self):
+        if not self.history_path:
+            yield
+        else:
+            self.read_history(self.history_path)
+            yield
+            self.write_history(self.history_path)
+
+    def read_history(self, history_path: Path):
+        if not history_path.exists():
+            return
+
+        with open(history_path, "r") as f_in:
+            data = json.load(f_in)
+            for k, v in data.items():
+                self.history[Path(k)] = v
+
+    def write_history(self, history_path: Path):
+        with open(history_path, "w") as f_out:
+            json.dump({str(k): v for k, v in self.history.items()}, f_out, indent=2)
 
     def on_missing(self, t: Path | Phony | Variable):
         if isinstance(t, Path) and t.exists():
