@@ -5,7 +5,7 @@ import re
 import sys
 import textwrap
 import tomllib
-from typing import Optional
+from typing import Optional, Any
 import argh  # type: ignore
 import asyncio
 from rich.console import Console
@@ -20,7 +20,7 @@ from .utility import construct, read_from_file
 from .program import Program, resolve_tasks
 from .logging import logger, configure_logger
 from .version import __version__
-
+from .result import Result
 
 log = logger()
 
@@ -34,7 +34,7 @@ async def main(
     db.force_run = force_run
 
     with db.persistent_history():
-        results = await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
+        results: list[Result[Any]] = await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
 
     if not all(results):
         log.error("Some jobs have failed:")
