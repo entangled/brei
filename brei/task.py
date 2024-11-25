@@ -145,7 +145,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     async def run(self, *, db: TaskDB):
         if not self.always_run() and not self.needs_run(db) and not db.force_run:
             tgts = " ".join(f"`{t}`" for t in self.target_paths)
-            log.info(f"Targets {tgts} already up-to-date.")
+            log.debug(f"Targets {tgts} already up-to-date.")
             return
 
         log.debug(f"{self}")
@@ -173,7 +173,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             if not is_oneliner(self.script):
                 assert self.stdin is None
 
-            
+
             with self.get_stdout() as stdout:
                 stdout_data = b""
                 for line in self.script.splitlines():
@@ -364,7 +364,7 @@ class Environment:
 
 
 class Template(TaskProxy):
-    """A `Template` can receive the same arguments as a TaskProxy. The difference is 
+    """A `Template` can receive the same arguments as a TaskProxy. The difference is
     that any template variables in the Template can be substituted with a `TemplateCall`."""
     def call(self, args: dict[str, Any]) -> TaskProxy:
         return substitute(self, args)

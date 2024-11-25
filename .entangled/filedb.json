@@ -1,335 +1,335 @@
 {
-  "version": "2.0.0b6",
   "files": [
     {
-      "path": "test/test_result.py",
-      "deps": [
-        "docs/lazy.md"
-      ],
-      "modified": "2023-10-29T00:47:01.162720",
-      "hexdigest": "641268e8d518ca9795ee946eafe891bafc21ce0ee0c9258cef02520a061bed32",
-      "size": 450
-    },
-    {
-      "path": "examples/rot13.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-30T12:55:10.091496",
-      "hexdigest": "fcb8ff0b615c15086fb26b8cd6b77db888f85438c89fc7e71b487a6aafade56e",
-      "size": 596
-    },
-    {
-      "path": "docs/errors.md",
-      "deps": null,
-      "modified": "2023-10-29T00:52:12.399889",
-      "hexdigest": "86feac1a785973501c6e22cb634086a8ed15e5371944c172892eb49014522b9a",
-      "size": 883
-    },
-    {
-      "path": "docs/utility.md",
-      "deps": null,
-      "modified": "2023-11-03T15:28:32.044949",
-      "hexdigest": "19b3b17801aca2c8ea09d9e1e3b0fedc01a99acd42afbe025dac563ba1423ba3",
-      "size": 5850
-    },
-    {
-      "path": "docs/lazy.md",
-      "deps": null,
-      "modified": "2023-11-02T15:37:15.436818",
-      "hexdigest": "d0f638ef826f389213d594b6d72ab9ead6db2fac653800e4136f2e8b3b6ee262",
-      "size": 6899
-    },
-    {
-      "path": "docs/index.md",
-      "deps": null,
-      "modified": "2023-11-03T15:37:29.672071",
-      "hexdigest": "6b51d5d0a2f999ea327410ea72fa9eed043cd96efed476b3bfce7bc3cbe31d27",
-      "size": 9493
-    },
-    {
-      "path": "docs/program.md",
-      "deps": null,
-      "modified": "2023-11-03T15:32:43.367416",
-      "hexdigest": "2142e226a9a039fb9d673cb4505698642b535114b1618c60acfa1b8410159263",
-      "size": 6676
-    },
-    {
-      "path": "docs/template_strings.md",
-      "deps": null,
-      "modified": "2023-11-03T15:27:37.154866",
-      "hexdigest": "3359acf0ee1f6fd5b645c56fb307e5e326c1707125a8895038035a8234d91c68",
-      "size": 4674
-    },
-    {
-      "path": "docs/tasks.md",
-      "deps": null,
-      "modified": "2023-11-03T15:10:24.371746",
-      "hexdigest": "0678ee6e255a044cbe9da0f02456b931c25acdb6be823742628206e5c59b8b1d",
-      "size": 11227
-    },
-    {
-      "path": "test/test_template_strings.py",
-      "deps": [
-        "docs/template_strings.md"
-      ],
-      "modified": "2023-10-29T00:46:37.894632",
-      "hexdigest": "3c590abfe2e9110072691949d70aa08f947da9c2a13f368854463d9d0494a64d",
-      "size": 1566
-    },
-    {
-      "path": "examples/versioned_output.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-30T11:19:39.320683",
-      "hexdigest": "3e7e6847ed26def54beafd76c898f71ef4e9d1254b41d643f9771ccd570d259e",
-      "size": 505
-    },
-    {
-      "path": "examples/tasks.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-29T10:15:02.404472",
-      "hexdigest": "2dac044fb2c5d06a78aeefb038db5249a7524c53ff0e60d8c756a8a6df3c6678",
-      "size": 256
-    },
-    {
-      "path": "examples/hello-includes.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-28T20:37:53.475601",
-      "hexdigest": "3d67de8ef7b078421a03212479e42676b4c69de8b06c2ac697f3e8d3c843b74f",
-      "size": 245
-    },
-    {
-      "path": "examples/include-gen.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-30T19:08:45.133752",
-      "hexdigest": "03cb75d64a04555bdcd1db952cf23cabf95557842d4cf8b374d9f08f8288213b",
-      "size": 604
-    },
-    {
-      "path": "examples/echo.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-29T09:38:17.997990",
-      "hexdigest": "c30dc3ffbf29c8f3177569ddc24e4b8098b8f27034f71cbbc1a1617365f5e177",
-      "size": 127
-    },
-    {
-      "path": "brei/program.py",
-      "deps": [
-        "docs/program.md"
-      ],
-      "modified": "2023-11-03T15:32:43.164416",
-      "hexdigest": "5fc18a713e12099f483b3f134c5bf45652a174ddb341b6faaa62df4a00812351",
-      "size": 6689
-    },
-    {
-      "path": "brei/errors.py",
-      "deps": [
-        "docs/errors.md"
-      ],
-      "modified": "2023-10-29T00:55:24.391604",
-      "hexdigest": "1345eb0823f9ce114bc5fdb81002d5a7e48efafc6465997e2312bf833cd2544c",
-      "size": 906
-    },
-    {
-      "path": "brei/utility.py",
-      "deps": [
-        "docs/utility.md"
-      ],
-      "modified": "2023-11-01T11:24:14.405731",
-      "hexdigest": "fa3601d2d066e6d1837d9e4445fe69c820b0c5ec71973615f1612080ea7d02ec",
-      "size": 772
-    },
-    {
-      "path": "brei/result.py",
-      "deps": [
-        "docs/lazy.md"
-      ],
-      "modified": "2023-11-01T20:54:43.092092",
-      "hexdigest": "ba812916629b7497c21d0cfc84e2e32459b8b292ec553dc22b443f60edb8e1ad",
-      "size": 845
-    },
-    {
-      "path": "brei/lazy.py",
-      "deps": [
-        "docs/lazy.md"
-      ],
-      "modified": "2023-10-30T09:55:59.453690",
-      "hexdigest": "af47e62d4f9cc1381df52935cfa57138025f1a4baed2668423944bc4251252cb",
-      "size": 4883
-    },
-    {
-      "path": "brei/task.py",
-      "deps": [
-        "docs/tasks.md"
-      ],
-      "modified": "2023-11-03T15:10:24.159745",
-      "hexdigest": "6df6c2b26abe321850ec90b2ae3ede47b334e7d6aa2877fa5f53ccde50eba45c",
-      "size": 10971
-    },
-    {
-      "path": "brei/template_strings.py",
-      "deps": [
-        "docs/template_strings.md"
-      ],
-      "modified": "2023-11-03T15:27:36.930866",
-      "hexdigest": "6f42aab5ed0699b89bc98e9b5fd43e4d39d507dbff3895a12015069463866bf8",
-      "size": 1748
-    },
-    {
-      "path": "examples/custom-runner.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-30T13:07:28.858569",
-      "hexdigest": "0353fe16026e11682cc9640d9468b720fec35786118ff149d17427a07aadee90",
-      "size": 493
-    },
-    {
-      "path": "brei/runner.py",
-      "deps": [
-        "docs/tasks.md"
-      ],
-      "modified": "2023-10-29T10:11:17.915720",
-      "hexdigest": "f4072af62e3ab52c2242393edda0b9d7721d19ce256b05d435559e9e3c7da337",
-      "size": 292
-    },
-    {
-      "path": "docs/examples.md",
-      "deps": null,
-      "modified": "2023-10-30T10:17:35.952734",
-      "hexdigest": "2023de98e5b4aa0ea490ee2d46031cbb9310251b601cef5a8c183d72e0438abe",
-      "size": 28
-    },
-    {
-      "path": "brei/logging.py",
       "deps": [
         "docs/implementation.md"
       ],
-      "modified": "2023-10-31T12:18:17.789389",
-      "hexdigest": "5de3219dd14ed01c32c13b6b82880e230f5f4f08fbf130ad29438de7cd155052",
-      "size": 832
-    },
-    {
-      "path": "brei/version.py",
-      "deps": [
-        "docs/implementation.md"
-      ],
-      "modified": "2023-10-30T11:13:50.292983",
-      "hexdigest": "551b7b0399c74d7f4324f1a3830ee882fa2c91e1e4e66eba825acee2e5a7e85a",
-      "size": 142
-    },
-    {
-      "path": "brei/__init__.py",
-      "deps": [
-        "docs/implementation.md"
-      ],
-      "modified": "2023-11-02T16:39:31.056613",
       "hexdigest": "aa2d8afb1d55bdfba5ecdcaaa47cb3a67cda7a8786dd1b8083756b36ed000419",
+      "modified": "2023-11-17T23:21:56.498791",
+      "path": "brei/__init__.py",
       "size": 1613
     },
     {
-      "path": "brei/cli.py",
-      "deps": [
-        "docs/implementation.md"
-      ],
-      "modified": "2023-11-05T19:53:53.592677",
-      "hexdigest": "d88813548a03ebf55ff3c4fe693a524ff47936a7b6db4e9eda59b9c5f1f5feaf",
-      "size": 4133
-    },
-    {
-      "path": "docs/implementation.md",
-      "deps": null,
-      "modified": "2023-11-05T19:53:53.811678",
-      "hexdigest": "cce000595f56db0389c41535c8267fb80a624fea2eab5c98b8bd6a9aa2badf1a",
-      "size": 7050
-    },
-    {
-      "path": "examples/template_multiplexing.toml",
-      "deps": [
-        "docs/index.md"
-      ],
-      "modified": "2023-10-30T12:44:11.681782",
-      "hexdigest": "5fc633436c4e76ef99a7b8055fc540af619007d3d5ff4f0250ef2e70c2b0128f",
-      "size": 610
-    },
-    {
-      "path": "docs/contents.md",
-      "deps": null,
-      "modified": "2023-11-03T12:43:40.925183",
-      "hexdigest": "8058c105efb6b6acb95c1824e8a0c3346e4b1a7d38b8d2297357890dda55239d",
-      "size": 893
-    },
-    {
-      "path": "docs/test_coverage.md",
-      "deps": null,
-      "modified": "2023-11-03T15:38:37.350229",
-      "hexdigest": "79ea9f77c8ad0db16d3388bf5bc233ac8edb570f0c5bf8e71e813b89944a5da1",
-      "size": 1054
-    },
-    {
-      "path": "brei/construct.py",
       "deps": [
         "docs/utility.md"
       ],
-      "modified": "2023-11-03T15:28:31.805949",
-      "hexdigest": "005011dc46c31414b0ed214e75340aa27d41ef2b55fc86d4aaad4a9990589097",
-      "size": 4786
-    },
-    {
-      "path": "brei/async_timer.py",
-      "deps": [
-        "docs/utility.md"
-      ],
-      "modified": "2023-11-01T13:05:22.894924",
       "hexdigest": "5c6500475e2d323c2606a5961c2c150b045f72cf2de40eb79d94a1e46dee4ab9",
+      "modified": "2023-11-01T13:05:22.894924",
+      "path": "brei/async_timer.py",
       "size": 356
     },
     {
-      "path": "examples/force_run.toml",
+      "deps": [
+        "docs/implementation.md"
+      ],
+      "hexdigest": "be30bed2f2f75cc2f3a1646ee1df041c4568c676e05c6585b82c6ddd2ebf81fc",
+      "modified": "2024-10-21T13:06:22.637059",
+      "path": "brei/cli.py",
+      "size": 4210
+    },
+    {
+      "deps": [
+        "docs/utility.md"
+      ],
+      "hexdigest": "005011dc46c31414b0ed214e75340aa27d41ef2b55fc86d4aaad4a9990589097",
+      "modified": "2023-11-17T23:21:56.498791",
+      "path": "brei/construct.py",
+      "size": 4786
+    },
+    {
+      "deps": [
+        "docs/errors.md"
+      ],
+      "hexdigest": "1345eb0823f9ce114bc5fdb81002d5a7e48efafc6465997e2312bf833cd2544c",
+      "modified": "2023-10-29T00:55:24.391604",
+      "path": "brei/errors.py",
+      "size": 906
+    },
+    {
+      "deps": [
+        "docs/lazy.md"
+      ],
+      "hexdigest": "8684be6316b837dcb775d98d5e6b9eded2630e390a0e3146cc0a478fb4ea00c3",
+      "modified": "2024-10-21T13:05:49.628831",
+      "path": "brei/lazy.py",
+      "size": 4890
+    },
+    {
+      "deps": [
+        "docs/implementation.md"
+      ],
+      "hexdigest": "5de3219dd14ed01c32c13b6b82880e230f5f4f08fbf130ad29438de7cd155052",
+      "modified": "2023-10-31T12:18:17.789389",
+      "path": "brei/logging.py",
+      "size": 832
+    },
+    {
+      "deps": [
+        "docs/program.md"
+      ],
+      "hexdigest": "16b140351a5bbb3db34ad4ddae64af58f2f07d477b627d0c738c4d1cb0dea96f",
+      "modified": "2023-11-17T23:21:56.498791",
+      "path": "brei/program.py",
+      "size": 6796
+    },
+    {
+      "deps": [
+        "docs/lazy.md"
+      ],
+      "hexdigest": "ba812916629b7497c21d0cfc84e2e32459b8b292ec553dc22b443f60edb8e1ad",
+      "modified": "2023-11-01T20:54:43.092092",
+      "path": "brei/result.py",
+      "size": 845
+    },
+    {
+      "deps": [
+        "docs/tasks.md"
+      ],
+      "hexdigest": "f4072af62e3ab52c2242393edda0b9d7721d19ce256b05d435559e9e3c7da337",
+      "modified": "2023-10-29T10:11:17.915720",
+      "path": "brei/runner.py",
+      "size": 292
+    },
+    {
+      "deps": [
+        "docs/tasks.md"
+      ],
+      "hexdigest": "cebac95303c524b0ec3789c68ec8922029cca8b3b86916510b13a2f878525def",
+      "modified": "2024-11-25T11:15:13.367061",
+      "path": "brei/task.py",
+      "size": 12208
+    },
+    {
+      "deps": [
+        "docs/template_strings.md"
+      ],
+      "hexdigest": "6f42aab5ed0699b89bc98e9b5fd43e4d39d507dbff3895a12015069463866bf8",
+      "modified": "2023-11-17T23:21:56.498791",
+      "path": "brei/template_strings.py",
+      "size": 1748
+    },
+    {
+      "deps": [
+        "docs/utility.md"
+      ],
+      "hexdigest": "fa3601d2d066e6d1837d9e4445fe69c820b0c5ec71973615f1612080ea7d02ec",
+      "modified": "2023-11-01T11:24:14.405731",
+      "path": "brei/utility.py",
+      "size": 772
+    },
+    {
+      "deps": [
+        "docs/implementation.md"
+      ],
+      "hexdigest": "551b7b0399c74d7f4324f1a3830ee882fa2c91e1e4e66eba825acee2e5a7e85a",
+      "modified": "2023-10-30T11:13:50.292983",
+      "path": "brei/version.py",
+      "size": 142
+    },
+    {
+      "deps": null,
+      "hexdigest": "8058c105efb6b6acb95c1824e8a0c3346e4b1a7d38b8d2297357890dda55239d",
+      "modified": "2023-11-17T23:21:56.499791",
+      "path": "docs/contents.md",
+      "size": 893
+    },
+    {
+      "deps": null,
+      "hexdigest": "86feac1a785973501c6e22cb634086a8ed15e5371944c172892eb49014522b9a",
+      "modified": "2023-10-29T00:52:12.399889",
+      "path": "docs/errors.md",
+      "size": 883
+    },
+    {
+      "deps": null,
+      "hexdigest": "2023de98e5b4aa0ea490ee2d46031cbb9310251b601cef5a8c183d72e0438abe",
+      "modified": "2023-10-30T10:17:35.952734",
+      "path": "docs/examples.md",
+      "size": 28
+    },
+    {
+      "deps": null,
+      "hexdigest": "4b92576516c27f50c6d15a5d7f6e22d77bcb9c463f96e182b56fbfd28af3ad1a",
+      "modified": "2024-11-25T11:12:20.523765",
+      "path": "docs/implementation.md",
+      "size": 7127
+    },
+    {
+      "deps": null,
+      "hexdigest": "6b51d5d0a2f999ea327410ea72fa9eed043cd96efed476b3bfce7bc3cbe31d27",
+      "modified": "2023-11-17T23:21:56.500792",
+      "path": "docs/index.md",
+      "size": 9493
+    },
+    {
+      "deps": null,
+      "hexdigest": "42c9b17b344671fb757797f53b3ddfb9bafd3228630a0e3fe996c8b0f73e992f",
+      "modified": "2024-11-25T11:12:20.530766",
+      "path": "docs/lazy.md",
+      "size": 6906
+    },
+    {
+      "deps": null,
+      "hexdigest": "5544365fd14230ad903612d90c747ed226ef7618cf3e4f75a20216d55984d6b2",
+      "modified": "2024-11-25T11:12:20.532765",
+      "path": "docs/program.md",
+      "size": 6783
+    },
+    {
+      "deps": null,
+      "hexdigest": "f555f054675e29492a3faaf60650ebdd2dcdf5cc31012c76d80b579c0c1a74f5",
+      "modified": "2024-11-25T11:15:13.414061",
+      "path": "docs/tasks.md",
+      "size": 12464
+    },
+    {
+      "deps": null,
+      "hexdigest": "3359acf0ee1f6fd5b645c56fb307e5e326c1707125a8895038035a8234d91c68",
+      "modified": "2023-11-17T23:21:56.508791",
+      "path": "docs/template_strings.md",
+      "size": 4674
+    },
+    {
+      "deps": null,
+      "hexdigest": "87653d6a7817bfa8fedb42b00598aec6a68daa73a9602402f601dc4b9f90cc37",
+      "modified": "2024-11-25T11:12:20.535765",
+      "path": "docs/test_coverage.md",
+      "size": 1054
+    },
+    {
+      "deps": null,
+      "hexdigest": "19b3b17801aca2c8ea09d9e1e3b0fedc01a99acd42afbe025dac563ba1423ba3",
+      "modified": "2023-11-17T23:21:56.508791",
+      "path": "docs/utility.md",
+      "size": 5850
+    },
+    {
       "deps": [
         "docs/index.md"
       ],
-      "modified": "2023-11-03T15:37:29.861071",
+      "hexdigest": "0353fe16026e11682cc9640d9468b720fec35786118ff149d17427a07aadee90",
+      "modified": "2023-10-30T13:07:28.858569",
+      "path": "examples/custom-runner.toml",
+      "size": 493
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
+      "hexdigest": "c30dc3ffbf29c8f3177569ddc24e4b8098b8f27034f71cbbc1a1617365f5e177",
+      "modified": "2023-10-29T09:38:17.997990",
+      "path": "examples/echo.toml",
+      "size": 127
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
       "hexdigest": "97bbb7202fc68819aeeca9489798bd2f60854f966c452109a7bbc3137ac746ea",
+      "modified": "2023-11-17T23:21:56.508791",
+      "path": "examples/force_run.toml",
       "size": 368
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
+      "hexdigest": "3d67de8ef7b078421a03212479e42676b4c69de8b06c2ac697f3e8d3c843b74f",
+      "modified": "2023-10-28T20:37:53.475601",
+      "path": "examples/hello-includes.toml",
+      "size": 245
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
+      "hexdigest": "03cb75d64a04555bdcd1db952cf23cabf95557842d4cf8b374d9f08f8288213b",
+      "modified": "2023-10-30T19:08:45.133752",
+      "path": "examples/include-gen.toml",
+      "size": 604
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
+      "hexdigest": "fcb8ff0b615c15086fb26b8cd6b77db888f85438c89fc7e71b487a6aafade56e",
+      "modified": "2023-10-30T12:55:10.091496",
+      "path": "examples/rot13.toml",
+      "size": 596
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
+      "hexdigest": "2dac044fb2c5d06a78aeefb038db5249a7524c53ff0e60d8c756a8a6df3c6678",
+      "modified": "2023-10-29T10:15:02.404472",
+      "path": "examples/tasks.toml",
+      "size": 256
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
+      "hexdigest": "5fc633436c4e76ef99a7b8055fc540af619007d3d5ff4f0250ef2e70c2b0128f",
+      "modified": "2023-10-30T12:44:11.681782",
+      "path": "examples/template_multiplexing.toml",
+      "size": 610
+    },
+    {
+      "deps": [
+        "docs/index.md"
+      ],
+      "hexdigest": "3e7e6847ed26def54beafd76c898f71ef4e9d1254b41d643f9771ccd570d259e",
+      "modified": "2023-10-30T11:19:39.320683",
+      "path": "examples/versioned_output.toml",
+      "size": 505
+    },
+    {
+      "deps": [
+        "docs/lazy.md"
+      ],
+      "hexdigest": "641268e8d518ca9795ee946eafe891bafc21ce0ee0c9258cef02520a061bed32",
+      "modified": "2023-10-29T00:47:01.162720",
+      "path": "test/test_result.py",
+      "size": 450
+    },
+    {
+      "deps": [
+        "docs/template_strings.md"
+      ],
+      "hexdigest": "3c590abfe2e9110072691949d70aa08f947da9c2a13f368854463d9d0494a64d",
+      "modified": "2023-10-29T00:46:37.894632",
+      "path": "test/test_template_strings.py",
+      "size": 1566
     }
   ],
   "source": [],
   "target": [
-    "brei/version.py",
-    "brei/utility.py",
-    "brei/construct.py",
+    "brei/__init__.py",
+    "brei/async_timer.py",
     "brei/cli.py",
-    "brei/task.py",
-    "brei/program.py",
-    "examples/template_multiplexing.toml",
-    "test/test_template_strings.py",
-    "examples/tasks.toml",
-    "brei/template_strings.py",
-    "test/test_result.py",
-    "brei/result.py",
-    "brei/runner.py",
-    "examples/custom-runner.toml",
+    "brei/construct.py",
     "brei/errors.py",
     "brei/lazy.py",
-    "examples/versioned_output.toml",
-    "examples/rot13.toml",
-    "brei/__init__.py",
-    "examples/hello-includes.toml",
-    "brei/async_timer.py",
-    "examples/force_run.toml",
-    "examples/echo.toml",
     "brei/logging.py",
-    "examples/include-gen.toml"
-  ]
+    "brei/program.py",
+    "brei/result.py",
+    "brei/runner.py",
+    "brei/task.py",
+    "brei/template_strings.py",
+    "brei/utility.py",
+    "brei/version.py",
+    "examples/custom-runner.toml",
+    "examples/echo.toml",
+    "examples/force_run.toml",
+    "examples/hello-includes.toml",
+    "examples/include-gen.toml",
+    "examples/rot13.toml",
+    "examples/tasks.toml",
+    "examples/template_multiplexing.toml",
+    "examples/versioned_output.toml",
+    "test/test_result.py",
+    "test/test_template_strings.py"
+  ],
+  "version": "2.1.10"
 }

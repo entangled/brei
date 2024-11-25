@@ -73,7 +73,7 @@ Result = Failure | Ok[R]
 from __future__ import annotations
 from copy import copy
 from dataclasses import dataclass, field, fields
-from typing import Generic, Iterable, Optional, Self, TypeVar, cast
+from typing import Generic, Iterable, Optional, Self, TypeVar, cast, Any
 import asyncio
 
 from .errors import CyclicWorkflowError, HelpfulUserError
@@ -188,7 +188,7 @@ class LazyDB(Generic[T, TaskT]):
     tasks: list[TaskT] = field(default_factory=list)
     index: dict[T, TaskT] = field(default_factory=dict)
 
-    async def run(self, t: T, visited: dict[T, None] | None = None, **kwargs) -> Result[R]:
+    async def run(self, t: T, visited: dict[T, None] | None = None, **kwargs) -> Result[Any]:
         visited = visited or dict()
         if t in visited:
             raise CyclicWorkflowError(list(visited.keys()))

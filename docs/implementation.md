@@ -110,7 +110,7 @@ import re
 import sys
 import textwrap
 import tomllib
-from typing import Optional
+from typing import Optional, Any
 import argh  # type: ignore
 import asyncio
 from rich.console import Console
@@ -125,7 +125,7 @@ from .utility import construct, read_from_file
 from .program import Program, resolve_tasks
 from .logging import logger, configure_logger
 from .version import __version__
-
+from .result import Result
 
 log = logger()
 
@@ -133,13 +133,14 @@ log = logger()
 async def main(
     program: Program, target_strs: list[str], force_run: bool, throttle: Optional[int]
 ):
-    db = await resolve_tasks(program)
-    for t in db.tasks:
-        log.debug(str(t))
+    db = await resolve_tasks(program, history_path=Path(".brei_history"))
     if throttle:
         db.throttle = asyncio.Semaphore(throttle)
     db.force_run = force_run
-    results = await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
+
+    with db.persistent_history():
+        results: list[Result[Any]] = await asyncio.gather(*(db.run(Phony(t), db=db) for t in target_strs))
+
     if not all(results):
         log.error("Some jobs have failed:")
         for r in results:
