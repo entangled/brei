@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/index.md#examples/custom-runner.toml>>[init]
 [[task]]
 description = "Creating temporary directory"
 stdout = "var(dir)"
@@ -27,4 +26,3 @@ print("10! = ", fact(10))
 name = "all"
 requires = ["${dir}/hello.txt"]
 script = "cat ${dir}/hello.txt"
-# ~/~ end

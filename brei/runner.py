@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/tasks.md#brei/runner.py>>[init]
 from dataclasses import dataclass
 
 
@@ -12,4 +11,3 @@ DEFAULT_RUNNERS: dict[str, Runner] = {
     "python": Runner("python", ["${script}"]),
     "bash": Runner("bash", ["${script}"]),
 }
-# ~/~ end

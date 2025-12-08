@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/implementation.md#brei/cli.py>>[init]
 from argparse import ArgumentParser
 from pathlib import Path
 import re
@@ -130,4 +129,3 @@ def cli():
 
 if __name__ == "__main__":
     cli()
-# ~/~ end

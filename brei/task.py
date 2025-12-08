@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/tasks.md#brei/task.py>>[init]
 from __future__ import annotations
 import asyncio
 from collections import defaultdict
@@ -59,6 +58,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     script: Optional[str] = None
     stdin: Optional[Path | Variable] = None
     stdout: Optional[Path | Variable] = None
+    arguments: Optional[list[str]] = None
     description: Optional[str] = None
     force: bool = False
 
@@ -195,6 +195,9 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             with self.get_script_path() as path, self.get_stdout() as stdout:
                 runner = db.runners[self.runner]
                 args = [string.Template(arg).substitute(script=path) for arg in runner.args]
+                if self.arguments:
+                    args.append(self.arguments)
+                    
                 async with db.throttle or nullcontext():
                     proc = await create_subprocess_exec(
                         runner.command,
@@ -236,6 +239,7 @@ class TaskProxy:
     script: Optional[str] = None
     stdin: Optional[str] = None
     stdout: Optional[str] = None
+    arguments: Optional[list[str]] = None
     description: Optional[str] = None
     force: bool = False
 
@@ -368,4 +372,3 @@ class Template(TaskProxy):
     that any template variables in the Template can be substituted with a `TemplateCall`."""
     def call(self, args: dict[str, Any]) -> TaskProxy:
         return substitute(self, args)
-# ~/~ end

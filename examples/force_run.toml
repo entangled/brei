@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/index.md#examples/force_run.toml>>[init]
 [[task]]
 name = "test"
 requires = ["#coverage-report"]
@@ -14,4 +13,3 @@ creates = [".coverage"]
 force = true
 description = "Run tests"
 script = "coverage run --source=brei -m pytest"
-# ~/~ end

@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/index.md#examples/include-gen.toml>>[init]
 include = [
     "${dir}/gen.json"
 ]
@@ -27,4 +26,3 @@ print(json.dumps({"task": tasks}))
 [[task]]
 name = "all"
 requires = ["#write-outs"]
-# ~/~ end

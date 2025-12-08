@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/template_strings.md#test/test_template_strings.py>>[init]
 from dataclasses import dataclass
 from typing import Iterable, Optional
 import pytest
@@ -54,4 +53,3 @@ def test_template_dtype():
     assert subst.some_list == ["foo bar", "bar foo bar"]
     assert subst.some_prop == "bar foo"
     assert subst.some_none is None
-# ~/~ end

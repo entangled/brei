@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/errors.md#brei/errors.py>>[init]
 from dataclasses import dataclass
 from typing import Any, Generic, TypeVar
 
@@ -45,4 +44,3 @@ class FailedTaskError(UserError):
             f"process returned code {self.error_code}\n"
             f"standard error output: {self.stderr}"
         )
-# ~/~ end

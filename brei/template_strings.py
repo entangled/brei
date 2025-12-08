@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/template_strings.md#brei/template_strings.py>>[init]
 from dataclasses import dataclass, is_dataclass, fields
 from string import Template
 from typing import Any, Generic, Mapping, TypeVar, cast
@@ -68,4 +67,3 @@ def _(template: list) -> set[str]:
 @gather_args.register
 def _(_template: None) -> set[str]:
     return set()
-# ~/~ end

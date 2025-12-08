@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/implementation.md#brei/__init__.py>>[init]
 """
 Welcome to Brei's API documentation. There are two ways to use Brei: from the
 command-line (in which case we refer to the homepage for documentation), or
@@ -41,4 +40,3 @@ __all__ = [
     "TaskProxy", "Template", "TemplateCall", "Variable", "construct",
     "resolve_tasks",
 ]
-# ~/~ end

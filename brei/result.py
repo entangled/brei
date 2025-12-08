@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/lazy.md#brei/result.py>>[init]
 from typing import TypeVar, Generic
 from dataclasses import dataclass
 
@@ -44,4 +43,3 @@ class Ok(Generic[R]):
 
 
 Result = Failure | Ok[R]
-# ~/~ end

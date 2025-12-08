@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/index.md#examples/template_multiplexing.toml>>[init]
 [[task]]
 description = "Creating temporary directory"
 stdout = "var(dir)"
@@ -29,4 +28,3 @@ join = "outer"
 [[task]]
 name = "all"
 requires = ["#inner", "#outer"]
-# ~/~ end

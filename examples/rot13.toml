@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/index.md#examples/rot13.toml>>[init]
 [[task]]
 description = "Creating temporary directory"
 stdout = "var(dir)"
@@ -29,4 +28,3 @@ template = "rot13"
 name = "all"
 requires = ["${dir}/msg.txt"]
 script = "cat ${dir}/msg.txt"
-# ~/~ end

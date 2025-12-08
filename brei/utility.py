@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/utility.md#brei/utility.py>>[init]
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -32,4 +31,3 @@ class FileStat:
 def stat(path: Path) -> FileStat:
     path = normal_relative(path)
     return FileStat.from_path(path)
-# ~/~ end

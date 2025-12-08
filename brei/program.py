@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/program.md#brei/program.py>>[init]
 from __future__ import annotations
 import asyncio
 from copy import copy
@@ -220,4 +219,3 @@ async def resolve_tasks(program: Program, history_path: Path | None = None) -> T
         await go(program)
 
     return db
-# ~/~ end

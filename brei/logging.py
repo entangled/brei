@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/implementation.md#brei/logging.py>>[init]
 import logging
 import sys
 from rich.highlighter import RegexHighlighter
@@ -24,4 +23,3 @@ def configure_logger(debug: bool, rich: bool = True):
             level=logging.DEBUG if debug else logging.INFO,
             handlers=[logging.StreamHandler(sys.stdout)]
         )
-# ~/~ end

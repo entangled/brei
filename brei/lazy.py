@@ -1,4 +1,3 @@
-# ~/~ begin <<docs/lazy.md#brei/lazy.py>>[init]
 from __future__ import annotations
 from copy import copy
 from dataclasses import dataclass, field, fields
@@ -155,4 +154,3 @@ class LazyDB(Generic[T, TaskT]):
     def reset(self):
         for t in self.tasks:
             t.reset()
-# ~/~ end

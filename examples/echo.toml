@@ -1,5 +1,3 @@
-# ~/~ begin <<docs/index.md#examples/echo.toml>>[init]
 [template.echo]
 stdout = "${stdout}"
 script = "echo '${text}'"
-# ~/~ end
