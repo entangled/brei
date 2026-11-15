@@ -1,0 +1,30 @@
+# ~/~ begin <<docs/index.md#examples/list_variables.toml>>[init]
+[[task]]
+description = "Listing figures"
+stdout = "listvar(figures)"
+runner = "python"
+script = """
+from pathlib import Path
+for p in sorted(Path("docs/fig").glob("*.svg")):
+    print(p.name)
+"""
+
+[template.copy]
+description = "copy `${name}`"
+requires = ["docs/fig/${name}"]
+creates = ["docs/site/fig/${name}"]
+runner = "python"
+script = """
+import shutil
+shutil.copy("docs/fig/${name}", "docs/site/fig/${name}")
+"""
+
+[[call]]
+template = "copy"
+collect = "figures"
+args = { name = ["splice(figures)"] }
+
+[[task]]
+name = "all"
+requires = ["#figures"]
+# ~/~ end

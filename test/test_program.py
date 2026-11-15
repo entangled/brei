@@ -9,6 +9,7 @@ from brei.lazy import Phony
 from brei.program import Program, resolve_tasks
 from brei.task import Task
 from brei.utility import stat
+from brei.errors import HelpfulUserError
 
 
 @dataclass
@@ -254,3 +255,135 @@ async def test_failing_command(tmp_path, target):
         assert not result
         # The target may be written partially; it should be built again.
         assert Path(target) not in db.history
+
+
+list_names = """
+[[task]]
+stdout = "listvar(names)"
+script = '''python -c 'print("a"); print(""); print("b")' '''
+"""
+
+splice_call = list_names + """
+[template.write]
+stdout = "out-${name}.txt"
+script = '''python -c 'print("${name}")' '''
+
+[[call]]
+template = "write"
+collect = "outs"
+args = { name = ["splice(names)", "c"] }
+
+[[task]]
+name = "all"
+requires = ["#outs"]
+"""
+
+
+@pytest.mark.asyncio
+async def test_splice_call(tmp_path):
+    with chdir(tmp_path):
+        src = Path("brei.toml")
+        src.write_text(splice_call)
+        db = await resolve_tasks(Program.read(src))
+        assert await db.run(Phony("all"), db=db)
+        for name in "abc":
+            assert Path(f"out-{name}.txt").read_text().strip() == name
+        assert not Path("out-.txt").exists()
+
+
+splice_requires = """
+[[task]]
+stdout = "listvar(inputs)"
+script = '''python -c 'print("in-1.txt"); print("in-2.txt")' '''
+
+[[task]]
+stdout = "summary.txt"
+requires = ["splice(inputs)"]
+script = '''python -c 'print(open("in-1.txt").read() + open("in-2.txt").read())' '''
+"""
+
+
+@pytest.mark.asyncio
+async def test_splice_requires(tmp_path):
+    with chdir(tmp_path):
+        src = Path("brei.toml")
+        src.write_text(splice_requires)
+        Path("in-1.txt").write_text("1")
+        Path("in-2.txt").write_text("2")
+        db = await resolve_tasks(Program.read(src))
+        assert await db.run(Path("summary.txt"), db=db)
+        assert Path("summary.txt").read_text().strip() == "12"
+
+        time.sleep(0.01)
+        Path("in-2.txt").write_text("3")
+        db.reset()
+        assert await db.run(Path("summary.txt"), db=db)
+        assert Path("summary.txt").read_text().strip() == "13"
+
+
+@pytest.mark.asyncio
+async def test_splice_empty_list(tmp_path):
+    with chdir(tmp_path):
+        src = Path("brei.toml")
+        src.write_text("""
+[[task]]
+stdout = "listvar(nothing)"
+script = "python -c 'pass'"
+
+[template.write]
+stdout = "out-${name}.txt"
+script = "python -c 'pass'"
+
+[[call]]
+template = "write"
+collect = "outs"
+args = { name = ["splice(nothing)"] }
+""")
+        db = await resolve_tasks(Program.read(src))
+        assert await db.run(Phony("outs"), db=db)
+        assert not list(Path().glob("out-*"))
+
+
+@pytest.mark.parametrize("workflow, message", [
+    (list_names + """
+[[task]]
+stdout = "x.txt"
+script = "python -c 'print(\\"${names}\\")'"
+""", "list variable"),
+    (list_names + """
+[[task]]
+stdout = "x.txt"
+requires = ["listvar(names)"]
+script = "python -c 'pass'"
+""", "can only be used as `stdout`"),
+    ("""
+[[task]]
+stdout = "var(name)"
+script = "python -c 'print(1)'"
+
+[template.write]
+stdout = "out-${name}.txt"
+script = "python -c 'pass'"
+
+[[call]]
+template = "write"
+args = { name = ["splice(name)"] }
+""", "needs a list variable"),
+    (list_names + """
+[template.write]
+stdout = "out-${a}-${b}.txt"
+script = "python -c 'pass'"
+
+[[call]]
+template = "write"
+args = { a = ["splice(names)"], b = ["1", "2", "3"] }
+""", "same length"),
+])
+@pytest.mark.asyncio
+async def test_list_variable_errors(tmp_path, workflow, message):
+    with chdir(tmp_path):
+        src = Path("brei.toml")
+        src.write_text(workflow)
+        with pytest.raises(HelpfulUserError, match=message):
+            db = await resolve_tasks(Program.read(src))
+            await db.run(Path("x.txt"), db=db)

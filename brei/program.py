@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 from copy import copy
 from itertools import chain, product, repeat
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 import json
 from pathlib import Path
@@ -17,6 +17,7 @@ from .errors import HelpfulUserError, UserError
 
 from .utility import construct, read_from_file
 from .task import (
+    splice_name,
     Variable,
     TaskDB,
     Template,
@@ -74,6 +75,13 @@ class TemplateCall:
             return
 
         if self.join == Join.INNER:
+            # Lists may be computed with `splice`, so a difference in length
+            # is an error, instead of silently dropping items.
+            lengths = {k: len(v) for k, v in self.args.items() if not isinstance(v, str)}
+            if len(set(lengths.values())) > 1:
+                raise HelpfulUserError(
+                    f"Template `{self.template}`: the arguments of an inner join should "
+                    "have the same length, got " + ", ".join(f"{k}: {n}" for k, n in lengths.items()))
             for v in zip(
                 *map(
                     lambda x: repeat(x) if isinstance(x, str) else x,
@@ -112,6 +120,29 @@ class Program:
     @staticmethod
     def read(path: Path, section: str | None = None) -> Program:
         return read_from_file(Program, path, section)
+
+
+def call_splices(call: TemplateCall) -> list[str]:
+    """Names of the list variables spliced into the arguments of `call`."""
+    return [n for v in call.args.values() for item in ([v] if isinstance(v, str) else v)
+            if (n := splice_name(item))]
+
+
+async def expand_splices(db: TaskDB, call: TemplateCall) -> TemplateCall:
+    """Compute the list variables spliced into the arguments of `call`, and
+    insert their elements."""
+    names = call_splices(call)
+    results = await asyncio.gather(*(db.run(Variable(n), db=db) for n in names))
+    for n, r in zip(names, results):
+        if not r:
+            raise HelpfulUserError(f"Could not compute list variable `{n}`: {r}")
+
+    def expand(v: str | list[str]) -> str | list[str]:
+        if isinstance(v, str):
+            return db.splice([v]) if splice_name(v) else v
+        return db.splice(v)
+
+    return replace(call, args={k: expand(v) for k, v in call.args.items()})
 
 
 def tasks_from_call(template: Template, call: TemplateCall) -> list[TaskProxy]:
@@ -169,6 +200,10 @@ async def resolve_tasks(program: Program, history_path: Path | None = None) -> T
                 )
                 delayed_calls.append(c)
                 continue
+            if call_splices(c):
+                log.debug("call to `%s` splices list variables, waiting for tasks", c.template)
+                delayed_calls.append(c)
+                continue
 
             task_templates.extend(tasks_from_call(template_index[c.template], c))
 
@@ -203,6 +238,7 @@ async def resolve_tasks(program: Program, history_path: Path | None = None) -> T
                 )
                 raise MissingTemplate(c.template)
 
+            c = await expand_splices(db, c)
             for tt in tasks_from_call(template_index[c.template], c):
                 if gather_args(tt.creates):
                     delayed_templates.append(tt)
