@@ -1,6 +1,6 @@
 [project]
 name = "brei"
-version = "0.3.0"
+version = "0.3.1"
 description = "A minimal build system."
 authors = [{ name = "Johan Hidding", email = "j.hidding@esciencecenter.nl" }]
 license = "Apache-2.0"
