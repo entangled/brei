@@ -16,6 +16,7 @@ from textwrap import indent
 import shlex
 import hashlib
 
+from .errors import HelpfulUserError
 from .result import TaskFailure
 from .lazy import MissingDependency, Lazy, LazyDB, Phony
 from .utility import stat
@@ -38,10 +39,23 @@ class Variable:
         return f"var({self.name})"
 
 
+# `listvar(name)` as `stdout` stores the output, split into lines, as a list.
+# `splice(name)` as an element of a list inserts the elements of that list.
+LIST_VARIABLE = re.compile(r"listvar\(([^\s\(\)]+)\)")
+SPLICE = re.compile(r"splice\(([^\s\(\)]+)\)")
+
+
+def splice_name(s: str) -> str | None:
+    """The name of the list variable in `splice(name)`, or `None`."""
+    return m.group(1) if (m := SPLICE.fullmatch(s)) else None
+
+
 def str_to_target(s: str) -> Path | Phony | Variable:
     if s[0] == "#":
         return Phony(s[1:])
     elif m := re.match(r"var\(([^\s\(\)]+)\)", s):
+        return Variable(m.group(1))
+    elif m := LIST_VARIABLE.fullmatch(s):
         return Variable(m.group(1))
     else:
         return Path(s)
@@ -52,7 +66,7 @@ def is_oneliner(s: str) -> bool:
 
 
 @dataclass
-class Task(Lazy[Path | Phony | Variable, str | None]):
+class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
     name: Optional[str] = None
     runner: Optional[str] = None
     path: Optional[Path] = None
@@ -61,6 +75,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
     stdout: Optional[Path | Variable] = None
     description: Optional[str] = None
     force: bool = False
+    list_output: bool = False
 
     @property
     def target_paths(self):
@@ -231,6 +246,8 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
         if self.needs_run(db):
             raise TaskFailure("Task didn't achieve goals.")
 
+        if self.list_output:
+            return [line for line in stdout_data.decode().splitlines() if line] if stdout_data else []
         return stdout_data.decode().strip() if stdout_data else None
 
 
@@ -286,13 +303,15 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
 
     def __post_init__(self):
         assert not gather_args(self.template.creates)
+        check_list_syntax(self.template)
         self.creates += [str_to_target(t) for t in self.template.all_targets]
         self.requires += [Variable(arg) for arg in gather_args(self.template)]
+        self.requires += [Variable(n) for t in self.template.requires if (n := splice_name(t))]
 
     async def run(self, *, db):
         proxy = substitute(self.template, db.environment)
         tgts = [str_to_target(t) for t in proxy.all_targets]
-        deps = [str_to_target(t) for t in proxy.all_dependencies]
+        deps = [str_to_target(t) for t in db.splice(proxy.all_dependencies)]
         path = Path(proxy.path) if proxy.path else None
         stdin = str_to_target(proxy.stdin) if proxy.stdin else None
         stdout = str_to_target(proxy.stdout) if proxy.stdout else None
@@ -307,9 +326,21 @@ class TemplateTask(Lazy[Path | Phony | Variable, Task]):
             stdin,
             stdout,
             proxy.description,
-            proxy.force
+            proxy.force,
+            list_output=proxy.stdout is not None and LIST_VARIABLE.fullmatch(proxy.stdout) is not None,
         )
         return task
+
+
+def check_list_syntax(proxy: TaskProxy):
+    """`listvar(name)` can only be used as `stdout`, `splice(name)` only in
+    `requires`."""
+    for t in [*proxy.creates, *proxy.all_dependencies]:
+        if LIST_VARIABLE.fullmatch(t):
+            raise HelpfulUserError(f"`{t}` can only be used as `stdout` of a task.")
+    for t in [*proxy.all_targets, *(x for x in (proxy.stdin, proxy.path) if x)]:
+        if SPLICE.fullmatch(t):
+            raise HelpfulUserError(f"`{t}` can only be used in `requires` or template call arguments.")
 
 
 @dataclass
@@ -361,6 +392,25 @@ class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVaria
     def environment(self):
         return Environment(self)
 
+    def list_variable(self, name: str) -> list[str]:
+        """The value of list variable `name`, which should be computed already."""
+        if Variable(name) not in self.index:
+            raise HelpfulUserError(f"List variable `{name}` is not defined.")
+        value = self.index[Variable(name)].result
+        if not isinstance(value, list):
+            raise HelpfulUserError(
+                f"`splice({name})` needs a list variable; use `listvar({name})` as `stdout`.")
+        return value
+
+    def splice(self, items: list[str]) -> list[str]:
+        """Replace each `splice(name)` in `items` with the elements of the list
+        variable `name`."""
+        result: list[str] = []
+        for item in items:
+            name = splice_name(item)
+            result.extend(self.list_variable(name) if name else [item])
+        return result
+
 
 class Environment:
     def __init__(self, db):
@@ -373,7 +423,11 @@ class Environment:
         return (k.name for k in self.db.index if isinstance(k, Variable))
 
     def __getitem__(self, k: str):
-        return self.db.index[Variable(k)].result
+        value = self.db.index[Variable(k)].result
+        if isinstance(value, list):
+            raise HelpfulUserError(
+                f"`{k}` is a list variable, it can only be used as `splice({k})`.")
+        return value
 
 
 class Template(TaskProxy):

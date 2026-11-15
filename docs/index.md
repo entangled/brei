@@ -188,6 +188,51 @@ Also note the following:
 - The `[environment]` item lists global variables.
 - All string substitution is done lazily.
 
+## List variables
+A task can also write its output to a list variable, by using `"listvar(name)"` as `stdout`. Each line of the output becomes an element of the list; empty lines are skipped. You can then use `"splice(name)"` as an element of a list in the arguments of a template call, to create a task for each element, or in `requires`, to depend on all of them. For instance, to copy all figures to the website:
+
+``` {.toml file=examples/list_variables.toml}
+[[task]]
+description = "Listing figures"
+stdout = "listvar(figures)"
+runner = "python"
+script = """
+from pathlib import Path
+for p in sorted(Path("docs/fig").glob("*.svg")):
+    print(p.name)
+"""
+
+[template.copy]
+description = "copy `${name}`"
+requires = ["docs/fig/${name}"]
+creates = ["docs/site/fig/${name}"]
+runner = "python"
+script = """
+import shutil
+shutil.copy("docs/fig/${name}", "docs/site/fig/${name}")
+"""
+
+[[call]]
+template = "copy"
+collect = "figures"
+args = { name = ["splice(figures)"] }
+
+[[task]]
+name = "all"
+requires = ["#figures"]
+```
+
+The task that lists the figures has no file targets, so it runs every time, and new figures are found. Each copy task only runs when its figure changed.
+
+List variables are kept simple on purpose:
+
+- `listvar(name)` can only be used as `stdout` of a task.
+- `splice(name)` can only be a whole element of a list in `requires` or in template call arguments, not part of a string.
+- A list variable can't be used in a string with `${name}`.
+- In an `inner` join, all lists should have the same length.
+
+Brei has no functions to work on file names. Instead, have the listing print what the template needs, like the file names above. For anything more involved, generate a workflow and include it, see the next section.
+
 ## Includes
 You can include parts of a workflow from other files, both TOML and JSON.
 
