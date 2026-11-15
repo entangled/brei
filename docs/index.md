@@ -31,10 +31,10 @@ Brei is available on PyPI:
 pip install brei
 ```
 
-Although for Python we recommend using virtual environments, for example [Poetry](https://python-poetry.org/). Once you've setup a project in Poetry
+Although for Python we recommend using virtual environments, for example [uv](https://docs.astral.sh/uv/). Once you've setup a project with `uv init`
 
 ```
-poetry add brei
+uv add brei
 ```
 
 Then `brei` should be available as a command-line executable.
