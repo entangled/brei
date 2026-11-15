@@ -118,17 +118,19 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
             tmpfile = None
             path = self.path
         elif self.script is not None:
-            tmpfile = NamedTemporaryFile("w")
-            tmpfile.write(self.script)
-            tmpfile.flush()
+            # On Windows, a file can't be opened by another process while we
+            # still have it open, so we close it before running the script.
+            with NamedTemporaryFile("w", delete=False) as tmpfile:
+                tmpfile.write(self.script)
             path = Path(tmpfile.name)
         else:
             raise ValueError("A `Rule` can have either `path` or `script` defined.")
 
-        yield path
-
-        if tmpfile is not None:
-            tmpfile.close()
+        try:
+            yield path
+        finally:
+            if tmpfile is not None:
+                path.unlink(missing_ok=True)
 
     @contextmanager
     def get_stdout(self):
@@ -141,6 +143,15 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
                 stdout.close()
             case _:
                 yield None
+
+    def check_return_code(self, returncode: int | None, db: TaskDB):
+        """A failing command fails the task. Its targets may be written
+        partially, so we forget them, and they are built again next time."""
+        if returncode == 0:
+            return
+        for p in self.target_paths:
+            db.history.pop(p, None)
+        raise TaskFailure(f"Command failed with exit code {returncode}.")
 
     async def run(self, *, db: TaskDB):
         if not self.always_run() and not self.needs_run(db) and not db.force_run:
@@ -190,6 +201,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
                         stdout_data += stdout_data_part
                     if stderr_data:
                         log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
+                    self.check_return_code(proc.returncode, db)
 
         elif self.runner is not None:
             with self.get_script_path() as path, self.get_stdout() as stdout:
@@ -208,6 +220,7 @@ class Task(Lazy[Path | Phony | Variable, str | None]):
 
             if stderr_data:
                 log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
+            self.check_return_code(proc.returncode, db)
 
         else:
             return

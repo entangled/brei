@@ -224,3 +224,33 @@ async def test_loom(tmp_path, test):
             assert tgt.exists()
             assert tgt.read_text().strip() == content.strip()
 
+
+
+failing = """
+[[task]]
+stdout = "runner.txt"
+runner = "python"
+script = '''
+import sys
+print("partial output")
+sys.exit(3)
+'''
+
+[[task]]
+stdout = "oneliner.txt"
+script = "python -c 'import sys; sys.exit(4)'"
+"""
+
+
+@pytest.mark.parametrize("target", ["runner.txt", "oneliner.txt"])
+@pytest.mark.asyncio
+async def test_failing_command(tmp_path, target):
+    with chdir(tmp_path):
+        src = Path("brei.toml")
+        src.write_text(failing)
+        db = await resolve_tasks(Program.read(src))
+
+        result = await db.run(Path(target), db=db)
+        assert not result
+        # The target may be written partially; it should be built again.
+        assert Path(target) not in db.history
