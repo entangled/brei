@@ -363,6 +363,45 @@ div.sourceCode {
     box-shadow: none;
 }
 
+/* === Terminal output =========================== */
+/* ANSI styles and colours in the output of commands, see `filters/eval.lua`. */
+.ansi .ansi-bold { font-weight: bold; }
+.ansi .ansi-dim { opacity: 0.6; }
+.ansi .ansi-italic { font-style: italic; }
+.ansi .ansi-underline { text-decoration: underline; }
+.ansi .ansi-fg-0 { color: #5c6370; }
+.ansi .ansi-fg-1 { color: #e06c75; }
+.ansi .ansi-fg-2 { color: #98c379; }
+.ansi .ansi-fg-3 { color: #e5c07b; }
+.ansi .ansi-fg-4 { color: #61afef; }
+.ansi .ansi-fg-5 { color: #c678dd; }
+.ansi .ansi-fg-6 { color: #56b6c2; }
+.ansi .ansi-fg-7 { color: #dcdfe4; }
+.ansi .ansi-fg-8 { color: #7f848e; }
+.ansi .ansi-fg-9 { color: #ff7b86; }
+.ansi .ansi-fg-10 { color: #b5e890; }
+.ansi .ansi-fg-11 { color: #ffd68a; }
+.ansi .ansi-fg-12 { color: #8cc8ff; }
+.ansi .ansi-fg-13 { color: #e09cff; }
+.ansi .ansi-fg-14 { color: #7fd8e3; }
+.ansi .ansi-fg-15 { color: #ffffff; }
+.ansi .ansi-bg-0 { background-color: #5c6370; }
+.ansi .ansi-bg-1 { background-color: #e06c75; }
+.ansi .ansi-bg-2 { background-color: #98c379; }
+.ansi .ansi-bg-3 { background-color: #e5c07b; }
+.ansi .ansi-bg-4 { background-color: #61afef; }
+.ansi .ansi-bg-5 { background-color: #c678dd; }
+.ansi .ansi-bg-6 { background-color: #56b6c2; }
+.ansi .ansi-bg-7 { background-color: #dcdfe4; }
+.ansi .ansi-bg-8 { background-color: #7f848e; }
+.ansi .ansi-bg-9 { background-color: #ff7b86; }
+.ansi .ansi-bg-10 { background-color: #b5e890; }
+.ansi .ansi-bg-11 { background-color: #ffd68a; }
+.ansi .ansi-bg-12 { background-color: #8cc8ff; }
+.ansi .ansi-bg-13 { background-color: #e09cff; }
+.ansi .ansi-bg-14 { background-color: #7fd8e3; }
+.ansi .ansi-bg-15 { background-color: #ffffff; }
+
 /* === Equations =================================== */
 span.equation {
     display: block;
