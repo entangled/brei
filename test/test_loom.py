@@ -8,6 +8,10 @@ from brei.task import TaskDB, Task
 from brei.async_timer import timer
 
 
+# `os.sync` doesn't exist on Windows, where it isn't needed.
+sync = getattr(os, "sync", lambda: None)
+
+
 class TaskDBTester(TaskDB):
     def target(self, tgt, deps, **kwargs):
         self.add(Task([tgt], deps, **kwargs))
@@ -30,7 +34,7 @@ async def test_hello(tmp_path: Path):
         )
         db.phony("all", [tgt])
         await db.run(Phony("all"), db=db)
-        os.sync()
+        sync()
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World!\n"
 
@@ -46,7 +50,7 @@ async def test_hello_stdout(tmp_path: Path):
         db.phony("all", [tgt])
 
         await db.run(Phony("all"), db=db)
-        os.sync()
+        sync()
         assert tgt.exists()
         assert tgt.read_text() == "Hello, World!\n"
 
@@ -56,13 +60,14 @@ async def test_runtime(tmp_path: Path):
     with chdir(tmp_path):
         db = TaskDBTester()
         for a in range(4):
-            db.phony(f"sleep{a}", [], runner="bash", script=f"sleep 0.2\n")
+            db.phony(f"sleep{a}", [], runner="python", script="import time; time.sleep(0.2)\n")
         db.phony("all", [Phony(f"sleep{a}") for a in range(4)])
         async with timer() as t:
             await db.run(Phony("all"), db=db)
 
         assert t.elapsed is not None
-        assert t.elapsed > 0.1 and t.elapsed < 0.4
+        # Running in parallel; one after another would take 0.8 seconds.
+        assert t.elapsed > 0.2 and t.elapsed < 0.8
 
 
 @pytest.mark.asyncio
@@ -106,14 +111,14 @@ async def test_rebuild(tmp_path: Path):
         assert c.read_text() == "12\n"
 
         i2.write_text("4\n")
-        os.sync()
+        sync()
 
         # assert not db.index[a].needs_run()
         # assert db.index[b].needs_run()
 
         db.reset()
         await db.run(c, db=db)
-        os.sync()
+        sync()
 
         assert stat(a) < stat(i2)
         assert a.read_text() == "2\n"
