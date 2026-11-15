@@ -26,26 +26,23 @@ To install, you may:
 pip install brei
 ```
 
-Or you use a tool for virtual environments, we recommend [Poetry](https://python-poetry.org/), after creating a new project with `poetry init`:
+Or you use a tool for virtual environments, we recommend [uv](https://docs.astral.sh/uv/), after creating a new project with `uv init`:
 
 ```
-poetry add brei
+uv add brei
 ```
 
 ## Development
 To run unit tests and type checker:
 
 ```
-poetry install
-poetry shell
-brei test
+uv run brei test
 ```
 
 To build the documentation, run the `brei weave` workflow:
 
 ```
-# poetry shell
-brei weave
+uv run brei weave
 ```
 
 Some parts of Brei are literate. Run the entangled watch daemon while editing code,
