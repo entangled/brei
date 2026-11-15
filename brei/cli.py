@@ -1,16 +1,13 @@
 # ~/~ begin <<docs/implementation.md#brei/cli.py>>[init]
-from argparse import ArgumentParser
 from pathlib import Path
 import re
 import sys
 import textwrap
 import tomllib
 from typing import Optional, Any
-import argh  # type: ignore
 import asyncio
+import click
 from rich.console import Console
-
-from rich_argparse import RichHelpFormatter
 from rich.table import Table
 
 from .runner import DEFAULT_RUNNERS
@@ -44,19 +41,54 @@ async def main(
                 log.error(msg)
 
 
-@argh.arg("targets", nargs="*", help="names of tasks to run")
-@argh.arg(
+def read_program(input_file: Optional[str]) -> Program:
+    if input_file is not None:
+        if m := re.match(r"([^\[\]]+)\[([^\[\]\s]+)\]", input_file):
+            input_path = Path(m.group(1))
+            section = m.group(2)
+        else:
+            input_path = Path(input_file)
+            section = None
+
+        return read_from_file(Program, input_path, section)
+
+    elif Path("brei.toml").exists():
+        return read_from_file(Program, Path("brei.toml"))
+
+    elif Path("pyproject.toml").exists():
+        with open("pyproject.toml", "rb") as f_in:
+            data = tomllib.load(f_in)
+        try:
+            for s in ["tool", "brei"]:
+                data = data[s]
+        except KeyError as e:
+            raise HelpfulUserError(
+                f"With out the `-i` argument, Brei looks for `brei.toml` first, then for "
+                f"a `[tool.brei]` section in `pyproject.toml`. A `pyproject.toml` file was "
+                f"found, but contained no `[tool.brei]` section."
+            ) from e
+
+        return construct(Program, data)
+    else:
+        raise HelpfulUserError(
+            "No input file given, no `brei.toml` found and no `pyproject.toml` found."
+        )
+
+
+@click.command(context_settings={"help_option_names": ["-h", "--help"]})
+@click.argument("targets", nargs=-1)
+@click.option(
     "-i",
     "--input-file",
     help="Brei TOML or JSON file, use a `[...]` suffix to indicate a subsection.",
 )
-@argh.arg("-B", "--force-run", help="rebuild all dependencies")
-@argh.arg("-j", "--jobs", help="limit number of concurrent jobs")
-@argh.arg("-v", "--version", help="print version number and exit")
-@argh.arg("--list-runners", help="show default configured runners")
-@argh.arg("--debug", help="more verbose logging")
+@click.option("-B", "--force-run", is_flag=True, help="rebuild all dependencies")
+@click.option("-j", "--jobs", type=int, help="limit number of concurrent jobs")
+@click.option("-v", "--version", is_flag=True, help="print version number and exit")
+@click.option("--list-runners", is_flag=True, help="show default configured runners")
+@click.option("--debug", is_flag=True, help="more verbose logging")
 def brei(
-    targets: list[str],
+    targets: tuple[str, ...],
     *,
     input_file: Optional[str] = None,
     force_run: bool = False,
@@ -65,7 +97,10 @@ def brei(
     list_runners: bool = False,
     debug: bool = False
 ):
-    """Build one of the configured targets."""
+    """Build one of the configured targets.
+
+    TARGETS are the names of tasks to run.
+    """
     if version:
         print(f"Brei {__version__}, Copyright (c) 2023 Netherlands eScience Center.")
         print("Licensed under the Apache License, Version 2.0.")
@@ -82,50 +117,20 @@ def brei(
         console.print(t)
         sys.exit(0)
 
-    if input_file is not None:
-        if m := re.match(r"([^\[\]]+)\[([^\[\]\s]+)\]", input_file):
-            input_path = Path(m.group(1))
-            section = m.group(2)
-        else:
-            input_path = Path(input_file)
-            section = None
+    try:
+        program = read_program(input_file)
+    except HelpfulUserError as e:
+        raise click.ClickException(str(e)) from e
 
-        program = read_from_file(Program, input_path, section)
-
-    elif Path("brei.toml").exists():
-        program = read_from_file(Program, Path("brei.toml"))
-
-    elif Path("pyproject.toml").exists():
-        with open("pyproject.toml", "rb") as f_in:
-            data = tomllib.load(f_in)
-        try:
-            for s in ["tool", "brei"]:
-                data = data[s]
-        except KeyError as e:
-            raise HelpfulUserError(
-                f"With out the `-f` argument, Brei looks for `brei.toml` first, then for "
-                f"a `[tool.brei]` section in `pyproject.toml`. A `pyproject.toml` file was "
-                f"found, but contained no `[tool.brei]` section."
-            ) from e
-
-        program = construct(Program, data)
-    else:
-        raise HelpfulUserError(
-            "No input file given, no `loom.toml` found and no `pyproject.toml` found."
-        )
-
-    jobs = int(jobs) if jobs else None
     configure_logger(debug)
     try:
-        asyncio.run(main(program, targets, force_run, jobs))
+        asyncio.run(main(program, list(targets), force_run, jobs))
     except UserError as e:
         log.error(f"Failed: {e}")
 
 
 def cli():
-    parser = ArgumentParser(formatter_class=RichHelpFormatter)
-    argh.set_default_command(parser, brei)
-    argh.dispatch(parser)
+    brei()
 
 
 if __name__ == "__main__":
