@@ -6,7 +6,7 @@ import textwrap
 import tomllib
 from typing import Optional, Any
 import asyncio
-import click
+import rich_click as click
 from rich.console import Console
 from rich.table import Table
 
