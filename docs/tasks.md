@@ -27,7 +27,7 @@ import re
 import string
 import json
 from tempfile import NamedTemporaryFile
-from typing import Any, DefaultDict, Optional, TextIO
+from typing import Any, DefaultDict, Optional
 from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
@@ -167,16 +167,45 @@ class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
                 path.unlink(missing_ok=True)
 
     @contextmanager
+    def get_stdin(self, db: TaskDB):
+        """Yields the `stdin` argument for the subprocess, and the data to
+        send to it."""
+        match self.stdin:
+            case Variable(x):
+                yield asyncio.subprocess.PIPE, db.environment[x].encode()
+            case x if isinstance(x, Path):
+                with open(x, "r") as stdin:
+                    yield stdin, None
+            case _:
+                yield None, None
+
+    @contextmanager
     def get_stdout(self):
         match self.stdout:
             case Variable(x):
                 yield asyncio.subprocess.PIPE
             case x if isinstance(x, Path):
-                stdout = open(x, "w")
-                yield stdout
-                stdout.close()
+                with open(x, "w") as stdout:
+                    yield stdout
             case _:
                 yield None
+
+    @contextmanager
+    def get_commands(self, db: TaskDB):
+        """Yields the list of commands to run. Without a runner, each line
+        of the script is a command; with a runner, the script is written to a
+        file (if needed) and passed to the runner."""
+        if self.runner is None:
+            assert self.script is not None
+            if not is_oneliner(self.script):
+                assert self.stdin is None
+            yield [shlex.split(line) for line in self.script.splitlines()]
+            return
+
+        runner = db.runners[self.runner]
+        with self.get_script_path() as path:
+            args = [string.Template(arg).substitute(script=path) for arg in runner.args]
+            yield [[runner.command, *args]]
 
     def check_return_code(self, returncode: int | None, db: TaskDB):
         """A failing command fails the task. Its targets may be written
@@ -187,6 +216,23 @@ class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
             db.history.pop(p, None)
         raise TaskFailure(f"Command failed with exit code {returncode}.")
 
+    async def _exec(self, db: TaskDB, short_note: str, command: list[str],
+                    stdin, input_data: bytes | None, stdout) -> bytes:
+        """Run a single command, returning its standard output if it was captured."""
+        async with db.throttle or nullcontext():
+            proc = await create_subprocess_exec(
+                *command,
+                stdin=stdin,
+                stdout=stdout,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout_data, stderr_data = await proc.communicate(input_data)
+            log.debug(f"return-code {proc.returncode}")
+        if stderr_data:
+            log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
+        self.check_return_code(proc.returncode, db)
+        return stdout_data or b""
+
     async def run(self, *, db: TaskDB):
         if not self.always_run() and not self.needs_run(db) and not db.force_run:
             tgts = " ".join(f"`{t}`" for t in self.target_paths)
@@ -194,7 +240,7 @@ class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
             return
 
         log.debug(f"{self}")
-        if (self.path is None and self.script is None):
+        if self.runner is None and self.script is None:
             return
 
         targets = " ".join(f"`{t}`" for t in self.creates)
@@ -202,62 +248,12 @@ class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
             or f"creating {targets}"
         log.info(f"[green]{short_note}[/]", extra={'markup': True})
 
-        stdin: TextIO | int | None = None
-        match self.stdin:
-            case Variable(x):
-                stdin = asyncio.subprocess.PIPE
-                input_data = db.environment[x].encode()
-            case x if isinstance(x, Path):
-                stdin = open(x, "r")
-                input_data = None
-            case _:
-                stdin = None
-                input_data = None
-
-        if self.runner is None and self.script is not None:
-            if not is_oneliner(self.script):
-                assert self.stdin is None
-
-
-            with self.get_stdout() as stdout:
-                stdout_data = b""
-                for line in self.script.splitlines():
-                    async with db.throttle or nullcontext():
-                        proc = await create_subprocess_exec(
-                            *shlex.split(line),
-                            stdin=stdin,
-                            stdout=stdout,
-                            stderr=asyncio.subprocess.PIPE,
-                        )
-                        stdout_data_part, stderr_data = await proc.communicate(input_data)
-                        log.debug(f"return-code {proc.returncode}")
-                    if stdout_data_part:
-                        stdout_data += stdout_data_part
-                    if stderr_data:
-                        log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
-                    self.check_return_code(proc.returncode, db)
-
-        elif self.runner is not None:
-            with self.get_script_path() as path, self.get_stdout() as stdout:
-                runner = db.runners[self.runner]
-                args = [string.Template(arg).substitute(script=path) for arg in runner.args]
-                async with db.throttle or nullcontext():
-                    proc = await create_subprocess_exec(
-                        runner.command,
-                        *args,
-                        stdin=stdin,
-                        stdout=stdout,
-                        stderr=asyncio.subprocess.PIPE,
-                    )
-                    stdout_data, stderr_data = await proc.communicate(input_data)
-                    log.debug(f"return-code {proc.returncode}")
-
-            if stderr_data:
-                log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
-            self.check_return_code(proc.returncode, db)
-
-        else:
-            return
+        stdout_data = b""
+        with self.get_commands(db) as commands, \
+                self.get_stdin(db) as (stdin, input_data), \
+                self.get_stdout() as stdout:
+            for command in commands:
+                stdout_data += await self._exec(db, short_note, command, stdin, input_data, stdout)
 
         for p in self.target_paths:
             db.history[p] = self.digest
@@ -266,7 +262,7 @@ class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
             raise TaskFailure("Task didn't achieve goals.")
 
         if self.list_output:
-            return [line for line in stdout_data.decode().splitlines() if line] if stdout_data else []
+            return [line for line in stdout_data.decode().splitlines() if line]
         return stdout_data.decode().strip() if stdout_data else None
 
 
