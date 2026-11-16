@@ -29,5 +29,7 @@ jobs:
       run: uv sync
     - name: Lint with MyPy
       run: uv run mypy
+    - name: Lint with Pyright
+      run: uv run pyright brei
     - name: Test with pytest
       run: uv run pytest
