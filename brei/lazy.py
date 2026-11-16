@@ -1,15 +1,12 @@
 # ~/~ begin <<docs/lazy.md#brei/lazy.py>>[init]
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Generic, Optional, TypeVar, Any
+from typing import Optional, Any
 import asyncio
 
 from .errors import CyclicWorkflowError
 from .logging import logger
 from .result import Failure, Result, Ok, DependencyFailure, MissingFailure
-
-T = TypeVar("T")
-R = TypeVar("R")
 
 log = logger()
 
@@ -32,7 +29,7 @@ class Phony:
 
 
 @dataclass
-class Lazy(Generic[T, R]):
+class Lazy[T, R]:
     """Base class for tasks that are tagged with type `T` (usually `str` or
     `Path`) and representing values of type `R`.
 
@@ -76,15 +73,12 @@ class Lazy(Generic[T, R]):
         self._awaiting = []
 
 
-TaskT = TypeVar("TaskT", bound=Lazy)
-
-
 class MissingDependency(Exception):
     pass
 
 
 @dataclass
-class LazyDB(Generic[T, TaskT]):
+class LazyDB[T, TaskT: Lazy]:
     """Collect tasks and coordinate running a task from a task identifier."""
 
     tasks: list[TaskT] = field(default_factory=list)

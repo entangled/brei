@@ -37,7 +37,7 @@ We can trace these variable substitutions using the same lazy evaluation strateg
 ``` {.python file=brei/template_strings.py}
 from dataclasses import dataclass, is_dataclass, fields
 from string import Template
-from typing import Any, Generic, Mapping, TypeVar
+from typing import Any, Mapping
 from functools import singledispatch
 
 from msgspec import Struct, structs
@@ -46,10 +46,7 @@ from msgspec import Struct, structs
 from .lazy import Lazy
 
 
-T = TypeVar("T")
-
-
-def substitute(template: T, env: Mapping[str, str]) -> T:
+def substitute[T](template: T, env: Mapping[str, str]) -> T:
     return _substitute(template, env)
 
 

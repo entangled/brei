@@ -5,7 +5,7 @@ description = "A minimal build system."
 authors = [{ name = "Johan Hidding", email = "j.hidding@esciencecenter.nl" }]
 license = "Apache-2.0"
 readme = "README.md"
-requires-python = ">=3.11,<4"
+requires-python = ">=3.12,<4"
 dependencies = [
     "click>=8.3.0,<9",
     "rich>=15.0.0,<16",

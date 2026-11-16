@@ -1,10 +1,5 @@
 # ~/~ begin <<docs/lazy.md#brei/result.py>>[init]
-from typing import TypeVar, Generic
 from dataclasses import dataclass
-
-
-T = TypeVar("T")
-R = TypeVar("R")
 
 
 class Failure(Exception):
@@ -13,7 +8,7 @@ class Failure(Exception):
 
 
 @dataclass
-class MissingFailure(Failure, Generic[T]):
+class MissingFailure[T](Failure):
     target: T
 
     def __str__(self):
@@ -29,19 +24,19 @@ class TaskFailure(Failure):
 
 
 @dataclass
-class DependencyFailure(Failure, Generic[T]):
+class DependencyFailure[T](Failure):
     dependencies: dict[T, Failure]
 
     def __str__(self):
         return "\n".join(f"{key} -> {fail}" for key, fail in self.dependencies.items())
 
 @dataclass
-class Ok(Generic[R]):
+class Ok[R]:
     value: R
 
     def __bool__(self):
         return True
 
 
-Result = Failure | Ok[R]
+type Result[R] = Failure | Ok[R]
 # ~/~ end

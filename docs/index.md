@@ -11,7 +11,7 @@ script = "echo 'Hello, World!'"
 - No new syntax: programmable workflows in TOML or JSON files.
 - Efficient: Runs tasks lazily and in parallel.
 - Feature complete: Supports templates, variables, includes and configurable runners.
-- Few dependencies: Only needs Python &ge;3.11.
+- Few dependencies: Only needs Python &ge;3.12.
 - Small codebase: Brei is around 1000 lines of Python.
 
 ```bash

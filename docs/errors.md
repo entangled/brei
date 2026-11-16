@@ -1,6 +1,5 @@
 ``` {.python file=brei/errors.py}
 from dataclasses import dataclass
-from typing import Any, Generic, TypeVar
 
 
 class UserError(Exception):
@@ -8,10 +7,8 @@ class UserError(Exception):
         return "Unknown user error."
 
 
-T = TypeVar("T")
-
 @dataclass
-class CyclicWorkflowError(UserError, Generic[T]):
+class CyclicWorkflowError[T](UserError):
     cycle: list[T]
 
     def __str__(self):

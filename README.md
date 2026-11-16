@@ -7,7 +7,7 @@
 Minimal workflow system and alternative to Make.
 
 - Read from TOML or JSON (also `pyproject.toml` in `[tool.brei]` section)
-- Only Python &ge; 3.11 required
+- Only Python &ge; 3.12 required
 - Runs task lazily and in parallel
 - Supports variables, templates, includes and custom runners
 
