@@ -1,9 +1,8 @@
 # ~/~ begin <<docs/tasks.md#brei/runner.py>>[init]
-from dataclasses import dataclass
+from msgspec import Struct
 
 
-@dataclass
-class Runner:
+class Runner(Struct, forbid_unknown_fields=True):
     command: str
     args: list[str]
 

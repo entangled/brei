@@ -1,11 +1,10 @@
 # Tasks
 
 ``` {.python file=brei/runner.py}
-from dataclasses import dataclass
+from msgspec import Struct
 
 
-@dataclass
-class Runner:
+class Runner(Struct, forbid_unknown_fields=True):
     command: str
     args: list[str]
 
@@ -41,6 +40,8 @@ from .utility import stat
 from .logging import logger
 from .template_strings import gather_args, substitute
 from .runner import Runner, DEFAULT_RUNNERS
+
+from msgspec import Struct, field as struct_field
 
 
 log = logger()
@@ -269,15 +270,14 @@ class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
         return stdout_data.decode().strip() if stdout_data else None
 
 
-@dataclass
-class TaskProxy:
+class TaskProxy(Struct, forbid_unknown_fields=True):
     """Input to create an actual Task.
 
     An actual `Task` has no template variables remaining and untyped strings
     are replaced with `Path` `Variable` or `Phony` objects.
     """
-    creates: list[str] = field(default_factory=list)
-    requires: list[str] = field(default_factory=list)
+    creates: list[str] = struct_field(default_factory=list)
+    requires: list[str] = struct_field(default_factory=list)
     name: Optional[str] = None
     runner: Optional[str] = None
     path: Optional[str] = None

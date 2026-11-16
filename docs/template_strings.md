@@ -40,6 +40,8 @@ from string import Template
 from typing import Any, Generic, Mapping, TypeVar, cast
 from functools import singledispatch
 
+from msgspec import Struct, structs
+
 
 from .lazy import Lazy
 
@@ -48,7 +50,7 @@ T = TypeVar("T")
 
 
 @singledispatch
-def substitute(template, env: Mapping[str, str]):
+def substitute(template: T, env: Mapping[str, str]) -> T:
     dtype = type(template)
     if is_dataclass(dtype):
         args = {
@@ -56,7 +58,12 @@ def substitute(template, env: Mapping[str, str]):
             for f in fields(dtype)
             if f.name[0] != "_"
         }
-        return dtype(**args)
+        return cast(T, dtype(**args))
+    if isinstance(template, Struct):
+        return cast(T, structs.replace(template, **{
+            f: substitute(getattr(template, f), env)
+            for f in template.__struct_fields__
+        }))
 
     return template
     # raise TypeError(f"Can't perform string substitution on object of type: {dtype}")
@@ -86,6 +93,11 @@ def gather_args(template: Any) -> set[str]:
             if f.name[0] != "_"
         )
         return set().union(*args)
+    if isinstance(template, Struct):
+        return set().union(*(
+            gather_args(getattr(template, f))
+            for f in template.__struct_fields__
+        ))
 
     return set()
     # raise TypeError(f"Can't perform string substitution on object of type: {dtype}")

@@ -3,12 +3,14 @@ from __future__ import annotations
 import asyncio
 from copy import copy
 from itertools import chain, product, repeat
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass
 from enum import Enum
 import json
 from pathlib import Path
 
 import tomllib
+from msgspec import Struct, field
+from msgspec.structs import replace
 
 
 from .template_strings import gather_args
@@ -48,12 +50,11 @@ class MissingTemplate(UserError):
 
 
 class Join(Enum):
-    INNER = 1
-    OUTER = 2
+    INNER = "inner"
+    OUTER = "outer"
 
 
-@dataclass
-class TemplateCall:
+class TemplateCall(Struct, forbid_unknown_fields=True):
     """Calls a template with a set of arguments.
 
     Members:
@@ -97,8 +98,7 @@ class TemplateCall:
                 yield dict(zip(self.args.keys(), v))
 
 
-@dataclass
-class Program:
+class Program(Struct, forbid_unknown_fields=True):
     """A Brei program.
 
     Members:

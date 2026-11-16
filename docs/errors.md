@@ -29,10 +29,10 @@ class HelpfulUserError(UserError):
 @dataclass
 class InputError(UserError):
     expected: str
-    got: Any
+    msg: str
 
     def __str__(self):
-        return f"Expected {self.expected}, got: {self.got}"
+        return f"Invalid input for `{self.expected}`: {self.msg}"
 
 
 @dataclass

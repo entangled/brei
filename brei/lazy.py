@@ -6,7 +6,6 @@ from typing import Generic, Iterable, Optional, Self, TypeVar, cast, Any
 import asyncio
 
 from .errors import CyclicWorkflowError, HelpfulUserError
-from .utility import FromStr
 from .logging import logger
 from .result import Failure, Result, Ok, DependencyFailure, TaskFailure, MissingFailure
 
@@ -17,7 +16,7 @@ log = logger()
 
 
 @dataclass
-class Phony(FromStr):
+class Phony:
     name: str
 
     @classmethod

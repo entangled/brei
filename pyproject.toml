@@ -10,6 +10,7 @@ dependencies = [
     "click>=8.3.0,<9",
     "rich>=15.0.0,<16",
     "rich-click>=1.9.4,<2",
+    "msgspec>=0.20.0",
 ]
 
 [project.scripts]
@@ -26,6 +27,7 @@ dev = [
     "coverage>=7.3.2",
     "pyright>=1.1.333",
     "pdoc>=14.1.0",
+    "entangled-cli>=2.0.0b4",
 ]
 
 [build-system]

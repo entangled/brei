@@ -12,8 +12,8 @@ If you want to read the `Program` yourself, there are several ways to do so:
 section, this last bit giving a object path into the data. For instance:
 `Program.read(Path("pyproject.toml"), "tool.brei")`.
 2. Read your own data format into JSON compatible data, then
-`construct(Program, data)`. The `construct` function uses the type annotations
-in dataclasses to validate the input data.
+`construct(Program, data)`. The `construct` function uses `msgspec` to validate
+the input data against the type annotations of the program's classes.
 
 After reading the data, you'll want to resolve all tasks, i.e. perform includes
 and run any necessary task to resolve the targets of all other tasks.

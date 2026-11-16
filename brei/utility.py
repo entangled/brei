@@ -8,7 +8,7 @@ from datetime import datetime
 
 import os
 
-from .construct import construct, FromStr, read_from_file 
+from .construct import construct, read_from_file
 
 
 def normal_relative(path: Path) -> Path:

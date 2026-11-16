@@ -11,7 +11,7 @@ from rich.console import Console
 from rich.table import Table
 
 from .runner import DEFAULT_RUNNERS
-from .errors import HelpfulUserError, UserError
+from .errors import HelpfulUserError, InputError, UserError
 from .lazy import Phony
 from .utility import construct, read_from_file
 from .program import Program, resolve_tasks
@@ -119,7 +119,7 @@ def brei(
 
     try:
         program = read_program(input_file)
-    except HelpfulUserError as e:
+    except (HelpfulUserError, InputError) as e:
         raise click.ClickException(str(e)) from e
 
     configure_logger(debug)
