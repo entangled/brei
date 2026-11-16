@@ -425,11 +425,4 @@ class Environment:
             raise HelpfulUserError(
                 f"`{k}` is a list variable, it can only be used as `splice({k})`.")
         return value
-
-
-class Template(TaskProxy):
-    """A `Template` can receive the same arguments as a TaskProxy. The difference is
-    that any template variables in the Template can be substituted with a `TemplateCall`."""
-    def call(self, args: dict[str, Any]) -> TaskProxy:
-        return substitute(self, args)
 # ~/~ end

@@ -52,7 +52,7 @@ There are three kinds of targets: `pathlib.Path`, `Phony` and `Variable`.
 from .program import Program, resolve_tasks, TemplateCall
 from .construct import construct
 from .lazy import Lazy, LazyDB
-from .task import Task, TaskDB, Phony, Variable, TaskProxy, Template
+from .task import Task, TaskDB, Phony, Variable, TaskProxy
 from .runner import Runner
 from .cli import brei
 
@@ -60,7 +60,7 @@ __all__ = [
     "brei",
 
     "Lazy", "LazyDB", "Phony", "Program", "Runner", "Task", "TaskDB",
-    "TaskProxy", "Template", "TemplateCall", "Variable", "construct",
+    "TaskProxy", "TemplateCall", "Variable", "construct",
     "resolve_tasks",
 ]
 ```

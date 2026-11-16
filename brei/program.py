@@ -13,7 +13,7 @@ from msgspec import Struct, field
 from msgspec.structs import replace
 
 
-from .template_strings import gather_args
+from .template_strings import gather_args, substitute
 from .logging import logger
 from .errors import HelpfulUserError, UserError
 
@@ -22,7 +22,6 @@ from .task import (
     splice_name,
     Variable,
     TaskDB,
-    Template,
     Runner,
     TaskProxy,
     TemplateTask,
@@ -105,14 +104,15 @@ class Program(Struct, forbid_unknown_fields=True):
 
       - task: list of tasks.
       - environment: variables.
-      - template: set of templates.
+      - template: set of templates; these are tasks with template variables
+        that are substituted by a `TemplateCall`.
       - call: list of calls to templates.
       - include: list of includes.
       - runner: extra configured task runners.
     """
     task: list[TaskProxy] = field(default_factory=list)
     environment: dict[str, str] = field(default_factory=dict)
-    template: dict[str, Template] = field(default_factory=dict)
+    template: dict[str, TaskProxy] = field(default_factory=dict)
     call: list[TemplateCall] = field(default_factory=list)
     include: list[str] = field(default_factory=list)
     runner: dict[str, Runner] = field(default_factory=dict)
@@ -145,8 +145,8 @@ async def expand_splices(db: TaskDB, call: TemplateCall) -> TemplateCall:
     return replace(call, args={k: expand(v) for k, v in call.args.items()})
 
 
-def tasks_from_call(template: Template, call: TemplateCall) -> list[TaskProxy]:
-    tasks = [template.call(args) for args in call.all_args]
+def tasks_from_call(template: TaskProxy, call: TemplateCall) -> list[TaskProxy]:
+    tasks = [substitute(template, args) for args in call.all_args]
     if call.collect:
         targets = list(chain.from_iterable(t.all_targets for t in tasks))
         collection = TaskProxy([], targets, name=call.collect)
