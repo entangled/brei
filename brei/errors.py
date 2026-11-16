@@ -4,7 +4,7 @@ from typing import Any, Generic, TypeVar
 
 
 class UserError(Exception):
-    def __str__(self):
+    def __str__(self) -> str:
         return "Unknown user error."
 
 

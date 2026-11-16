@@ -14,7 +14,7 @@ class PyFunc(Lazy[str, Any]):
         self.db = db
         self.foo = foo
 
-    async def run(self):
+    async def run(self, *, db):
         args = [self.db.index[t].result for t in self.requires]
         return self.foo(*args)
 
@@ -28,7 +28,7 @@ class PyLiteral(Lazy[str, Any]):
         super().__init__([tgt], [])
         self.value = value
 
-    async def run(self):
+    async def run(self, *, db):
         return self.value
 
 

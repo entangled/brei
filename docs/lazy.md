@@ -208,7 +208,7 @@ class LazyDB(Generic[T, TaskT]):
                 case _:
                     return result
 
-    def on_missing(self, _: T) -> TaskT:
+    def on_missing(self, t: T) -> TaskT:
         raise MissingDependency()
 
     def add(self, task: TaskT):
