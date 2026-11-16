@@ -37,7 +37,7 @@ We can trace these variable substitutions using the same lazy evaluation strateg
 ``` {.python file=brei/template_strings.py}
 from dataclasses import dataclass, is_dataclass, fields
 from string import Template
-from typing import Any, Generic, Mapping, TypeVar, cast
+from typing import Any, Generic, Mapping, TypeVar
 from functools import singledispatch
 
 from msgspec import Struct, structs
@@ -49,58 +49,49 @@ from .lazy import Lazy
 T = TypeVar("T")
 
 
-@singledispatch
 def substitute(template: T, env: Mapping[str, str]) -> T:
-    dtype = type(template)
-    if is_dataclass(dtype):
-        args = {
-            f.name: substitute(getattr(template, f.name), env)
-            for f in fields(dtype)
-            if f.name[0] != "_"
-        }
-        return cast(T, dtype(**args))
-    if isinstance(template, Struct):
-        return cast(T, structs.replace(template, **{
-            f: substitute(getattr(template, f), env)
-            for f in template.__struct_fields__
-        }))
-
-    return template
-    # raise TypeError(f"Can't perform string substitution on object of type: {dtype}")
+    return _substitute(template, env)
 
 
-@substitute.register
+def _fields(obj: Any) -> list[str] | None:
+    """Names of the fields to recurse into, or None if `obj` is a leaf."""
+    if is_dataclass(obj) and not isinstance(obj, type):
+        return [f.name for f in fields(obj) if f.name[0] != "_"]
+    if isinstance(obj, Struct):
+        return list(obj.__struct_fields__)
+    return None
+
+
+def _rebuild(obj: Any, values: dict[str, Any]) -> Any:
+    if isinstance(obj, Struct):
+        return structs.replace(obj, **values)
+    return type(obj)(**values)
+
+
+@singledispatch
+def _substitute(template: Any, env: Mapping[str, str]) -> Any:
+    names = _fields(template)
+    if names is None:
+        return template
+    return _rebuild(template, {n: substitute(getattr(template, n), env) for n in names})
+
+
+@_substitute.register
 def _(template: str, env: Mapping[str, str]) -> str:
     return Template(template).safe_substitute(env)
 
 
-@substitute.register
+@_substitute.register
 def _(template: list, env: Mapping[str, str]) -> list:
     return [substitute(x, env) for x in template]
-
-@substitute.register
-def _(_template: None, _) -> None:
-    return None
 
 
 @singledispatch
 def gather_args(template: Any) -> set[str]:
-    dtype = type(template)
-    if is_dataclass(dtype):
-        args = (
-            gather_args(getattr(template, f.name))
-            for f in fields(dtype)
-            if f.name[0] != "_"
-        )
-        return set().union(*args)
-    if isinstance(template, Struct):
-        return set().union(*(
-            gather_args(getattr(template, f))
-            for f in template.__struct_fields__
-        ))
-
-    return set()
-    # raise TypeError(f"Can't perform string substitution on object of type: {dtype}")
+    names = _fields(template)
+    if names is None:
+        return set()
+    return set().union(*(gather_args(getattr(template, n)) for n in names))
 
 
 @gather_args.register
@@ -111,11 +102,6 @@ def _(template: str) -> set[str]:
 @gather_args.register
 def _(template: list) -> set[str]:
     return set().union(*map(gather_args, template))
-
-
-@gather_args.register
-def _(_template: None) -> set[str]:
-    return set()
 ```
 
 ``` {.python file=test/test_template_strings.py}
