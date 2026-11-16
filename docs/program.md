@@ -3,12 +3,14 @@
 ``` {.python file=brei/program.py}
 from __future__ import annotations
 import asyncio
+from collections.abc import Iterator
 from copy import copy
 from itertools import chain, product, repeat
 from dataclasses import dataclass
 from enum import Enum
 import json
 from pathlib import Path
+from typing import cast
 
 import tomllib
 from msgspec import Struct, field
@@ -71,9 +73,9 @@ class TemplateCall(Struct, forbid_unknown_fields=True):
     join: Join = Join.INNER
 
     @property
-    def all_args(self):
+    def all_args(self) -> Iterator[dict[str, str]]:
         if all(isinstance(v, str) for v in self.args.values()):
-            yield self.args
+            yield cast(dict[str, str], self.args)
             return
 
         if self.join == Join.INNER:

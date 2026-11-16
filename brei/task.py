@@ -2,6 +2,7 @@
 from __future__ import annotations
 import asyncio
 from collections import defaultdict
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager, nullcontext
 from copy import copy
 from dataclasses import dataclass, field
@@ -435,17 +436,20 @@ class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVaria
         return result
 
 
-class Environment:
+class Environment(Mapping[str, str]):
     def __init__(self, db):
         self.db = db
 
-    def __contains__(self, k: str):
-        return Variable(k) in self.db.index
+    def __contains__(self, k: object):
+        return isinstance(k, str) and Variable(k) in self.db.index
 
-    def items(self):
+    def __iter__(self) -> Iterator[str]:
         return (k.name for k in self.db.index if isinstance(k, Variable))
 
-    def __getitem__(self, k: str):
+    def __len__(self) -> int:
+        return sum(1 for _ in self)
+
+    def __getitem__(self, k: str) -> str:
         value = self.db.index[Variable(k)].result
         if isinstance(value, list):
             raise HelpfulUserError(
