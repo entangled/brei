@@ -116,3 +116,22 @@ async def atest_cycles():
     with pytest.raises(CyclicWorkflowError):
         await z.eval()
 
+
+
+class Noop(Lazy[str, None]):
+    async def run(self, *, db=None):
+        return None
+
+
+@pytest.mark.timeout(1)
+def test_cycle_from_two_branches():
+    """`all` starts `a` and `b` at the same time, and each waits for the other."""
+    async def run():
+        db = LazyDB()
+        db.add(Noop(["all"], ["a", "b"]))
+        db.add(Noop(["a"], ["b"]))
+        db.add(Noop(["b"], ["a"]))
+        with pytest.raises(CyclicWorkflowError):
+            await db.run("all")
+
+    asyncio.run(run())
