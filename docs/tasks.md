@@ -42,6 +42,7 @@ from .template_strings import gather_args, substitute
 from .runner import Runner, DEFAULT_RUNNERS
 
 from msgspec import Struct, field as struct_field
+from rich.markup import escape
 
 
 log = logger()
@@ -218,20 +219,45 @@ class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
 
     async def _exec(self, db: TaskDB, short_note: str, command: list[str],
                     stdin, input_data: bytes | None, stdout) -> bytes:
-        """Run a single command, returning its standard output if it was captured."""
+        """Run a single command, returning its standard output if it was captured.
+        Standard error, and standard output if it doesn't go to a file or
+        variable, is forwarded to the log line by line while the command runs."""
+        async def write_stdin():
+            if input_data is None or proc.stdin is None:
+                return
+            try:
+                proc.stdin.write(input_data)
+                await proc.stdin.drain()
+                proc.stdin.close()
+            except (BrokenPipeError, ConnectionResetError):
+                pass  # the command exited without reading all of its input
+
+        async def forward(stream: asyncio.StreamReader | None):
+            if stream is None:
+                return
+            async for line in stream:
+                log.info(f"[gold1]{short_note}[/] %s", escape(line.decode().rstrip()),
+                         extra={"markup": True})
+
+        async def read_stdout() -> bytes:
+            if stdout is asyncio.subprocess.PIPE and proc.stdout is not None:
+                return await proc.stdout.read()
+            await forward(proc.stdout)
+            return b""
+
         async with db.throttle or nullcontext():
             proc = await create_subprocess_exec(
                 *command,
                 stdin=stdin,
-                stdout=stdout,
+                stdout=asyncio.subprocess.PIPE if stdout is None else stdout,
                 stderr=asyncio.subprocess.PIPE,
             )
-            stdout_data, stderr_data = await proc.communicate(input_data)
+            stdout_data, *_ = await asyncio.gather(
+                read_stdout(), forward(proc.stderr), write_stdin())
+            await proc.wait()
             log.debug(f"return-code {proc.returncode}")
-        if stderr_data:
-            log.info(f"[gold1]{short_note}[/] %s", stderr_data.decode().rstrip(), extra={"markup": True})
         self.check_return_code(proc.returncode, db)
-        return stdout_data or b""
+        return stdout_data
 
     async def run(self, *, db: TaskDB):
         if not self.always_run() and not self.needs_run(db) and not db.force_run:
