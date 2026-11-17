@@ -26,7 +26,7 @@ dev = [
     "pytest-timeout>=2.2.0",
     "coverage>=7.3.2",
     "pyright>=1.1.333",
-    "pdoc>=14.1.0",
+    "pdoc>=16",
     "entangled-cli>=2.0.0b4",
 ]
 
