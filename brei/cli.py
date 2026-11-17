@@ -4,7 +4,7 @@ import re
 import sys
 import textwrap
 import tomllib
-from typing import Optional, Any
+from typing import Any
 import asyncio
 import rich_click as click
 from rich.console import Console
@@ -23,7 +23,7 @@ log = logger()
 
 
 async def main(
-    program: Program, target_strs: list[str], force_run: bool, throttle: Optional[int]
+    program: Program, target_strs: list[str], force_run: bool, throttle: int | None
 ):
     db = await resolve_tasks(program, history_path=Path(".brei_history"))
     if throttle:
@@ -41,7 +41,7 @@ async def main(
                 log.error(msg)
 
 
-def read_program(input_file: Optional[str]) -> Program:
+def read_program(input_file: str | None) -> Program:
     if input_file is not None:
         if m := re.match(r"([^\[\]]+)\[([^\[\]\s]+)\]", input_file):
             input_path = Path(m.group(1))
@@ -90,9 +90,9 @@ def read_program(input_file: Optional[str]) -> Program:
 def brei(
     targets: tuple[str, ...],
     *,
-    input_file: Optional[str] = None,
+    input_file: str | None = None,
     force_run: bool = False,
-    jobs: Optional[int] = None,
+    jobs: int | None = None,
     version: bool = False,
     list_runners: bool = False,
     debug: bool = False

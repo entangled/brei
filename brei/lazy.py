@@ -1,7 +1,7 @@
 # ~/~ begin <<docs/lazy.md#brei/lazy.py>>[init]
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Optional, Any
+from typing import Any
 import asyncio
 
 from .errors import CyclicWorkflowError
@@ -50,7 +50,7 @@ class Lazy[T, R]:
     creates: list[T]
     requires: list[T]
 
-    _future: Optional[asyncio.Future[R]] = field(default=None, init=False)
+    _future: asyncio.Future[R] | None = field(default=None, init=False)
     _awaiting: list[Lazy] = field(default_factory=list, init=False)
 
     def __bool__(self):

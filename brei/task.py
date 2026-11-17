@@ -11,7 +11,7 @@ import re
 import string
 import json
 from tempfile import NamedTemporaryFile
-from typing import Any, DefaultDict, Optional
+from typing import Any, DefaultDict
 from asyncio import create_subprocess_exec
 from textwrap import indent
 import shlex
@@ -71,13 +71,13 @@ def is_oneliner(s: str) -> bool:
 
 @dataclass
 class Task(Lazy[Path | Phony | Variable, str | list[str] | None]):
-    name: Optional[str] = None
-    runner: Optional[str] = None
-    path: Optional[Path] = None
-    script: Optional[str] = None
-    stdin: Optional[Path | Variable] = None
-    stdout: Optional[Path | Variable] = None
-    description: Optional[str] = None
+    name: str | None = None
+    runner: str | None = None
+    path: Path | None = None
+    script: str | None = None
+    stdin: Path | Variable | None = None
+    stdout: Path | Variable | None = None
+    description: str | None = None
     force: bool = False
     list_output: bool = False
 
@@ -284,13 +284,13 @@ class TaskProxy(Struct, forbid_unknown_fields=True):
     """
     creates: list[str] = struct_field(default_factory=list)
     requires: list[str] = struct_field(default_factory=list)
-    name: Optional[str] = None
-    runner: Optional[str] = None
-    path: Optional[str] = None
-    script: Optional[str] = None
-    stdin: Optional[str] = None
-    stdout: Optional[str] = None
-    description: Optional[str] = None
+    name: str | None = None
+    runner: str | None = None
+    path: str | None = None
+    script: str | None = None
+    stdin: str | None = None
+    stdout: str | None = None
+    description: str | None = None
     force: bool = False
 
     @property
@@ -370,7 +370,7 @@ def check_list_syntax(proxy: TaskProxy):
 @dataclass
 class TaskDB(LazyDB[Path | Variable | Phony, Task | TemplateTask | TemplateVariable]):
     runners: dict[str, Runner] = field(default_factory=lambda: copy(DEFAULT_RUNNERS))
-    throttle: Optional[asyncio.Semaphore] = None
+    throttle: asyncio.Semaphore | None = None
     force_run: bool = False
     history_path: Path | None = None
     history: dict[Path, str | None] = field(default_factory=dict)

@@ -1,5 +1,5 @@
 # ~/~ begin <<docs/utility.md#brei/construct.py>>[init]
-from typing import Any, Optional
+from typing import Any
 
 import tomllib
 import json
@@ -20,7 +20,7 @@ def construct[T](annot: type[T], data: Any) -> T:
         raise InputError(annot.__name__, str(e)) from e
 
 
-def read_from_file[T](data_type: type[T], path: Path, section: Optional[str] = None) -> T:
+def read_from_file[T](data_type: type[T], path: Path, section: str | None = None) -> T:
     """Read a config from given `path` in given `section`. The path should refer to
     a TOML or JSON file that should decode to a `Config` object. If `section` is given, only
     that section is decoded to a `Config` object. The `section` string may contain

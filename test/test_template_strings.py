@@ -1,6 +1,6 @@
 # ~/~ begin <<docs/template_strings.md#test/test_template_strings.py>>[init]
 from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Iterable
 import pytest
 from brei.task import TemplateVariable, Variable
 from brei.template_strings import gather_args, substitute
@@ -40,7 +40,7 @@ async def test_template_string():
 class MyData:
     some_list: list[str]
     some_prop: str
-    some_none: Optional[str] = None
+    some_none: str | None = None
 
 
 def test_template_dtype():
